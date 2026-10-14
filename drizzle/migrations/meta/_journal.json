@@ -15,6 +15,13 @@
       "when": 1792013034377,
       "tag": "0001_owner_admin_on_signup",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792013501625,
+      "tag": "0002_applicant_and_client_areas",
+      "breakpoints": true
     }
   ]
 }

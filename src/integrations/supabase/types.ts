@@ -14,12 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
+      applicant_profiles: {
+        Row: {
+          created_at: string
+          cv_path: string | null
+          hourly_rate: number
+          id: string
+          owner_id: string
+          role_title: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cv_path?: string | null
+          hourly_rate: number
+          id?: string
+          owner_id?: string
+          role_title: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cv_path?: string | null
+          hourly_rate?: number
+          id?: string
+          owner_id?: string
+          role_title?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applicant_profiles_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_posts: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          owner_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          owner_id?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          owner_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_posts_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
           email: string
           id: string
           name: string
+          phone: string | null
           updated_at: string
         }
         Insert: {
@@ -27,6 +107,7 @@ export type Database = {
           email: string
           id: string
           name?: string
+          phone?: string | null
           updated_at?: string
         }
         Update: {
@@ -34,6 +115,7 @@ export type Database = {
           email?: string
           id?: string
           name?: string
+          phone?: string | null
           updated_at?: string
         }
         Relationships: []
