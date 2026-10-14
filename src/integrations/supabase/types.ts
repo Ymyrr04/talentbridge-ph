@@ -16,36 +16,57 @@ export type Database = {
     Tables: {
       applicant_profiles: {
         Row: {
+          availability: string | null
           created_at: string
           cv_original_filename: string | null
           cv_path: string | null
+          english_level: string | null
+          experience_level: string | null
           hourly_rate: number
+          hours_per_week: number | null
           id: string
           owner_id: string
           role_title: string
+          skills: string[] | null
           status: string
+          summary: string | null
+          time_zones: string[] | null
           updated_at: string
         }
         Insert: {
+          availability?: string | null
           created_at?: string
           cv_original_filename?: string | null
           cv_path?: string | null
+          english_level?: string | null
+          experience_level?: string | null
           hourly_rate: number
+          hours_per_week?: number | null
           id?: string
           owner_id?: string
           role_title: string
+          skills?: string[] | null
           status?: string
+          summary?: string | null
+          time_zones?: string[] | null
           updated_at?: string
         }
         Update: {
+          availability?: string | null
           created_at?: string
           cv_original_filename?: string | null
           cv_path?: string | null
+          english_level?: string | null
+          experience_level?: string | null
           hourly_rate?: number
+          hours_per_week?: number | null
           id?: string
           owner_id?: string
           role_title?: string
+          skills?: string[] | null
           status?: string
+          summary?: string | null
+          time_zones?: string[] | null
           updated_at?: string
         }
         Relationships: [
