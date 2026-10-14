@@ -11,18 +11,25 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApplicantRouteRouteImport } from './routes/applicant/route'
+import { Route as ClientRouteRouteImport } from './routes/client/route'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as ApplicantDashboardRouteImport } from './routes/applicant/dashboard'
 import { Route as ApplicantSettingsRouteImport } from './routes/applicant/settings'
+import { Route as ClientBrowseRouteImport } from './routes/client/browse'
 import { Route as ClientDashboardRouteImport } from './routes/client/dashboard'
+import { Route as ClientPricingRouteImport } from './routes/client/pricing'
+import { Route as ClientSettingsRouteImport } from './routes/client/settings'
 import { Route as SignupApplicantRouteImport } from './routes/signup/applicant'
 import { Route as SignupClientRouteImport } from './routes/signup/client'
 import { Route as ApplicantProfilesIndexRouteImport } from './routes/applicant/profiles/index'
 import { Route as ApplicantProfilesNewRouteImport } from './routes/applicant/profiles/new'
+import { Route as ClientJobsIndexRouteImport } from './routes/client/jobs/index'
+import { Route as ClientJobsNewRouteImport } from './routes/client/jobs/new'
 import { Route as ApplicantProfilesIdEditRouteImport } from './routes/applicant/profiles/$id/edit'
+import { Route as ClientJobsIdEditRouteImport } from './routes/client/jobs/$id/edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -32,6 +39,11 @@ const IndexRoute = IndexRouteImport.update({
 const ApplicantRouteRoute = ApplicantRouteRouteImport.update({
   id: '/applicant',
   path: '/applicant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientRouteRoute = ClientRouteRouteImport.update({
+  id: '/client',
+  path: '/client',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -64,10 +76,25 @@ const ApplicantSettingsRoute = ApplicantSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => ApplicantRouteRoute,
 } as any)
+const ClientBrowseRoute = ClientBrowseRouteImport.update({
+  id: '/browse',
+  path: '/browse',
+  getParentRoute: () => ClientRouteRoute,
+} as any)
 const ClientDashboardRoute = ClientDashboardRouteImport.update({
-  id: '/client/dashboard',
-  path: '/client/dashboard',
-  getParentRoute: () => rootRouteImport,
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => ClientRouteRoute,
+} as any)
+const ClientPricingRoute = ClientPricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => ClientRouteRoute,
+} as any)
+const ClientSettingsRoute = ClientSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => ClientRouteRoute,
 } as any)
 const SignupApplicantRoute = SignupApplicantRouteImport.update({
   id: '/signup/applicant',
@@ -89,120 +116,177 @@ const ApplicantProfilesNewRoute = ApplicantProfilesNewRouteImport.update({
   path: '/profiles/new',
   getParentRoute: () => ApplicantRouteRoute,
 } as any)
+const ClientJobsIndexRoute = ClientJobsIndexRouteImport.update({
+  id: '/jobs/',
+  path: '/jobs/',
+  getParentRoute: () => ClientRouteRoute,
+} as any)
+const ClientJobsNewRoute = ClientJobsNewRouteImport.update({
+  id: '/jobs/new',
+  path: '/jobs/new',
+  getParentRoute: () => ClientRouteRoute,
+} as any)
 const ApplicantProfilesIdEditRoute = ApplicantProfilesIdEditRouteImport.update({
   id: '/profiles/$id/edit',
   path: '/profiles/$id/edit',
   getParentRoute: () => ApplicantRouteRoute,
 } as any)
+const ClientJobsIdEditRoute = ClientJobsIdEditRouteImport.update({
+  id: '/jobs/$id/edit',
+  path: '/jobs/$id/edit',
+  getParentRoute: () => ClientRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/applicant': typeof ApplicantRouteRouteWithChildren
+  '/client': typeof ClientRouteRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
+  '/client/browse': typeof ClientBrowseRoute
   '/client/dashboard': typeof ClientDashboardRoute
+  '/client/pricing': typeof ClientPricingRoute
+  '/client/settings': typeof ClientSettingsRoute
   '/signup/applicant': typeof SignupApplicantRoute
   '/signup/client': typeof SignupClientRoute
   '/applicant/profiles/new': typeof ApplicantProfilesNewRoute
+  '/client/jobs/new': typeof ClientJobsNewRoute
   '/applicant/profiles/': typeof ApplicantProfilesIndexRoute
+  '/client/jobs/': typeof ClientJobsIndexRoute
   '/applicant/profiles/$id/edit': typeof ApplicantProfilesIdEditRoute
+  '/client/jobs/$id/edit': typeof ClientJobsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/applicant': typeof ApplicantRouteRouteWithChildren
+  '/client': typeof ClientRouteRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
+  '/client/browse': typeof ClientBrowseRoute
   '/client/dashboard': typeof ClientDashboardRoute
+  '/client/pricing': typeof ClientPricingRoute
+  '/client/settings': typeof ClientSettingsRoute
   '/signup/applicant': typeof SignupApplicantRoute
   '/signup/client': typeof SignupClientRoute
   '/applicant/profiles/new': typeof ApplicantProfilesNewRoute
+  '/client/jobs/new': typeof ClientJobsNewRoute
   '/applicant/profiles': typeof ApplicantProfilesIndexRoute
+  '/client/jobs': typeof ClientJobsIndexRoute
   '/applicant/profiles/$id/edit': typeof ApplicantProfilesIdEditRoute
+  '/client/jobs/$id/edit': typeof ClientJobsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/applicant': typeof ApplicantRouteRouteWithChildren
+  '/client': typeof ClientRouteRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
+  '/client/browse': typeof ClientBrowseRoute
   '/client/dashboard': typeof ClientDashboardRoute
+  '/client/pricing': typeof ClientPricingRoute
+  '/client/settings': typeof ClientSettingsRoute
   '/signup/applicant': typeof SignupApplicantRoute
   '/signup/client': typeof SignupClientRoute
   '/applicant/profiles/new': typeof ApplicantProfilesNewRoute
+  '/client/jobs/new': typeof ClientJobsNewRoute
   '/applicant/profiles/': typeof ApplicantProfilesIndexRoute
+  '/client/jobs/': typeof ClientJobsIndexRoute
   '/applicant/profiles/$id/edit': typeof ApplicantProfilesIdEditRoute
+  '/client/jobs/$id/edit': typeof ClientJobsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/applicant'
+    | '/client'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/admin/dashboard'
     | '/applicant/dashboard'
     | '/applicant/settings'
+    | '/client/browse'
     | '/client/dashboard'
+    | '/client/pricing'
+    | '/client/settings'
     | '/signup/applicant'
     | '/signup/client'
     | '/applicant/profiles/new'
+    | '/client/jobs/new'
     | '/applicant/profiles/'
+    | '/client/jobs/'
     | '/applicant/profiles/$id/edit'
+    | '/client/jobs/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/applicant'
+    | '/client'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/admin/dashboard'
     | '/applicant/dashboard'
     | '/applicant/settings'
+    | '/client/browse'
     | '/client/dashboard'
+    | '/client/pricing'
+    | '/client/settings'
     | '/signup/applicant'
     | '/signup/client'
     | '/applicant/profiles/new'
+    | '/client/jobs/new'
     | '/applicant/profiles'
+    | '/client/jobs'
     | '/applicant/profiles/$id/edit'
+    | '/client/jobs/$id/edit'
   id:
     | '__root__'
     | '/'
     | '/applicant'
+    | '/client'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/admin/dashboard'
     | '/applicant/dashboard'
     | '/applicant/settings'
+    | '/client/browse'
     | '/client/dashboard'
+    | '/client/pricing'
+    | '/client/settings'
     | '/signup/applicant'
     | '/signup/client'
     | '/applicant/profiles/new'
+    | '/client/jobs/new'
     | '/applicant/profiles/'
+    | '/client/jobs/'
     | '/applicant/profiles/$id/edit'
+    | '/client/jobs/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApplicantRouteRoute: typeof ApplicantRouteRouteWithChildren
+  ClientRouteRoute: typeof ClientRouteRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
-  ClientDashboardRoute: typeof ClientDashboardRoute
   SignupApplicantRoute: typeof SignupApplicantRoute
   SignupClientRoute: typeof SignupClientRoute
 }
@@ -221,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/applicant'
       fullPath: '/applicant'
       preLoaderRoute: typeof ApplicantRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/client': {
+      id: '/client'
+      path: '/client'
+      fullPath: '/client'
+      preLoaderRoute: typeof ClientRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -265,12 +356,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApplicantSettingsRouteImport
       parentRoute: typeof ApplicantRouteRoute
     }
+    '/client/browse': {
+      id: '/client/browse'
+      path: '/browse'
+      fullPath: '/client/browse'
+      preLoaderRoute: typeof ClientBrowseRouteImport
+      parentRoute: typeof ClientRouteRoute
+    }
     '/client/dashboard': {
       id: '/client/dashboard'
-      path: '/client/dashboard'
+      path: '/dashboard'
       fullPath: '/client/dashboard'
       preLoaderRoute: typeof ClientDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ClientRouteRoute
+    }
+    '/client/pricing': {
+      id: '/client/pricing'
+      path: '/pricing'
+      fullPath: '/client/pricing'
+      preLoaderRoute: typeof ClientPricingRouteImport
+      parentRoute: typeof ClientRouteRoute
+    }
+    '/client/settings': {
+      id: '/client/settings'
+      path: '/settings'
+      fullPath: '/client/settings'
+      preLoaderRoute: typeof ClientSettingsRouteImport
+      parentRoute: typeof ClientRouteRoute
     }
     '/signup/applicant': {
       id: '/signup/applicant'
@@ -300,12 +412,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApplicantProfilesNewRouteImport
       parentRoute: typeof ApplicantRouteRoute
     }
+    '/client/jobs/': {
+      id: '/client/jobs/'
+      path: '/jobs'
+      fullPath: '/client/jobs/'
+      preLoaderRoute: typeof ClientJobsIndexRouteImport
+      parentRoute: typeof ClientRouteRoute
+    }
+    '/client/jobs/new': {
+      id: '/client/jobs/new'
+      path: '/jobs/new'
+      fullPath: '/client/jobs/new'
+      preLoaderRoute: typeof ClientJobsNewRouteImport
+      parentRoute: typeof ClientRouteRoute
+    }
     '/applicant/profiles/$id/edit': {
       id: '/applicant/profiles/$id/edit'
       path: '/profiles/$id/edit'
       fullPath: '/applicant/profiles/$id/edit'
       preLoaderRoute: typeof ApplicantProfilesIdEditRouteImport
       parentRoute: typeof ApplicantRouteRoute
+    }
+    '/client/jobs/$id/edit': {
+      id: '/client/jobs/$id/edit'
+      path: '/jobs/$id/edit'
+      fullPath: '/client/jobs/$id/edit'
+      preLoaderRoute: typeof ClientJobsIdEditRouteImport
+      parentRoute: typeof ClientRouteRoute
     }
   }
 }
@@ -330,14 +463,38 @@ const ApplicantRouteRouteWithChildren = ApplicantRouteRoute._addFileChildren(
   ApplicantRouteRouteChildren,
 )
 
+interface ClientRouteRouteChildren {
+  ClientBrowseRoute: typeof ClientBrowseRoute
+  ClientDashboardRoute: typeof ClientDashboardRoute
+  ClientPricingRoute: typeof ClientPricingRoute
+  ClientSettingsRoute: typeof ClientSettingsRoute
+  ClientJobsNewRoute: typeof ClientJobsNewRoute
+  ClientJobsIndexRoute: typeof ClientJobsIndexRoute
+  ClientJobsIdEditRoute: typeof ClientJobsIdEditRoute
+}
+
+const ClientRouteRouteChildren: ClientRouteRouteChildren = {
+  ClientBrowseRoute: ClientBrowseRoute,
+  ClientDashboardRoute: ClientDashboardRoute,
+  ClientPricingRoute: ClientPricingRoute,
+  ClientSettingsRoute: ClientSettingsRoute,
+  ClientJobsNewRoute: ClientJobsNewRoute,
+  ClientJobsIndexRoute: ClientJobsIndexRoute,
+  ClientJobsIdEditRoute: ClientJobsIdEditRoute,
+}
+
+const ClientRouteRouteWithChildren = ClientRouteRoute._addFileChildren(
+  ClientRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApplicantRouteRoute: ApplicantRouteRouteWithChildren,
+  ClientRouteRoute: ClientRouteRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   AdminDashboardRoute: AdminDashboardRoute,
-  ClientDashboardRoute: ClientDashboardRoute,
   SignupApplicantRoute: SignupApplicantRoute,
   SignupClientRoute: SignupClientRoute,
 }
