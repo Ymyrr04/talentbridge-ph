@@ -20,6 +20,7 @@ import { Route as ApplicantApplicationsRouteImport } from './routes/applicant/ap
 import { Route as ApplicantDashboardRouteImport } from './routes/applicant/dashboard'
 import { Route as ApplicantJobsRouteImport } from './routes/applicant/jobs'
 import { Route as ApplicantSettingsRouteImport } from './routes/applicant/settings'
+import { Route as ClientApplicationsRouteImport } from './routes/client/applications'
 import { Route as ClientBrowseRouteImport } from './routes/client/browse'
 import { Route as ClientDashboardRouteImport } from './routes/client/dashboard'
 import { Route as ClientPricingRouteImport } from './routes/client/pricing'
@@ -87,6 +88,11 @@ const ApplicantSettingsRoute = ApplicantSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => ApplicantRouteRoute,
+} as any)
+const ClientApplicationsRoute = ClientApplicationsRouteImport.update({
+  id: '/applications',
+  path: '/applications',
+  getParentRoute: () => ClientRouteRoute,
 } as any)
 const ClientBrowseRoute = ClientBrowseRouteImport.update({
   id: '/browse',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
+  '/client/applications': typeof ClientApplicationsRoute
   '/client/browse': typeof ClientBrowseRoute
   '/client/dashboard': typeof ClientDashboardRoute
   '/client/pricing': typeof ClientPricingRoute
@@ -186,6 +193,7 @@ export interface FileRoutesByTo {
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
+  '/client/applications': typeof ClientApplicationsRoute
   '/client/browse': typeof ClientBrowseRoute
   '/client/dashboard': typeof ClientDashboardRoute
   '/client/pricing': typeof ClientPricingRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
+  '/client/applications': typeof ClientApplicationsRoute
   '/client/browse': typeof ClientBrowseRoute
   '/client/dashboard': typeof ClientDashboardRoute
   '/client/pricing': typeof ClientPricingRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/applicant/dashboard'
     | '/applicant/jobs'
     | '/applicant/settings'
+    | '/client/applications'
     | '/client/browse'
     | '/client/dashboard'
     | '/client/pricing'
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
     | '/applicant/dashboard'
     | '/applicant/jobs'
     | '/applicant/settings'
+    | '/client/applications'
     | '/client/browse'
     | '/client/dashboard'
     | '/client/pricing'
@@ -289,6 +300,7 @@ export interface FileRouteTypes {
     | '/applicant/dashboard'
     | '/applicant/jobs'
     | '/applicant/settings'
+    | '/client/applications'
     | '/client/browse'
     | '/client/dashboard'
     | '/client/pricing'
@@ -393,6 +405,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/applicant/settings'
       preLoaderRoute: typeof ApplicantSettingsRouteImport
       parentRoute: typeof ApplicantRouteRoute
+    }
+    '/client/applications': {
+      id: '/client/applications'
+      path: '/applications'
+      fullPath: '/client/applications'
+      preLoaderRoute: typeof ClientApplicationsRouteImport
+      parentRoute: typeof ClientRouteRoute
     }
     '/client/browse': {
       id: '/client/browse'
@@ -506,6 +525,7 @@ const ApplicantRouteRouteWithChildren = ApplicantRouteRoute._addFileChildren(
 )
 
 interface ClientRouteRouteChildren {
+  ClientApplicationsRoute: typeof ClientApplicationsRoute
   ClientBrowseRoute: typeof ClientBrowseRoute
   ClientDashboardRoute: typeof ClientDashboardRoute
   ClientPricingRoute: typeof ClientPricingRoute
@@ -516,6 +536,7 @@ interface ClientRouteRouteChildren {
 }
 
 const ClientRouteRouteChildren: ClientRouteRouteChildren = {
+  ClientApplicationsRoute: ClientApplicationsRoute,
   ClientBrowseRoute: ClientBrowseRoute,
   ClientDashboardRoute: ClientDashboardRoute,
   ClientPricingRoute: ClientPricingRoute,
