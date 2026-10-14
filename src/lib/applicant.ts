@@ -39,5 +39,7 @@ export async function uploadCv(userId: string, file: File): Promise<string> {
 }
 
 export async function removeCv(path: string | null | undefined) {
-  if (path) await supabase.storage.from("cv-uploads").remove([path]);
+  if (!path) return;
+  const { error } = await supabase.storage.from("cv-uploads").remove([path]);
+  if (error) console.error("Failed to remove CV", error);
 }
