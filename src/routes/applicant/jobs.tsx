@@ -85,7 +85,7 @@ function ApplyDialog({ job, onClose }: { job: Job | null; onClose: () => void })
     setBusy(true);
     const { error } = await supabase.rpc("apply_to_job", { _job_id: job.id, _profile_id: selected, _note: note.trim() });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Application sent");
     setNote("");
     setProfileId("");

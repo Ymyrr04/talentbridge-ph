@@ -23,7 +23,7 @@ function ClientApplicationsPage() {
 
   async function setStatus(id: string, status: string) {
     const { error } = await supabase.rpc("set_application_status", { _id: id, _status: status });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(`Marked as ${APPLICATION_STATUS_LABEL[status]}`);
     await qc.invalidateQueries({ queryKey: ["incoming-applications"] });
   }

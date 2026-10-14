@@ -20,7 +20,7 @@ function MyApplicationsPage() {
 
   async function withdraw(id: string) {
     const { error } = await supabase.from("job_applications").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Application withdrawn");
     await qc.invalidateQueries({ queryKey: ["my-applications"] });
   }
