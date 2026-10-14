@@ -10,33 +10,141 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as ApplicantDashboardRouteImport } from './routes/applicant.dashboard'
+import { Route as ClientDashboardRouteImport } from './routes/client.dashboard'
+import { Route as SignupApplicantRouteImport } from './routes/signup.applicant'
+import { Route as SignupClientRouteImport } from './routes/signup.client'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplicantDashboardRoute = ApplicantDashboardRouteImport.update({
+  id: '/applicant/dashboard',
+  path: '/applicant/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientDashboardRoute = ClientDashboardRouteImport.update({
+  id: '/client/dashboard',
+  path: '/client/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupApplicantRoute = SignupApplicantRouteImport.update({
+  id: '/signup/applicant',
+  path: '/signup/applicant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupClientRoute = SignupClientRouteImport.update({
+  id: '/signup/client',
+  path: '/signup/client',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/applicant/dashboard': typeof ApplicantDashboardRoute
+  '/client/dashboard': typeof ClientDashboardRoute
+  '/signup/applicant': typeof SignupApplicantRoute
+  '/signup/client': typeof SignupClientRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/applicant/dashboard': typeof ApplicantDashboardRoute
+  '/client/dashboard': typeof ClientDashboardRoute
+  '/signup/applicant': typeof SignupApplicantRoute
+  '/signup/client': typeof SignupClientRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/applicant/dashboard': typeof ApplicantDashboardRoute
+  '/client/dashboard': typeof ClientDashboardRoute
+  '/signup/applicant': typeof SignupApplicantRoute
+  '/signup/client': typeof SignupClientRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/reset-password'
+    | '/admin/dashboard'
+    | '/applicant/dashboard'
+    | '/client/dashboard'
+    | '/signup/applicant'
+    | '/signup/client'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/reset-password'
+    | '/admin/dashboard'
+    | '/applicant/dashboard'
+    | '/client/dashboard'
+    | '/signup/applicant'
+    | '/signup/client'
+  id:
+    | '__root__'
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/reset-password'
+    | '/admin/dashboard'
+    | '/applicant/dashboard'
+    | '/client/dashboard'
+    | '/signup/applicant'
+    | '/signup/client'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  ApplicantDashboardRoute: typeof ApplicantDashboardRoute
+  ClientDashboardRoute: typeof ClientDashboardRoute
+  SignupApplicantRoute: typeof SignupApplicantRoute
+  SignupClientRoute: typeof SignupClientRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +156,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/applicant/dashboard': {
+      id: '/applicant/dashboard'
+      path: '/applicant/dashboard'
+      fullPath: '/applicant/dashboard'
+      preLoaderRoute: typeof ApplicantDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/client/dashboard': {
+      id: '/client/dashboard'
+      path: '/client/dashboard'
+      fullPath: '/client/dashboard'
+      preLoaderRoute: typeof ClientDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/applicant': {
+      id: '/signup/applicant'
+      path: '/signup/applicant'
+      fullPath: '/signup/applicant'
+      preLoaderRoute: typeof SignupApplicantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/client': {
+      id: '/signup/client'
+      path: '/signup/client'
+      fullPath: '/signup/client'
+      preLoaderRoute: typeof SignupClientRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  ApplicantDashboardRoute: ApplicantDashboardRoute,
+  ClientDashboardRoute: ClientDashboardRoute,
+  SignupApplicantRoute: SignupApplicantRoute,
+  SignupClientRoute: SignupClientRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
