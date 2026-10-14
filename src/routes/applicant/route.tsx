@@ -16,6 +16,7 @@ function ApplicantLayout() {
         { to: "/applicant/dashboard", label: "Dashboard" },
         { to: "/applicant/profiles", label: "Profiles" },
         { to: "/applicant/jobs", label: "Open Jobs" },
+        { to: "/applicant/applications", label: "Applications" },
         { to: "/applicant/settings", label: "Settings" },
       ]}
     >

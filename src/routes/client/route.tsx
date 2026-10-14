@@ -15,6 +15,7 @@ function ClientLayout() {
       nav={[
         { to: "/client/dashboard", label: "Dashboard" },
         { to: "/client/jobs", label: "Job Posts" },
+        { to: "/client/applications", label: "Applications" },
         { to: "/client/browse", label: "Browse Talent" },
         { to: "/client/pricing", label: "Pricing" },
         { to: "/client/settings", label: "Settings" },

@@ -16,6 +16,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
+import { Route as ApplicantApplicationsRouteImport } from './routes/applicant/applications'
 import { Route as ApplicantDashboardRouteImport } from './routes/applicant/dashboard'
 import { Route as ApplicantJobsRouteImport } from './routes/applicant/jobs'
 import { Route as ApplicantSettingsRouteImport } from './routes/applicant/settings'
@@ -66,6 +67,11 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApplicantApplicationsRoute = ApplicantApplicationsRouteImport.update({
+  id: '/applications',
+  path: '/applications',
+  getParentRoute: () => ApplicantRouteRoute,
 } as any)
 const ApplicantDashboardRoute = ApplicantDashboardRouteImport.update({
   id: '/dashboard',
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/admin/dashboard'
+    | '/applicant/applications'
     | '/applicant/dashboard'
     | '/applicant/jobs'
     | '/applicant/settings'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/admin/dashboard'
+    | '/applicant/applications'
     | '/applicant/dashboard'
     | '/applicant/jobs'
     | '/applicant/settings'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/admin/dashboard'
+    | '/applicant/applications'
     | '/applicant/dashboard'
     | '/applicant/jobs'
     | '/applicant/settings'
@@ -353,6 +365,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/applicant/applications': {
+      id: '/applicant/applications'
+      path: '/applications'
+      fullPath: '/applicant/applications'
+      preLoaderRoute: typeof ApplicantApplicationsRouteImport
+      parentRoute: typeof ApplicantRouteRoute
     }
     '/applicant/dashboard': {
       id: '/applicant/dashboard'
@@ -463,6 +482,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface ApplicantRouteRouteChildren {
+  ApplicantApplicationsRoute: typeof ApplicantApplicationsRoute
   ApplicantDashboardRoute: typeof ApplicantDashboardRoute
   ApplicantJobsRoute: typeof ApplicantJobsRoute
   ApplicantSettingsRoute: typeof ApplicantSettingsRoute
@@ -472,6 +492,7 @@ interface ApplicantRouteRouteChildren {
 }
 
 const ApplicantRouteRouteChildren: ApplicantRouteRouteChildren = {
+  ApplicantApplicationsRoute: ApplicantApplicationsRoute,
   ApplicantDashboardRoute: ApplicantDashboardRoute,
   ApplicantJobsRoute: ApplicantJobsRoute,
   ApplicantSettingsRoute: ApplicantSettingsRoute,

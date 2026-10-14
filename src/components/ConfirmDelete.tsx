@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
 
-export function ConfirmDelete({ trigger, title, description, onConfirm }: { trigger: ReactNode; title: string; description: string; onConfirm: () => void }) {
+export function ConfirmDelete({ trigger, title, description, onConfirm, confirmLabel = "Delete" }: { trigger: ReactNode; title: string; description: string; onConfirm: () => void; confirmLabel?: string }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
@@ -24,7 +24,7 @@ export function ConfirmDelete({ trigger, title, description, onConfirm }: { trig
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={onConfirm}>
-            Delete
+            {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -16,3 +16,4 @@
 - Role areas: `src/routes/<role>/route.tsx` is the layout that runs `requireRole` once and renders `AppShell` with that role's nav; child pages need no guard code.
 - Per-user limits (e.g. max applicant profiles) are enforced by DB triggers, with the UI only mirroring them — client checks can be bypassed.
 - CVs live in the private `cv-uploads` bucket under `{user_id}/`; views use short-lived signed URLs and the app removes the file when its profile is deleted or the CV replaced.
+- Cross-role reads (applications, jobs board, talent) go through SECURITY DEFINER RPCs that return only allowed columns — base-table RLS stays owner-only.

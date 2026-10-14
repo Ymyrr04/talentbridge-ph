@@ -54,6 +54,7 @@ function MyApplicationsPage() {
                   title="Withdraw this application?"
                   description="The client will no longer see it."
                   onConfirm={() => withdraw(a.id)}
+                  confirmLabel="Withdraw"
                   trigger={<Button variant="outline" size="sm">Withdraw</Button>}
                 />
               </div>
