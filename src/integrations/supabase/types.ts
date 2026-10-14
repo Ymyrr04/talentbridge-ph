@@ -146,6 +146,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      browse_jobs: {
+        Args: never
+        Returns: {
+          created_at: string
+          description: string
+          id: string
+          title: string
+        }[]
+      }
       browse_talent: {
         Args: never
         Returns: {
