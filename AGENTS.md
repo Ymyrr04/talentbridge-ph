@@ -13,3 +13,6 @@
 - Role gating: role dashboards use `ssr: false` + `beforeLoad: requireRole(role)` from `src/lib/auth.ts` — session lives in browser storage, and one helper keeps redirect rules consistent.
 - Roles live only in `public.user_roles` (one row per user, no client write grants); assigned by the `handle_new_user` signup trigger from metadata limited to applicant/client — admin is set manually in the database.
 - Route files never use a `.client.` / `.server.` filename segment (e.g. use `signup/client.tsx`, not `signup.client.tsx`) — the bundler treats those as environment-only modules and breaks SSR.
+- Role areas: `src/routes/<role>/route.tsx` is the layout that runs `requireRole` once and renders `AppShell` with that role's nav; child pages need no guard code.
+- Per-user limits (e.g. max applicant profiles) are enforced by DB triggers, with the UI only mirroring them — client checks can be bypassed.
+- CVs live in the private `cv-uploads` bucket under `{user_id}/`; views use short-lived signed URLs and the app removes the file when its profile is deleted or the CV replaced.
