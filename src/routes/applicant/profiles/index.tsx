@@ -46,7 +46,10 @@ function Page() {
 
   async function openCv(path: string) {
     const { data, error } = await supabase.storage.from("cv-uploads").createSignedUrl(path, 60);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     window.open(data.signedUrl, "_blank", "noopener");
   }
 
