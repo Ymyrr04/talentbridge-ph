@@ -111,6 +111,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
           </div>
           <p className="text-xs text-muted-foreground">Between $1 and $500 per hour.</p>
         </div>
+        <CandidateFields value={cand} onChange={setCand} />
         <div className="space-y-1.5">
           <Label htmlFor="cv">CV <span className="font-normal text-muted-foreground">(PDF or DOCX, max 5 MB)</span></Label>
           <label htmlFor="cv" className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed px-4 py-4 text-sm transition-colors hover:bg-muted">
