@@ -18,6 +18,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
   const [roleTitle, setRoleTitle] = useState(existing?.role_title ?? "");
   const [rate, setRate] = useState(existing ? String(existing.hourly_rate) : "");
   const [file, setFile] = useState<File | null>(null);
+  const [status, setStatus] = useState<"draft" | "published">(existing?.status === "published" ? "published" : "draft");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -36,13 +37,19 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     let newPath: string | null = null;
     try {
       if (file) newPath = await uploadCv(userId, file);
-      const values = { role_title: title, hourly_rate: hourly, ...(newPath ? { cv_path: newPath } : {}) };
+      const values = {
+        role_title: title,
+        hourly_rate: hourly,
+        status,
+        ...(newPath && file ? { cv_path: newPath, cv_original_filename: file.name } : {}),
+      };
       const { error } = existing
         ? await supabase.from("applicant_profiles").update(values).eq("id", existing.id)
         : await supabase.from("applicant_profiles").insert({ ...values, owner_id: userId });
       if (error) throw error;
       if (newPath && existing?.cv_path) await removeCv(existing.cv_path);
       await qc.invalidateQueries({ queryKey: ["applicant-profiles", userId] });
+      if (existing) await qc.invalidateQueries({ queryKey: ["applicant-profile", existing.id] });
       toast.success(existing ? "Profile updated" : "Profile created");
       navigate({ to: "/applicant/profiles" });
     } catch (err) {
@@ -53,7 +60,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     }
   }
 
-  const currentCv = existing?.cv_path?.split("/").pop();
+  const currentCv = existing?.cv_path ? existing.cv_original_filename?.trim() || "CV uploaded" : null;
 
   return (
     <form onSubmit={onSubmit} className="max-w-2xl space-y-6">
@@ -98,6 +105,19 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
               setFile(f);
             }}
           />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="status">Status</Label>
+          <select
+            id="status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as "draft" | "published")}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+          <p className="text-xs text-muted-foreground">Only published profiles can be seen by employers.</p>
         </div>
       </div>
 
