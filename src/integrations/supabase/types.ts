@@ -55,6 +55,61 @@ export type Database = {
           },
         ]
       }
+      job_applications: {
+        Row: {
+          applicant_id: string
+          applicant_profile_id: string
+          cover_note: string
+          created_at: string
+          id: string
+          job_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          applicant_profile_id: string
+          cover_note?: string
+          created_at?: string
+          id?: string
+          job_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          applicant_profile_id?: string
+          cover_note?: string
+          created_at?: string
+          id?: string
+          job_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_applicant_profile_id_fkey"
+            columns: ["applicant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "applicant_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_posts: {
         Row: {
           created_at: string
@@ -146,6 +201,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_to_job: {
+        Args: { _job_id: string; _note: string; _profile_id: string }
+        Returns: string
+      }
       browse_jobs: {
         Args: never
         Returns: {
@@ -171,6 +230,38 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      incoming_applications: {
+        Args: never
+        Returns: {
+          applicant_email: string
+          applicant_name: string
+          cover_note: string
+          created_at: string
+          hourly_rate: number
+          id: string
+          job_id: string
+          job_title: string
+          role_title: string
+          status: string
+        }[]
+      }
+      my_applications: {
+        Args: never
+        Returns: {
+          cover_note: string
+          created_at: string
+          id: string
+          job_id: string
+          job_status: string
+          job_title: string
+          role_title: string
+          status: string
+        }[]
+      }
+      set_application_status: {
+        Args: { _id: string; _status: string }
+        Returns: undefined
       }
     }
     Enums: {
