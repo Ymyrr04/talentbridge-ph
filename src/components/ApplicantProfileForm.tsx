@@ -49,6 +49,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
       if (error) throw error;
       if (newPath && existing?.cv_path) await removeCv(existing.cv_path);
       await qc.invalidateQueries({ queryKey: ["applicant-profiles", userId] });
+      if (existing) await qc.invalidateQueries({ queryKey: ["applicant-profile", existing.id] });
       toast.success(existing ? "Profile updated" : "Profile created");
       navigate({ to: "/applicant/profiles" });
     } catch (err) {
