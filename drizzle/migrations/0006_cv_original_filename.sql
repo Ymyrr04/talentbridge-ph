@@ -1,0 +1,1 @@
+ALTER TABLE public.applicant_profiles ADD COLUMN cv_original_filename text;

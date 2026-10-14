@@ -17,6 +17,7 @@ export type Database = {
       applicant_profiles: {
         Row: {
           created_at: string
+          cv_original_filename: string | null
           cv_path: string | null
           hourly_rate: number
           id: string
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          cv_original_filename?: string | null
           cv_path?: string | null
           hourly_rate: number
           id?: string
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          cv_original_filename?: string | null
           cv_path?: string | null
           hourly_rate?: number
           id?: string
