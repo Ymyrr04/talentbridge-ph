@@ -8,7 +8,9 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
+
+const DevRoleSwitcher = import.meta.env.DEV ? lazy(() => import("@/dev/DevRoleSwitcher")) : null;
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -128,12 +130,19 @@ function RootComponent() {
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster />
+      {DevRoleSwitcher && mounted && (
+        <Suspense fallback={null}>
+          <DevRoleSwitcher />
+        </Suspense>
+      )}
     </QueryClientProvider>
   );
 }

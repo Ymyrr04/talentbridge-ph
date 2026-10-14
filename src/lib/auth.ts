@@ -22,9 +22,14 @@ export async function fetchMyRole(userId: string): Promise<AppRole | null> {
 
 /** Client-only route guard: logged out -> /login, wrong role -> own dashboard. */
 export async function requireRole(required: AppRole) {
-  const {
+  let {
     data: { user },
   } = await supabase.auth.getUser();
+  // Preview only: auto sign in as a sample account so testing needs no login.
+  if (!user && import.meta.env.DEV && required !== "admin") {
+    const { devSignIn } = await import("@/dev/devAccounts");
+    if (await devSignIn(required)) user = (await supabase.auth.getUser()).data.user;
+  }
   if (!user) throw redirect({ to: "/login" });
   const role = await fetchMyRole(user.id);
   if (!role) {
