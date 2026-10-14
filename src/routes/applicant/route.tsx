@@ -15,6 +15,7 @@ function ApplicantLayout() {
       nav={[
         { to: "/applicant/dashboard", label: "Dashboard" },
         { to: "/applicant/profiles", label: "Profiles" },
+        { to: "/applicant/jobs", label: "Open Jobs" },
         { to: "/applicant/settings", label: "Settings" },
       ]}
     >
