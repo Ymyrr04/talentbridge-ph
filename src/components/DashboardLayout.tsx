@@ -10,8 +10,11 @@ export function DashboardLayout({ userId, roleLabel, showAllDashboards = false }
   const queryClient = useQueryClient();
   const { data: profile } = useQuery({
     queryKey: ["profile", userId],
+    retryDelay: 500,
     queryFn: async () => {
       const { data } = await supabase.from("profiles").select("name, email").eq("id", userId).maybeSingle();
+      // Right after signup the session can lag a moment; throw so the query retries.
+      if (!data) throw new Error("Profile not ready");
       return data;
     },
   });
