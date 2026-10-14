@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { removeCv, uploadCv, validateCv } from "@/lib/applicant";
+import { CandidateFields, publishErrors, SUMMARY_MAX, type CandidateValues } from "@/components/CandidateFields";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,15 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
   const [rate, setRate] = useState(existing ? String(existing.hourly_rate) : "");
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<"draft" | "published">(existing?.status === "published" ? "published" : "draft");
+  const [cand, setCand] = useState<CandidateValues>({
+    skills: existing?.skills ?? [],
+    experience: existing?.experience_level ?? "",
+    summary: existing?.summary ?? "",
+    availability: existing?.availability ?? "",
+    hours: existing?.hours_per_week != null ? String(existing.hours_per_week) : "",
+    timeZones: existing?.time_zones ?? [],
+    english: existing?.english_level ?? "",
+  });
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -29,6 +39,22 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     const hourly = Number(rate);
     if (!title || title.length > 80) return setError("Role title is required (max 80 characters).");
     if (!Number.isFinite(hourly) || hourly < 1 || hourly > 500) return setError("Hourly rate must be between 1 and 500 USD.");
+    const hours = cand.hours ? Number(cand.hours) : null;
+    if (hours !== null && (!Number.isInteger(hours) || hours < 1 || hours > 60)) {
+      toast.error("Hours per week must be a whole number between 1 and 60.");
+      return;
+    }
+    if (cand.summary.length > SUMMARY_MAX) {
+      toast.error(`Summary must be ${SUMMARY_MAX} characters or fewer.`);
+      return;
+    }
+    if (status === "published") {
+      const missing = publishErrors(cand);
+      if (missing.length) {
+        toast.error("To publish, please add: " + missing.join(", ") + ".");
+        return;
+      }
+    }
     if (file) {
       const v = validateCv(file);
       if (v) return setError(v);
@@ -41,6 +67,13 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         role_title: title,
         hourly_rate: hourly,
         status,
+        skills: cand.skills.length ? cand.skills : null,
+        experience_level: cand.experience || null,
+        summary: cand.summary.trim() || null,
+        availability: cand.availability || null,
+        hours_per_week: hours,
+        time_zones: cand.timeZones.length ? cand.timeZones : null,
+        english_level: cand.english || null,
         ...(newPath && file ? { cv_path: newPath, cv_original_filename: file.name } : {}),
       };
       const { error } = existing
@@ -78,6 +111,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
           </div>
           <p className="text-xs text-muted-foreground">Between $1 and $500 per hour.</p>
         </div>
+        <CandidateFields value={cand} onChange={setCand} />
         <div className="space-y-1.5">
           <Label htmlFor="cv">CV <span className="font-normal text-muted-foreground">(PDF or DOCX, max 5 MB)</span></Label>
           <label htmlFor="cv" className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed px-4 py-4 text-sm transition-colors hover:bg-muted">

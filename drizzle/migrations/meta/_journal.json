@@ -50,6 +50,13 @@
       "when": 1792015991976,
       "tag": "0006_cv_original_filename",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792016195140,
+      "tag": "0007_applicant_candidate_fields",
+      "breakpoints": true
     }
   ]
 }
