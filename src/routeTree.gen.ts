@@ -13,11 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
-import { Route as ApplicantDashboardRouteImport } from './routes/applicant.dashboard'
-import { Route as ClientDashboardRouteImport } from './routes/client.dashboard'
-import { Route as SignupApplicantRouteImport } from './routes/signup.applicant'
-import { Route as SignupClientRouteImport } from './routes/signup.client'
+import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
+import { Route as ApplicantDashboardRouteImport } from './routes/applicant/dashboard'
+import { Route as ClientDashboardRouteImport } from './routes/client/dashboard'
+import { Route as SignupApplicantRouteImport } from './routes/signup/applicant'
+import { Route as SignupClientRouteImport } from './routes/signup/client'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
