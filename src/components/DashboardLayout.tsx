@@ -1,11 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Brand } from "./Brand";
 
-export function DashboardLayout({ userId, roleLabel }: { userId: string; roleLabel: string }) {
+export function DashboardLayout({ userId, roleLabel, showAllDashboards = false }: { userId: string; roleLabel: string; showAllDashboards?: boolean }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: profile } = useQuery({
@@ -35,9 +35,18 @@ export function DashboardLayout({ userId, roleLabel }: { userId: string; roleLab
               {roleLabel}
             </span>
           </div>
+          <div className="flex items-center gap-2">
+          {showAllDashboards && (
+            <nav className="flex gap-1 text-sm">
+              <Link to="/admin/dashboard" className="rounded-md px-2 py-1 text-muted-foreground hover:bg-muted" activeProps={{ className: "bg-muted text-foreground" }}>Admin</Link>
+              <Link to="/applicant/dashboard" className="rounded-md px-2 py-1 text-muted-foreground hover:bg-muted" activeProps={{ className: "bg-muted text-foreground" }}>Applicant</Link>
+              <Link to="/client/dashboard" className="rounded-md px-2 py-1 text-muted-foreground hover:bg-muted" activeProps={{ className: "bg-muted text-foreground" }}>Client</Link>
+            </nav>
+          )}
           <Button variant="outline" size="sm" onClick={signOut}>
-            <LogOut className="h-4 w-4" /> Log out
+            <LogOut className="h-4 w-4" /> <span className="hidden sm:inline">Log out</span>
           </Button>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
