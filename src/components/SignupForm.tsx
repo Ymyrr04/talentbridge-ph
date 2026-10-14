@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { dashboardPath, fetchMyRole } from "@/lib/auth";
 import { MailCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ export function SignupForm({ role }: { role: "applicant" | "client" }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const navigate = useNavigate();
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -34,6 +36,10 @@ export function SignupForm({ role }: { role: "applicant" | "client" }) {
     // Existing email: Supabase returns a user with no identities
     if (data.user && data.user.identities?.length === 0) {
       return setError("An account with this email already exists. Please log in.");
+    }
+    if (data.session && data.user) {
+      const r = await fetchMyRole(data.user.id);
+      if (r) return navigate({ to: dashboardPath(r), replace: true });
     }
     setSent(true);
   }
