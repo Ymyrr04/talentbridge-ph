@@ -31,6 +31,7 @@ export async function requireRole(required: AppRole) {
     await supabase.auth.signOut();
     throw redirect({ to: "/login" });
   }
-  if (role !== required) throw redirect({ to: dashboardPath(role) });
+  // Admins may open every dashboard; other roles only their own.
+  if (role !== required && role !== "admin") throw redirect({ to: dashboardPath(role) });
   return { user, role };
 }

@@ -10,6 +10,6 @@ export const Route = createFileRoute("/applicant/dashboard")({
 });
 
 function Page() {
-  const { user } = Route.useRouteContext();
-  return <DashboardLayout userId={user.id} roleLabel="Applicant" />;
+  const { user, role } = Route.useRouteContext();
+  return <DashboardLayout userId={user.id} showAllDashboards={role === "admin"} roleLabel="Applicant" />;
 }
