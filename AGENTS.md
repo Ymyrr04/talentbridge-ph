@@ -12,3 +12,4 @@
 ## Architecture rules
 - Role gating: role dashboards use `ssr: false` + `beforeLoad: requireRole(role)` from `src/lib/auth.ts` — session lives in browser storage, and one helper keeps redirect rules consistent.
 - Roles live only in `public.user_roles` (one row per user, no client write grants); assigned by the `handle_new_user` signup trigger from metadata limited to applicant/client — admin is set manually in the database.
+- Route files never use a `.client.` / `.server.` filename segment (e.g. use `signup/client.tsx`, not `signup.client.tsx`) — the bundler treats those as environment-only modules and breaks SSR.
