@@ -1,0 +1,120 @@
+import { useState, type FormEvent } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { FileText, Upload, Video } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
+import { removeCv, uploadCv, validateCv } from "@/lib/applicant";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+type Profile = Tables<"applicant_profiles">;
+
+export function ApplicantProfileForm({ userId, existing }: { userId: string; existing?: Profile }) {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [roleTitle, setRoleTitle] = useState(existing?.role_title ?? "");
+  const [rate, setRate] = useState(existing ? String(existing.hourly_rate) : "");
+  const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    const title = roleTitle.trim();
+    const hourly = Number(rate);
+    if (!title || title.length > 80) return setError("Role title is required (max 80 characters).");
+    if (!Number.isFinite(hourly) || hourly < 1 || hourly > 500) return setError("Hourly rate must be between 1 and 500 USD.");
+    if (file) {
+      const v = validateCv(file);
+      if (v) return setError(v);
+    }
+    setSaving(true);
+    let newPath: string | null = null;
+    try {
+      if (file) newPath = await uploadCv(userId, file);
+      const values = { role_title: title, hourly_rate: hourly, ...(newPath ? { cv_path: newPath } : {}) };
+      const { error } = existing
+        ? await supabase.from("applicant_profiles").update(values).eq("id", existing.id)
+        : await supabase.from("applicant_profiles").insert({ ...values, owner_id: userId });
+      if (error) throw error;
+      if (newPath && existing?.cv_path) await removeCv(existing.cv_path);
+      await qc.invalidateQueries({ queryKey: ["applicant-profiles", userId] });
+      toast.success(existing ? "Profile updated" : "Profile created");
+      navigate({ to: "/applicant/profiles" });
+    } catch (err) {
+      if (newPath) await removeCv(newPath);
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const currentCv = existing?.cv_path?.split("/").pop();
+
+  return (
+    <form onSubmit={onSubmit} className="max-w-2xl space-y-6">
+      <div className="space-y-5 rounded-2xl border bg-card p-6">
+        <div className="space-y-1.5">
+          <Label htmlFor="title">Role title</Label>
+          <Input id="title" required maxLength={80} placeholder="e.g. Senior Virtual Assistant" value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)} />
+          <p className="text-xs text-muted-foreground">{roleTitle.length}/80</p>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="rate">Expected hourly rate (USD)</Label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+            <Input id="rate" type="number" required min={1} max={500} step="0.01" className="pl-7" value={rate} onChange={(e) => setRate(e.target.value)} />
+          </div>
+          <p className="text-xs text-muted-foreground">Between $1 and $500 per hour.</p>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="cv">CV <span className="font-normal text-muted-foreground">(PDF or DOCX, max 5 MB)</span></Label>
+          <label htmlFor="cv" className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed px-4 py-4 text-sm transition-colors hover:bg-muted">
+            {file ? <FileText className="h-5 w-5 text-primary" /> : <Upload className="h-5 w-5 text-muted-foreground" />}
+            <span className="truncate">
+              {file ? file.name : currentCv ? `Current file: ${currentCv} — click to replace` : "Click to choose a file"}
+            </span>
+          </label>
+          <input
+            id="cv"
+            type="file"
+            className="sr-only"
+            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            onChange={(e) => {
+              const f = e.target.files?.[0] ?? null;
+              if (f) {
+                const v = validateCv(f);
+                if (v) {
+                  setError(v);
+                  e.target.value = "";
+                  return;
+                }
+              }
+              setError(null);
+              setFile(f);
+            }}
+          />
+        </div>
+      </div>
+
+      <div aria-disabled className="rounded-2xl border bg-muted/50 p-6 opacity-60">
+        <div className="flex items-center gap-2">
+          <Video className="h-5 w-5 text-muted-foreground" />
+          <p className="font-medium">Intro Videos (optional) – Coming soon</p>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">Record short intro videos to stand out to employers.</p>
+        <Button type="button" variant="outline" size="sm" className="mt-4" disabled>Add video</Button>
+      </div>
+
+      {error && <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
+      <div className="flex gap-3">
+        <Button type="submit" disabled={saving}>{saving ? "Saving…" : existing ? "Save changes" : "Create profile"}</Button>
+        <Button asChild variant="ghost"><Link to="/applicant/profiles">Cancel</Link></Button>
+      </div>
+    </form>
+  );
+}
