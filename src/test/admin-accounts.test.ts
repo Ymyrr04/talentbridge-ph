@@ -10,7 +10,7 @@ const user = (id: string, role: AdminUser["role"]): AdminUser =>
     phone: null,
     role,
     created_at: "2026-10-15T00:00:00+00:00",
-  }) as AdminUser;
+  }) as unknown as AdminUser;
 
 describe("accountsOf", () => {
   it("rebuilds the account list and counts when a cached result predates the role fields", () => {
