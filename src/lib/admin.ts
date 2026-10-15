@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const adminData = queryOptions({
-  queryKey: ["admin-data"],
+  queryKey: ["admin-data", 2],
   queryFn: async () => {
     const [users, profiles, jobs] = await Promise.all([
       supabase.rpc("admin_list_users"),
@@ -32,6 +32,25 @@ export const adminData = queryOptions({
 
 export type AdminData = Awaited<ReturnType<NonNullable<typeof adminData.queryFn>>>;
 export type AdminUser = AdminData["allUsers"][number];
+
+/**
+ * A cached admin result may predate any of these fields, so nothing here may
+ * assume a key is present — the page must still render the lists it can build.
+ */
+type AccountsShape = Partial<Pick<AdminData, "applicants" | "clients" | "admins" | "allUsers" | "roleCounts">>;
+
+export function accountsOf(d: AccountsShape) {
+  const applicants = d.applicants ?? [];
+  const clients = d.clients ?? [];
+  const admins = d.admins ?? [];
+  return {
+    all: d.allUsers ?? [...applicants, ...clients, ...admins],
+    applicants,
+    clients,
+    admins,
+    counts: d.roleCounts ?? { applicant: applicants.length, client: clients.length, admin: admins.length },
+  };
+}
 
 export const ROLE_LABEL: Record<AdminUser["role"], string> = {
   applicant: "Applicant",
