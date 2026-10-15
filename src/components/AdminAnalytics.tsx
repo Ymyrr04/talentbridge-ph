@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import type { AdminData } from "@/lib/admin";
 
 const config = {
-  applicants: { label: "New applicants", color: "var(--primary)" },
-  clients: { label: "New clients", color: "var(--accent)" },
-  jobs: { label: "Job posts", color: "var(--muted-foreground)" },
+  applicants: { label: "New applicants", color: "var(--chart-1)" },
+  clients: { label: "New clients", color: "var(--chart-2)" },
+  jobs: { label: "Job posts", color: "var(--chart-3)" },
 } satisfies ChartConfig;
 
 const dayKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
