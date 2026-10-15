@@ -15,7 +15,6 @@ import { Route as ClientRouteRouteImport } from './routes/client/route'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as ApplicantApplicationsRouteImport } from './routes/applicant/applications'
 import { Route as ApplicantDashboardRouteImport } from './routes/applicant/dashboard'
 import { Route as ApplicantJobsRouteImport } from './routes/applicant/jobs'
@@ -62,11 +61,6 @@ const LoginRoute = LoginRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApplicantApplicationsRoute = ApplicantApplicationsRouteImport.update({
@@ -162,7 +156,6 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
@@ -188,7 +181,6 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
@@ -215,7 +207,6 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
@@ -243,7 +234,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/reset-password'
-    | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
     | '/applicant/jobs'
@@ -269,7 +259,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/reset-password'
-    | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
     | '/applicant/jobs'
@@ -295,7 +284,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/reset-password'
-    | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
     | '/applicant/jobs'
@@ -322,7 +310,6 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
   SignupApplicantRoute: typeof SignupApplicantRoute
   SignupClientRoute: typeof SignupClientRoute
 }
@@ -369,13 +356,6 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/dashboard': {
-      id: '/admin/dashboard'
-      path: '/admin/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/applicant/applications': {
@@ -557,7 +537,6 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  AdminDashboardRoute: AdminDashboardRoute,
   SignupApplicantRoute: SignupApplicantRoute,
   SignupClientRoute: SignupClientRoute,
 }
