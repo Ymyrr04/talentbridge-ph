@@ -109,7 +109,7 @@ export async function exportApplicants(d: AdminData) {
   const zip = new JSZip();
   const cvs = zip.folder("cvs")!;
   const rows: Record<string, unknown>[] = [];
-  for (const u of d.applicants) {
+  for (const u of accountsOf(d).applicants) {
     const ps = d.profiles.filter((p) => p.owner_id === u.id);
     const base = { full_name: u.name, email: u.email, phone: u.phone, joined: u.created_at };
     if (ps.length === 0) {
@@ -148,7 +148,7 @@ export async function exportApplicants(d: AdminData) {
 
 export function exportClients(d: AdminData) {
   const rows: Record<string, unknown>[] = [];
-  for (const u of d.clients) {
+  for (const u of accountsOf(d).clients) {
     const js = d.jobs.filter((j) => j.owner_id === u.id);
     const base = { full_name: u.name, email: u.email, phone: u.phone, joined: u.created_at };
     if (js.length === 0) rows.push({ ...base, job_title: "", job_status: "", job_description: "", job_posted: "" });
@@ -159,7 +159,7 @@ export function exportClients(d: AdminData) {
 }
 
 export function exportAllUsers(d: AdminData) {
-  const rows = d.allUsers.map((u) => ({
+  const rows = accountsOf(d).all.map((u) => ({
     full_name: u.name,
     email: u.email,
     phone: u.phone,
