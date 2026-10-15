@@ -44,6 +44,13 @@ export function AdminAnalytics({ data }: { data: AdminData }) {
     { label: "Open job posts now", value: data.jobs.filter((j) => j.status === "open").length },
   ];
 
+  const roleRows = [
+    { key: "applicant", label: "Applicants", n: data.roleCounts.applicant },
+    { key: "client", label: "Clients", n: data.roleCounts.client },
+    { key: "admin", label: "Admins", n: data.roleCounts.admin },
+  ];
+  const totalAccounts = roleRows.reduce((a, r) => a + r.n, 0);
+
   return (
     <section className="mb-10">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
@@ -53,6 +60,27 @@ export function AdminAnalytics({ data }: { data: AdminData }) {
             <p className="mt-1 font-display text-2xl font-bold">{s.value}</p>
           </div>
         ))}
+      </div>
+      <div className="mt-4 rounded-xl border bg-card p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="font-display font-semibold">Accounts by role</p>
+          <p className="text-xs text-muted-foreground">{totalAccounts} total account{totalAccounts === 1 ? "" : "s"}</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {roleRows.map((r) => {
+            const pct = totalAccounts ? Math.round((r.n / totalAccounts) * 100) : 0;
+            return (
+              <div key={r.key} className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">{r.label}</p>
+                <p className="mt-1 font-display text-2xl font-bold">{r.n}</p>
+                <div className="mt-2 h-1.5 w-full rounded-full bg-muted">
+                  <div className="h-1.5 rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">{pct}% of all accounts</p>
+              </div>
+            );
+          })}
+        </div>
       </div>
       <div className="mt-4 rounded-xl border bg-card p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
