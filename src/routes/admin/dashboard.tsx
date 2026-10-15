@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { adminData, exportApplicants, exportClients, openCv } from "@/lib/admin";
 import { JOB_STATUS_LABEL } from "@/lib/client";
+import { AdminAnalytics } from "@/components/AdminAnalytics";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [{ title: "Admin Dashboard — TalentHub" }, { name: "robots", content: "noindex" }] }),
@@ -50,6 +51,7 @@ function Page() {
   return (
     <>
       <PageHeader title="Admin Dashboard" subtitle={`${data.applicants.length} applicant${data.applicants.length === 1 ? "" : "s"} · ${data.clients.length} client${data.clients.length === 1 ? "" : "s"} · ${data.jobs.length} job post${data.jobs.length === 1 ? "" : "s"}`} />
+      <AdminAnalytics data={data} />
       <div className="relative mb-6 max-w-md">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, email or phone" className="pl-9" aria-label="Search users" />
