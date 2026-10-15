@@ -72,8 +72,7 @@ function Page() {
   const [sort, setSort] = useState<Sort>({ key: "created_at", dir: "desc" });
 
   const term = q.trim().toLowerCase();
-  const hit = (u: AdminUser) =>
-    !term || [u.name, u.email, u.phone].some((v) => v?.toLowerCase().includes(term));
+  const hit = (u: AdminUser) => !term || [u.name, u.email, u.phone].some((v) => v?.toLowerCase().includes(term));
 
   const onSort = (k: UserSortKey) => setSort((s) => nextSort(s, k));
 
@@ -139,180 +138,188 @@ function Page() {
         </div>
       </div>
 
-      <Tabs defaultValue="all">
-        <TabsList>
-          <TabsTrigger value="all">All accounts ({data.allUsers.length})</TabsTrigger>
-          <TabsTrigger value="applicants">Applicants ({data.applicants.length})</TabsTrigger>
-          <TabsTrigger value="clients">Clients ({data.clients.length})</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all" className="mt-4">
-          <div className="mb-3 flex justify-end">
-            <Button size="sm" onClick={() => { exportAllUsers(data); toast.success("All accounts exported."); }}>
-              <Download className="h-4 w-4" /> Export all accounts (.csv)
-            </Button>
-          </div>
-          <div className="overflow-x-auto rounded-xl border bg-card">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <SortHeader k="name" label="Full name" sort={sort} onSort={onSort} />
-                  <SortHeader k="email" label="Email" sort={sort} onSort={onSort} />
-                  <SortHeader k="phone" label="Phone" sort={sort} onSort={onSort} />
-                  <SortHeader k="role" label="Role" sort={sort} onSort={onSort} />
-                  <SortHeader k="created_at" label="Joined" sort={sort} onSort={onSort} />
+      <section className="mb-10">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-display text-lg font-semibold">
+            All accounts
+            <span className="ml-2 text-sm font-normal text-muted-foreground">
+              {allUsers.length} shown
+            </span>
+          </h2>
+          <Button size="sm" onClick={() => { exportAllUsers(data); toast.success("All accounts exported."); }}>
+            <Download className="h-4 w-4" /> Export all accounts (.csv)
+          </Button>
+        </div>
+        <div className="overflow-x-auto rounded-xl border bg-card">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <SortHeader k="name" label="Full name" sort={sort} onSort={onSort} />
+                <SortHeader k="email" label="Email" sort={sort} onSort={onSort} />
+                <SortHeader k="phone" label="Phone" sort={sort} onSort={onSort} />
+                <SortHeader k="role" label="Role" sort={sort} onSort={onSort} />
+                <SortHeader k="created_at" label="Joined" sort={sort} onSort={onSort} />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {allUsers.map((u) => (
+                <TableRow key={u.id}>
+                  <TableCell className="font-medium">{u.name || "—"}</TableCell>
+                  <TableCell>
+                    <a href={`mailto:${u.email}`} className="text-primary hover:underline">{u.email}</a>
+                  </TableCell>
+                  <TableCell>{u.phone || "—"}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{ROLE_LABEL[u.role] ?? u.role}</Badge>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{joined(u.created_at)}</TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allUsers.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell className="font-medium">{u.name || "—"}</TableCell>
-                    <TableCell>
-                      <a href={`mailto:${u.email}`} className="text-primary hover:underline">{u.email}</a>
-                    </TableCell>
-                    <TableCell>{u.phone || "—"}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{ROLE_LABEL[u.role] ?? u.role}</Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{joined(u.created_at)}</TableCell>
-                  </TableRow>
-                ))}
-                {allUsers.length === 0 && (
+              ))}
+              {allUsers.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground">No accounts found.</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-3 font-display text-lg font-semibold">Applicants and clients in detail</h2>
+        <Tabs defaultValue="applicants">
+          <TabsList>
+            <TabsTrigger value="applicants">Applicants ({data.applicants.length})</TabsTrigger>
+            <TabsTrigger value="clients">Clients ({data.clients.length})</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="applicants" className="mt-4">
+            <div className="mb-3 flex justify-end">
+              <Button size="sm" onClick={runApplicantExport} disabled={busy}>
+                <Download className="h-4 w-4" /> {busy ? "Preparing…" : "Export applicants + CVs (.zip)"}
+              </Button>
+            </div>
+            <div className="overflow-x-auto rounded-xl border bg-card">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">No accounts found.</TableCell>
+                    <SortHeader k="name" label="Full name" sort={sort} onSort={onSort} />
+                    <SortHeader k="email" label="Email" sort={sort} onSort={onSort} />
+                    <SortHeader k="phone" label="Phone" sort={sort} onSort={onSort} />
+                    <SortHeader k="created_at" label="Joined" sort={sort} onSort={onSort} />
+                    <TableHead>Profiles</TableHead>
+                    <TableHead>CVs</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="applicants" className="mt-4">
-          <div className="mb-3 flex justify-end">
-            <Button size="sm" onClick={runApplicantExport} disabled={busy}>
-              <Download className="h-4 w-4" /> {busy ? "Preparing…" : "Export applicants + CVs (.zip)"}
-            </Button>
-          </div>
-          <div className="overflow-x-auto rounded-xl border bg-card">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <SortHeader k="name" label="Full name" sort={sort} onSort={onSort} />
-                  <SortHeader k="email" label="Email" sort={sort} onSort={onSort} />
-                  <SortHeader k="phone" label="Phone" sort={sort} onSort={onSort} />
-                  <SortHeader k="created_at" label="Joined" sort={sort} onSort={onSort} />
-                  <TableHead>Profiles</TableHead>
-                  <TableHead>CVs</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {applicants.map((u) => {
-                  const ps = data.profiles.filter((p) => p.owner_id === u.id);
-                  return (
-                    <TableRow key={u.id}>
-                      <TableCell className="font-medium">{u.name || "—"}</TableCell>
-                      <TableCell>
-                        <a href={`mailto:${u.email}`} className="text-primary hover:underline">{u.email}</a>
-                      </TableCell>
-                      <TableCell>{u.phone || "—"}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{joined(u.created_at)}</TableCell>
-                      <TableCell className="text-sm">
-                        {ps.length === 0 ? (
-                          <span className="text-muted-foreground">None</span>
-                        ) : (
-                          ps.map((p) => (
-                            <div key={p.id}>
-                              {p.role_title}{" "}
-                              <span className="text-muted-foreground">
-                                · ${p.hourly_rate}/hr · {p.status}
-                              </span>
-                            </div>
-                          ))
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {ps.filter((p) => p.cv_path).length === 0 ? (
-                          <span className="text-muted-foreground">—</span>
-                        ) : (
-                          ps
-                            .filter((p) => p.cv_path)
-                            .map((p) => (
-                              <button
-                                key={p.id}
-                                onClick={() => viewCv(p.cv_path!)}
-                                className="flex items-center gap-1 text-primary hover:underline"
-                              >
-                                <FileText className="h-3.5 w-3.5" /> {p.cv_original_filename || "CV"}
-                              </button>
+                </TableHeader>
+                <TableBody>
+                  {applicants.map((u) => {
+                    const ps = data.profiles.filter((p) => p.owner_id === u.id);
+                    return (
+                      <TableRow key={u.id}>
+                        <TableCell className="font-medium">{u.name || "—"}</TableCell>
+                        <TableCell>
+                          <a href={`mailto:${u.email}`} className="text-primary hover:underline">{u.email}</a>
+                        </TableCell>
+                        <TableCell>{u.phone || "—"}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{joined(u.created_at)}</TableCell>
+                        <TableCell className="text-sm">
+                          {ps.length === 0 ? (
+                            <span className="text-muted-foreground">None</span>
+                          ) : (
+                            ps.map((p) => (
+                              <div key={p.id}>
+                                {p.role_title}{" "}
+                                <span className="text-muted-foreground">
+                                  · ${p.hourly_rate}/hr · {p.status}
+                                </span>
+                              </div>
                             ))
-                        )}
-                      </TableCell>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {ps.filter((p) => p.cv_path).length === 0 ? (
+                            <span className="text-muted-foreground">—</span>
+                          ) : (
+                            ps
+                              .filter((p) => p.cv_path)
+                              .map((p) => (
+                                <button
+                                  key={p.id}
+                                  onClick={() => viewCv(p.cv_path!)}
+                                  className="flex items-center gap-1 text-primary hover:underline"
+                                >
+                                  <FileText className="h-3.5 w-3.5" /> {p.cv_original_filename || "CV"}
+                                </button>
+                              ))
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  {applicants.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground">No applicants found.</TableCell>
                     </TableRow>
-                  );
-                })}
-                {applicants.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">No applicants found.</TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="clients" className="mt-4">
-          <div className="mb-3 flex justify-end">
-            <Button size="sm" onClick={() => { exportClients(data); toast.success("Client export downloaded."); }}>
-              <Download className="h-4 w-4" /> Export clients + job posts (.csv)
-            </Button>
-          </div>
-          <div className="overflow-x-auto rounded-xl border bg-card">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <SortHeader k="name" label="Full name" sort={sort} onSort={onSort} />
-                  <SortHeader k="email" label="Email" sort={sort} onSort={onSort} />
-                  <SortHeader k="phone" label="Phone" sort={sort} onSort={onSort} />
-                  <SortHeader k="created_at" label="Joined" sort={sort} onSort={onSort} />
-                  <TableHead>Hiring needs</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {clients.map((u) => {
-                  const js = data.jobs.filter((j) => j.owner_id === u.id);
-                  return (
-                    <TableRow key={u.id}>
-                      <TableCell className="font-medium">{u.name || "—"}</TableCell>
-                      <TableCell>
-                        <a href={`mailto:${u.email}`} className="text-primary hover:underline">{u.email}</a>
-                      </TableCell>
-                      <TableCell>{u.phone || "—"}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{joined(u.created_at)}</TableCell>
-                      <TableCell className="text-sm">
-                        {js.length === 0 ? (
-                          <span className="text-muted-foreground">No job posts</span>
-                        ) : (
-                          js.map((j) => (
-                            <div key={j.id}>
-                              {j.title}{" "}
-                              <span className="text-muted-foreground">· {JOB_STATUS_LABEL[j.status] ?? j.status}</span>
-                            </div>
-                          ))
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-                {clients.length === 0 && (
+          <TabsContent value="clients" className="mt-4">
+            <div className="mb-3 flex justify-end">
+              <Button size="sm" onClick={() => { exportClients(data); toast.success("Client export downloaded."); }}>
+                <Download className="h-4 w-4" /> Export clients + job posts (.csv)
+              </Button>
+            </div>
+            <div className="overflow-x-auto rounded-xl border bg-card">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">No clients found.</TableCell>
+                    <SortHeader k="name" label="Full name" sort={sort} onSort={onSort} />
+                    <SortHeader k="email" label="Email" sort={sort} onSort={onSort} />
+                    <SortHeader k="phone" label="Phone" sort={sort} onSort={onSort} />
+                    <SortHeader k="created_at" label="Joined" sort={sort} onSort={onSort} />
+                    <TableHead>Hiring needs</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-      </Tabs>
+                </TableHeader>
+                <TableBody>
+                  {clients.map((u) => {
+                    const js = data.jobs.filter((j) => j.owner_id === u.id);
+                    return (
+                      <TableRow key={u.id}>
+                        <TableCell className="font-medium">{u.name || "—"}</TableCell>
+                        <TableCell>
+                          <a href={`mailto:${u.email}`} className="text-primary hover:underline">{u.email}</a>
+                        </TableCell>
+                        <TableCell>{u.phone || "—"}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{joined(u.created_at)}</TableCell>
+                        <TableCell className="text-sm">
+                          {js.length === 0 ? (
+                            <span className="text-muted-foreground">No job posts</span>
+                          ) : (
+                            js.map((j) => (
+                              <div key={j.id}>
+                                {j.title}{" "}
+                                <span className="text-muted-foreground">· {JOB_STATUS_LABEL[j.status] ?? j.status}</span>
+                              </div>
+                            ))
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  {clients.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground">No clients found.</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </section>
     </>
   );
 }
