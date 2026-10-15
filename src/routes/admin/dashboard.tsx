@@ -116,7 +116,7 @@ function Page() {
     <>
       <PageHeader
         title="Admin Dashboard"
-        subtitle={`${data.roleCounts.applicant} applicant${data.roleCounts.applicant === 1 ? "" : "s"} · ${data.roleCounts.client} client${data.roleCounts.client === 1 ? "" : "s"} · ${data.jobs.length} job post${data.jobs.length === 1 ? "" : "s"}`}
+        subtitle={`${roleCounts.applicant} applicant${roleCounts.applicant === 1 ? "" : "s"} · ${roleCounts.client} client${roleCounts.client === 1 ? "" : "s"} · ${data.jobs.length} job post${data.jobs.length === 1 ? "" : "s"}`}
       />
       <AdminAnalytics data={data} />
 
@@ -191,8 +191,8 @@ function Page() {
         <h2 className="mb-3 font-display text-lg font-semibold">Applicants and clients in detail</h2>
         <Tabs defaultValue="applicants">
           <TabsList>
-            <TabsTrigger value="applicants">Applicants ({data.applicants.length})</TabsTrigger>
-            <TabsTrigger value="clients">Clients ({data.clients.length})</TabsTrigger>
+            <TabsTrigger value="applicants">Applicants ({applicantRows.length})</TabsTrigger>
+            <TabsTrigger value="clients">Clients ({clientRows.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="applicants" className="mt-4">
