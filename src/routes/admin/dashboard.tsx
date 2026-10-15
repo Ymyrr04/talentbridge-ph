@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
+  accountsOf,
   adminData,
   exportAllUsers,
   exportApplicants,
@@ -66,6 +67,7 @@ function SortHeader({
 
 function Page() {
   const { data } = useSuspenseQuery(adminData);
+  const { all: allAccounts, applicants: applicantRows, clients: clientRows, counts: roleCounts } = accountsOf(data);
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [role, setRole] = useState<RoleFilter>("all");
@@ -77,17 +79,17 @@ function Page() {
   const onSort = (k: UserSortKey) => setSort((s) => nextSort(s, k));
 
   const allUsers = useMemo(
-    () => sortUsers(data.allUsers.filter((u) => (role === "all" || u.role === role) && hit(u)), sort.key, sort.dir),
-    [data.allUsers, role, term, sort],
+    () => sortUsers(allAccounts.filter((u) => (role === "all" || u.role === role) && hit(u)), sort.key, sort.dir),
+    [allAccounts, role, term, sort],
   );
-  const applicants = useMemo(() => sortUsers(data.applicants.filter(hit), sort.key, sort.dir), [data.applicants, term, sort]);
-  const clients = useMemo(() => sortUsers(data.clients.filter(hit), sort.key, sort.dir), [data.clients, term, sort]);
+  const applicants = useMemo(() => sortUsers(applicantRows.filter(hit), sort.key, sort.dir), [applicantRows, term, sort]);
+  const clients = useMemo(() => sortUsers(clientRows.filter(hit), sort.key, sort.dir), [clientRows, term, sort]);
 
   const chips: { key: RoleFilter; label: string; n: number }[] = [
-    { key: "all", label: "All accounts", n: data.allUsers.length },
-    { key: "applicant", label: "Applicants", n: data.roleCounts.applicant },
-    { key: "client", label: "Clients", n: data.roleCounts.client },
-    { key: "admin", label: "Admins", n: data.roleCounts.admin },
+    { key: "all", label: "All accounts", n: allAccounts.length },
+    { key: "applicant", label: "Applicants", n: roleCounts.applicant },
+    { key: "client", label: "Clients", n: roleCounts.client },
+    { key: "admin", label: "Admins", n: roleCounts.admin },
   ];
 
   async function runApplicantExport() {

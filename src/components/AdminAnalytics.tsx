@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
-import type { AdminData } from "@/lib/admin";
+import { accountsOf, type AdminData } from "@/lib/admin";
 
 const config = {
   applicants: { label: "New applicants", color: "var(--primary)" },
@@ -14,6 +14,7 @@ const dayKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padSt
 
 export function AdminAnalytics({ data }: { data: AdminData }) {
   const [range, setRange] = useState(14);
+  const { applicants: applicantRows, clients: clientRows, counts: roleCounts } = accountsOf(data);
 
   const { series, today, totals } = useMemo(() => {
     const days: Record<string, { day: string; label: string; applicants: number; clients: number; jobs: number }> = {};
@@ -26,8 +27,8 @@ export function AdminAnalytics({ data }: { data: AdminData }) {
       const row = days[dayKey(new Date(iso))];
       if (row) row[k]++;
     };
-    data.applicants.forEach((u) => bump(u.created_at, "applicants"));
-    data.clients.forEach((u) => bump(u.created_at, "clients"));
+    applicantRows.forEach((u) => bump(u.created_at, "applicants"));
+    clientRows.forEach((u) => bump(u.created_at, "clients"));
     data.jobs.forEach((j) => bump(j.created_at, "jobs"));
     const series = Object.values(days);
     const today = series[series.length - 1]!;
@@ -45,9 +46,9 @@ export function AdminAnalytics({ data }: { data: AdminData }) {
   ];
 
   const roleRows = [
-    { key: "applicant", label: "Applicants", n: data.roleCounts.applicant },
-    { key: "client", label: "Clients", n: data.roleCounts.client },
-    { key: "admin", label: "Admins", n: data.roleCounts.admin },
+    { key: "applicant", label: "Applicants", n: roleCounts.applicant },
+    { key: "client", label: "Clients", n: roleCounts.client },
+    { key: "admin", label: "Admins", n: roleCounts.admin },
   ];
   const totalAccounts = roleRows.reduce((a, r) => a + r.n, 0);
 
