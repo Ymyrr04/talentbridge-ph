@@ -57,6 +57,13 @@
       "when": 1792016195140,
       "tag": "0007_applicant_candidate_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792081675692,
+      "tag": "0008_admin_list_users",
+      "breakpoints": true
     }
   ]
 }

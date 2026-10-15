@@ -225,6 +225,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_users: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string
+          role: Database["public"]["Enums"]["app_role"]
+        }[]
+      }
       apply_to_job: {
         Args: { _job_id: string; _note: string; _profile_id: string }
         Returns: string

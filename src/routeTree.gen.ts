@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as ApplicantRouteRouteImport } from './routes/applicant/route'
 import { Route as ClientRouteRouteImport } from './routes/client/route'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -39,6 +40,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApplicantRouteRoute = ApplicantRouteRouteImport.update({
   id: '/applicant',
   path: '/applicant',
@@ -65,9 +71,9 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
-  getParentRoute: () => rootRouteImport,
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const ApplicantApplicationsRoute = ApplicantApplicationsRouteImport.update({
   id: '/applications',
@@ -157,6 +163,7 @@ const ClientJobsIdEditRoute = ClientJobsIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/applicant': typeof ApplicantRouteRouteWithChildren
   '/client': typeof ClientRouteRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/applicant': typeof ApplicantRouteRouteWithChildren
   '/client': typeof ClientRouteRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
@@ -210,6 +218,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/applicant': typeof ApplicantRouteRouteWithChildren
   '/client': typeof ClientRouteRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/applicant'
     | '/client'
     | '/forgot-password'
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/applicant'
     | '/client'
     | '/forgot-password'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/applicant'
     | '/client'
     | '/forgot-password'
@@ -317,12 +329,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   ApplicantRouteRoute: typeof ApplicantRouteRouteWithChildren
   ClientRouteRoute: typeof ClientRouteRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
   SignupApplicantRoute: typeof SignupApplicantRoute
   SignupClientRoute: typeof SignupClientRoute
 }
@@ -334,6 +346,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/applicant': {
@@ -373,10 +392,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/dashboard': {
       id: '/admin/dashboard'
-      path: '/admin/dashboard'
+      path: '/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/applicant/applications': {
       id: '/applicant/applications'
@@ -500,6 +519,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 interface ApplicantRouteRouteChildren {
   ApplicantApplicationsRoute: typeof ApplicantApplicationsRoute
   ApplicantDashboardRoute: typeof ApplicantDashboardRoute
@@ -552,12 +583,12 @@ const ClientRouteRouteWithChildren = ClientRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   ApplicantRouteRoute: ApplicantRouteRouteWithChildren,
   ClientRouteRoute: ClientRouteRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  AdminDashboardRoute: AdminDashboardRoute,
   SignupApplicantRoute: SignupApplicantRoute,
   SignupClientRoute: SignupClientRoute,
 }
