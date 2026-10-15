@@ -10,11 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as ApplicantRouteRouteImport } from './routes/applicant/route'
 import { Route as ClientRouteRouteImport } from './routes/client/route'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as ApplicantApplicationsRouteImport } from './routes/applicant/applications'
 import { Route as ApplicantDashboardRouteImport } from './routes/applicant/dashboard'
 import { Route as ApplicantJobsRouteImport } from './routes/applicant/jobs'
@@ -36,6 +38,11 @@ import { Route as ClientJobsIdEditRouteImport } from './routes/client/jobs/$id/e
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApplicantRouteRoute = ApplicantRouteRouteImport.update({
@@ -62,6 +69,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const ApplicantApplicationsRoute = ApplicantApplicationsRouteImport.update({
   id: '/applications',
@@ -151,11 +163,13 @@ const ClientJobsIdEditRoute = ClientJobsIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/applicant': typeof ApplicantRouteRouteWithChildren
   '/client': typeof ClientRouteRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
@@ -176,11 +190,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/applicant': typeof ApplicantRouteRouteWithChildren
   '/client': typeof ClientRouteRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
@@ -202,11 +218,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/applicant': typeof ApplicantRouteRouteWithChildren
   '/client': typeof ClientRouteRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
   '/applicant/jobs': typeof ApplicantJobsRoute
@@ -229,11 +247,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/applicant'
     | '/client'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
+    | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
     | '/applicant/jobs'
@@ -254,11 +274,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/applicant'
     | '/client'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
+    | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
     | '/applicant/jobs'
@@ -279,11 +301,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/applicant'
     | '/client'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
+    | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
     | '/applicant/jobs'
@@ -305,6 +329,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   ApplicantRouteRoute: typeof ApplicantRouteRouteWithChildren
   ClientRouteRoute: typeof ClientRouteRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -321,6 +346,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/applicant': {
@@ -357,6 +389,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/applicant/applications': {
       id: '/applicant/applications'
@@ -480,6 +519,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 interface ApplicantRouteRouteChildren {
   ApplicantApplicationsRoute: typeof ApplicantApplicationsRoute
   ApplicantDashboardRoute: typeof ApplicantDashboardRoute
@@ -532,6 +583,7 @@ const ClientRouteRouteWithChildren = ClientRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   ApplicantRouteRoute: ApplicantRouteRouteWithChildren,
   ClientRouteRoute: ClientRouteRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
