@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const adminData = queryOptions({
-  queryKey: ["admin-data"],
+  queryKey: ["admin-data", 2],
   queryFn: async () => {
     const [users, profiles, jobs] = await Promise.all([
       supabase.rpc("admin_list_users"),
@@ -13,9 +13,17 @@ export const adminData = queryOptions({
     if (profiles.error) throw profiles.error;
     if (jobs.error) throw jobs.error;
     const all = users.data ?? [];
+    const byRole = (r: "applicant" | "client" | "admin") => all.filter((u) => u.role === r);
     return {
-      applicants: all.filter((u) => u.role === "applicant"),
-      clients: all.filter((u) => u.role === "client"),
+      applicants: byRole("applicant"),
+      clients: byRole("client"),
+      admins: byRole("admin"),
+      allUsers: all,
+      roleCounts: {
+        applicant: byRole("applicant").length,
+        client: byRole("client").length,
+        admin: byRole("admin").length,
+      },
       profiles: profiles.data,
       jobs: jobs.data,
     };
@@ -23,6 +31,48 @@ export const adminData = queryOptions({
 });
 
 export type AdminData = Awaited<ReturnType<NonNullable<typeof adminData.queryFn>>>;
+export type AdminUser = AdminData["allUsers"][number];
+
+/**
+ * A cached admin result may predate any of these fields, so nothing here may
+ * assume a key is present — the page must still render the lists it can build.
+ */
+type AccountsShape = Partial<Pick<AdminData, "applicants" | "clients" | "admins" | "allUsers" | "roleCounts">>;
+
+export function accountsOf(d: AccountsShape) {
+  const applicants = d.applicants ?? [];
+  const clients = d.clients ?? [];
+  const admins = d.admins ?? [];
+  return {
+    all: d.allUsers ?? [...applicants, ...clients, ...admins],
+    applicants,
+    clients,
+    admins,
+    counts: d.roleCounts ?? { applicant: applicants.length, client: clients.length, admin: admins.length },
+  };
+}
+
+export const ROLE_LABEL: Record<AdminUser["role"], string> = {
+  applicant: "Applicant",
+  client: "Client",
+  admin: "Admin",
+};
+
+export type UserSortKey = "name" | "email" | "phone" | "role" | "created_at";
+export type Sort = { key: UserSortKey; dir: "asc" | "desc" };
+
+export function sortUsers<T extends AdminUser>(rows: T[], key: UserSortKey, dir: "asc" | "desc"): T[] {
+  const sorted = [...rows].sort((a, b) => String(a[key] ?? "").localeCompare(String(b[key] ?? "")));
+  return dir === "asc" ? sorted : sorted.reverse();
+}
+
+export function nextSort(current: Sort, key: UserSortKey): Sort {
+  return current.key === key ? { key, dir: current.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" };
+}
+
+export function joined(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
 
 function cell(v: unknown): string {
   if (v === null || v === undefined) return "";
@@ -59,7 +109,7 @@ export async function exportApplicants(d: AdminData) {
   const zip = new JSZip();
   const cvs = zip.folder("cvs")!;
   const rows: Record<string, unknown>[] = [];
-  for (const u of d.applicants) {
+  for (const u of accountsOf(d).applicants) {
     const ps = d.profiles.filter((p) => p.owner_id === u.id);
     const base = { full_name: u.name, email: u.email, phone: u.phone, joined: u.created_at };
     if (ps.length === 0) {
@@ -98,7 +148,7 @@ export async function exportApplicants(d: AdminData) {
 
 export function exportClients(d: AdminData) {
   const rows: Record<string, unknown>[] = [];
-  for (const u of d.clients) {
+  for (const u of accountsOf(d).clients) {
     const js = d.jobs.filter((j) => j.owner_id === u.id);
     const base = { full_name: u.name, email: u.email, phone: u.phone, joined: u.created_at };
     if (js.length === 0) rows.push({ ...base, job_title: "", job_status: "", job_description: "", job_posted: "" });
@@ -106,4 +156,15 @@ export function exportClients(d: AdminData) {
       rows.push({ ...base, job_title: j.title, job_status: j.status, job_description: j.description, job_posted: j.created_at });
   }
   downloadBlob(new Blob(["\uFEFF" + toCsv(rows)], { type: "text/csv" }), `talenthub-clients-${stamp()}.csv`);
+}
+
+export function exportAllUsers(d: AdminData) {
+  const rows = accountsOf(d).all.map((u) => ({
+    full_name: u.name,
+    email: u.email,
+    phone: u.phone,
+    role: ROLE_LABEL[u.role] ?? u.role,
+    joined: u.created_at,
+  }));
+  downloadBlob(new Blob(["\uFEFF" + toCsv(rows)], { type: "text/csv" }), `talenthub-all-accounts-${stamp()}.csv`);
 }
