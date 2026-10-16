@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, incomingApplications } from "@/lib/applications";
 import { MessageApplicantButton } from "@/components/MessageApplicantButton";
 import { IntroVideoButton } from "@/components/IntroVideoButton";
+import { VoiceIntroButton } from "@/components/VoiceIntroButton";
 
 export const Route = createFileRoute("/client/applications")({
   head: () => ({ meta: [{ title: "Applications — TalentHub" }, { name: "robots", content: "noindex" }] }),
@@ -25,6 +26,14 @@ function ClientApplicationsPage() {
       const { data, error } = await supabase.rpc("incoming_application_videos");
       if (error) throw error;
       return Object.fromEntries((data ?? []).map((r) => [r.application_id, r.video_path])) as Record<string, string>;
+    },
+  });
+  const { data: voices } = useQuery({
+    queryKey: ["incoming-application-voices"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("incoming_application_voices");
+      if (error) throw error;
+      return Object.fromEntries((data ?? []).map((r) => [r.application_id, r]));
     },
   });
   const qc = useQueryClient();
@@ -72,6 +81,7 @@ function ClientApplicationsPage() {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {videos?.[a.id] && <IntroVideoButton path={videos[a.id]!} applicantName={a.applicant_name} />}
+                  {voices?.[a.id] && <VoiceIntroButton path={voices[a.id]!.voice_path} link={voices[a.id]!.voice_link} applicantName={a.applicant_name} />}
                   <MessageApplicantButton applicationId={a.id} applicantName={a.applicant_name} />
                   <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${ApplicationStatusClass(a.status)}`}>
                     {APPLICATION_STATUS_LABEL[a.status]}

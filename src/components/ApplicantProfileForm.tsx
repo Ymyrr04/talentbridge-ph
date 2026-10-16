@@ -9,6 +9,8 @@ import { removeCv, uploadCv, validateCv } from "@/lib/applicant";
 import { CandidateFields, publishErrors, SUMMARY_MAX, type CandidateValues } from "@/components/CandidateFields";
 import { IntroVideoField, type VideoChange } from "@/components/IntroVideoField";
 import { removeVideo, uploadVideo } from "@/lib/introVideo";
+import { VoiceIntroField, type VoiceChange } from "@/components/VoiceIntroField";
+import { removeVoice, uploadVoice } from "@/lib/voiceIntro";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +33,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     timeZones: existing?.time_zones ?? [],
   });
   const [video, setVideo] = useState<VideoChange>({ kind: "keep" });
+  const [voice, setVoice] = useState<VoiceChange>({ kind: "keep" });
   const [profileId] = useState(() => existing?.id ?? crypto.randomUUID());
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -65,8 +68,10 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     setSaving(true);
     let newPath: string | null = null;
     let newVideo: string | null = null;
+    let newVoice: string | null = null;
     try {
       if (file) newPath = await uploadCv(userId, file);
+      if (voice.kind === "file") newVoice = await uploadVoice(userId, profileId, voice.blob);
       if (video.kind === "new") newVideo = await uploadVideo(userId, profileId, video.blob);
       const values = {
         role_title: title,
@@ -79,6 +84,9 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         hours_per_week: hours,
         time_zones: cand.timeZones.length ? cand.timeZones : null,
         ...(newVideo && video.kind === "new" ? { video_path: newVideo, video_duration_seconds: video.duration } : {}),
+        ...(voice.kind === "file" && newVoice ? { voice_path: newVoice, voice_link: null } : {}),
+        ...(voice.kind === "link" ? { voice_path: null, voice_link: voice.url } : {}),
+        ...(voice.kind === "remove" ? { voice_path: null, voice_link: null } : {}),
         ...(video.kind === "remove" ? { video_path: null, video_duration_seconds: null } : {}),
         ...(newPath && file ? { cv_path: newPath, cv_original_filename: file.name } : {}),
       };
@@ -87,6 +95,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         : await supabase.from("applicant_profiles").insert({ ...values, id: profileId, owner_id: userId });
       if (error) throw error;
       if (newPath && existing?.cv_path) await removeCv(existing.cv_path);
+      if (voice.kind !== "keep" && existing?.voice_path) await removeVoice(existing.voice_path);
       if (video.kind !== "keep" && existing?.video_path) await removeVideo(existing.video_path);
       await qc.invalidateQueries({ queryKey: ["applicant-profiles", userId] });
       if (existing) await qc.invalidateQueries({ queryKey: ["applicant-profile", existing.id] });
@@ -95,6 +104,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     } catch (err) {
       if (newPath) await removeCv(newPath);
       if (newVideo) await removeVideo(newVideo);
+      if (newVoice) await removeVoice(newVoice);
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setSaving(false);
@@ -164,6 +174,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
       </div>
 
       <IntroVideoField existingPath={existing?.video_path ?? null} value={video} onChange={setVideo} />
+      <VoiceIntroField existingPath={existing?.voice_path ?? null} existingLink={existing?.voice_link ?? null} value={voice} onChange={setVoice} />
 
       {error && <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
       <div className="flex gap-3">
