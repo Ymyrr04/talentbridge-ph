@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { removeVideo } from "@/lib/introVideo";
 import { removeVoice } from "@/lib/voiceIntro";
-import { MAX_PROFILES, myApplicantProfiles, myCv } from "@/lib/applicant";
+import { MAX_PROFILES, myAccountName, myApplicantProfiles, myCv } from "@/lib/applicant";
+import { StandardProfile } from "@/components/StandardProfile";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +24,7 @@ function Page() {
   const key = myApplicantProfiles(user.id).queryKey;
   const { data: profiles = [], isLoading } = useQuery(myApplicantProfiles(user.id));
   const { data: cv } = useQuery(myCv(user.id));
+  const { data: accountName } = useQuery(myAccountName(user.id));
   const full = profiles.length >= MAX_PROFILES;
 
   const toggle = useMutation({
@@ -81,11 +83,23 @@ function Page() {
             const published = p.status === "published";
             return (
               <div key={p.id} className="flex flex-col rounded-2xl border bg-card p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <p className="font-display font-semibold leading-snug">{p.role_title}</p>
+                <div className="flex justify-end">
                   <Badge variant={published ? "default" : "secondary"}>{published ? "Published" : "Draft"}</Badge>
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">${Number(p.hourly_rate).toFixed(2)}/hr</p>
+                <StandardProfile
+                  className="mt-2"
+                  data={{
+                    name: accountName,
+                    roleTitle: p.role_title,
+                    hourlyRate: p.hourly_rate,
+                    years: p.years_experience,
+                    field: p.field,
+                    highlights: p.highlights,
+                    availability: p.availability_list ?? (p.availability ? [p.availability] : []),
+                    hours: p.hours_per_week,
+                    timeZones: p.time_zones,
+                  }}
+                />
                 {cv ? (
                   <button onClick={() => openCv(cv.cv_path)} className="mt-3 inline-flex items-center gap-1.5 self-start text-sm text-primary hover:underline">
                     <FileText className="h-4 w-4" /> View CV
