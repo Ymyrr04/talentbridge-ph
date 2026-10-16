@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 
 type Job = Tables<"job_posts">;
 
@@ -52,6 +53,14 @@ function parseHours(v: string): number | null | undefined {
   const n = Number(v);
   return Number.isInteger(n) && n >= 1 && n <= 60 ? n : undefined;
 }
+/** [min, max] strings; on edit a one-sided saved value mirrors to both. */
+function initPair(min: number | null | undefined, max: number | null | undefined, fmt?: (n: number) => string): [string, string] {
+  const a = min != null ? (fmt ? fmt(min) : String(min)) : "";
+  const b = max != null ? (fmt ? fmt(max) : String(max)) : "";
+  if (a && !b) return [a, a];
+  if (!a && b) return [b, b];
+  return [a, b];
+}
 
 export function JobPostForm({ userId, existing }: { userId: string; existing?: Job }) {
   const navigate = useNavigate();
@@ -63,10 +72,18 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
   const [duration, setDuration] = useState(existing?.project_duration ?? "");
   const [zones, setZones] = useState<string[]>(existing?.time_zones ?? []);
   const [experience, setExperience] = useState(existing?.experience_level ?? "any");
-  const [rateMin, setRateMin] = useState(existing?.rate_min != null ? Number(existing.rate_min).toFixed(2) : "");
-  const [rateMax, setRateMax] = useState(existing?.rate_max != null ? Number(existing.rate_max).toFixed(2) : "");
-  const [hoursMin, setHoursMin] = useState(existing?.hours_min != null ? String(existing.hours_min) : "");
-  const [hoursMax, setHoursMax] = useState(existing?.hours_max != null ? String(existing.hours_max) : "");
+  const [rateMin0, rateMax0] = initPair(existing?.rate_min, existing?.rate_max, (n) => n.toFixed(2));
+  const [hoursMin0, hoursMax0] = initPair(existing?.hours_min, existing?.hours_max);
+  const [rateMin, setRateMin] = useState(rateMin0);
+  const [rateMax, setRateMax] = useState(rateMax0);
+  const [hoursMin, setHoursMin] = useState(hoursMin0);
+  const [hoursMax, setHoursMax] = useState(hoursMax0);
+  const [rateRange, setRateRange] = useState(
+    existing?.rate_min != null && existing?.rate_max != null && Number(existing.rate_min) !== Number(existing.rate_max),
+  );
+  const [hoursRange, setHoursRange] = useState(
+    existing?.hours_min != null && existing?.hours_max != null && existing.hours_min !== existing.hours_max,
+  );
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -82,6 +99,22 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
   function changeType(v: string) {
     setEmploymentType(v);
     if (v !== "project") setDuration("");
+  }
+  function toggleRateRange(on: boolean) {
+    setRateRange(on);
+    setRateMax(rateMin); // keep "From"; "To" matches it in both directions
+  }
+  function toggleHoursRange(on: boolean) {
+    setHoursRange(on);
+    setHoursMax(hoursMin);
+  }
+  function setFixedRate(v: string) {
+    setRateMin(v);
+    setRateMax(v);
+  }
+  function setFixedHours(v: string) {
+    setHoursMin(v);
+    setHoursMax(v);
   }
   function toggleZone(z: string, on: boolean) {
     setZones((cur) => (on ? [...new Set([...cur, z])] : cur.filter((x) => x !== z)));
@@ -176,31 +209,62 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
           </div>
         )}
         <div className="space-y-1.5">
-          <Label>Hourly rate (USD)</Label>
+          <div className="flex items-center justify-between gap-3">
+            <Label htmlFor={rateRange ? undefined : "rate"}>Hourly rate (USD)</Label>
+            <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+              <Switch checked={rateRange} onCheckedChange={toggleRateRange} aria-label="Set a rate range" />
+              Set a range
+            </label>
+          </div>
           <div className="grid grid-cols-2 gap-3 sm:max-w-md">
-            {([["rate-from", "From", rateMin, setRateMin], ["rate-to", "To", rateMax, setRateMax]] as const).map(([id, lbl, v, set]) => (
-              <div key={id} className="space-y-1">
-                <Label htmlFor={id} className="text-xs font-normal text-muted-foreground">{lbl}</Label>
+            {rateRange ? (
+              ([["rate-from", "From", rateMin, setRateMin], ["rate-to", "To", rateMax, setRateMax]] as const).map(([id, lbl, v, set]) => (
+                <div key={id} className="space-y-1">
+                  <Label htmlFor={id} className="text-xs font-normal text-muted-foreground">{lbl}</Label>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+                    <Input id={id} type="number" inputMode="decimal" min={1} max={500} step="0.01" className="pl-7" placeholder="0.00" aria-invalid={rateErr} value={v} onChange={(e) => set(e.target.value)} onBlur={() => fmt2(v, set)} />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="space-y-1">
                 <div className="relative">
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
-                  <Input id={id} type="number" inputMode="decimal" min={1} max={500} step="0.01" className="pl-7" placeholder="0.00" aria-invalid={rateErr} value={v} onChange={(e) => set(e.target.value)} onBlur={() => fmt2(v, set)} />
+                  <Input id="rate" type="number" inputMode="decimal" min={1} max={500} step="0.01" className="pl-7" placeholder="0.00" aria-invalid={rateErr} value={rateMin} onChange={(e) => setFixedRate(e.target.value)} onBlur={() => fmt2(rateMin, setFixedRate)} />
                 </div>
               </div>
-            ))}
+            )}
           </div>
-          <p className={`text-xs ${rateErr ? "text-destructive" : "text-muted-foreground"}`}>Between $1 and $500. Use the same amount for a fixed rate.</p>
+          <p className={`text-xs ${rateErr ? "text-destructive" : "text-muted-foreground"}`}>
+            {rateRange ? 'Between $1 and $500 per hour. "To" must be at least "From".' : "Between $1 and $500 per hour."}
+          </p>
         </div>
         <div className="space-y-1.5">
-          <Label>Hours per week</Label>
-          <div className="grid grid-cols-2 gap-3 sm:max-w-md">
-            {([["hours-from", "From", hoursMin, setHoursMin], ["hours-to", "To", hoursMax, setHoursMax]] as const).map(([id, lbl, v, set]) => (
-              <div key={id} className="space-y-1">
-                <Label htmlFor={id} className="text-xs font-normal text-muted-foreground">{lbl}</Label>
-                <Input id={id} type="number" inputMode="numeric" min={1} max={60} step={1} aria-invalid={hoursErr} value={v} onChange={(e) => set(e.target.value)} />
-              </div>
-            ))}
+          <div className="flex items-center justify-between gap-3">
+            <Label htmlFor={hoursRange ? undefined : "hours"}>Hours per week</Label>
+            <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+              <Switch checked={hoursRange} onCheckedChange={toggleHoursRange} aria-label="Set an hours range" />
+              Set a range
+            </label>
           </div>
-          <p className={`text-xs ${hoursErr ? "text-destructive" : "text-muted-foreground"}`}>Between 1 and 60. Use the same number for fixed hours.</p>
+          <div className="grid grid-cols-2 gap-3 sm:max-w-md">
+            {hoursRange ? (
+              ([["hours-from", "From", hoursMin, setHoursMin], ["hours-to", "To", hoursMax, setHoursMax]] as const).map(([id, lbl, v, set]) => (
+                <div key={id} className="space-y-1">
+                  <Label htmlFor={id} className="text-xs font-normal text-muted-foreground">{lbl}</Label>
+                  <Input id={id} type="number" inputMode="numeric" min={1} max={60} step={1} aria-invalid={hoursErr} value={v} onChange={(e) => set(e.target.value)} />
+                </div>
+              ))
+            ) : (
+              <div className="space-y-1">
+                <Input id="hours" type="number" inputMode="numeric" min={1} max={60} step={1} aria-invalid={hoursErr} value={hoursMin} onChange={(e) => setFixedHours(e.target.value)} />
+              </div>
+            )}
+          </div>
+          <p className={`text-xs ${hoursErr ? "text-destructive" : "text-muted-foreground"}`}>
+            {hoursRange ? 'Between 1 and 60 hours. "To" must be at least "From".' : "Between 1 and 60 hours."}
+          </p>
         </div>
         {estimate && (
           <div className="flex items-start gap-3 rounded-xl bg-muted p-4" aria-live="polite">
