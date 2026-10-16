@@ -66,7 +66,7 @@ export function ProfileSuggestionsDialog({
                 <StandardProfile
                   className="flex-1"
                   rateLabel="$__.__/hour"
-                  data={{ name: accountName, roleTitle: s.role_title, hourlyRate: null, years: s.years_experience, field: s.field, highlights: s.highlights, availability: [], hours: null, timeZones: [] }}
+                  data={{ name: accountName, roleTitle: s.role_title, hourlyRate: null, years: s.years_experience, industries: s.field ? [s.field] : [], highlights: s.highlights, availability: [], hours: null, timeZones: [] }}
                 />
                 {s.skills.length > 0 && <p className="mt-3 text-xs text-muted-foreground">Skills: {s.skills.join(", ")}</p>}
                 <Button className="mt-4" onClick={() => { onUse(s); onOpenChange(false); }}>Use this</Button>

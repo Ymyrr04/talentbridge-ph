@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, incomingApplications } from "@/lib/applications";
-import { availabilityBullet, firstName } from "@/lib/standardProfile";
+import { firstName } from "@/lib/standardProfile";
+import { StandardProfile } from "@/components/StandardProfile";
 import { cn } from "@/lib/utils";
 import { MessageApplicantButton } from "@/components/MessageApplicantButton";
 import { IntroVideoButton } from "@/components/IntroVideoButton";
@@ -42,6 +43,11 @@ type ProfileFormat = {
   availability_list: string[] | null;
   hours_per_week: number | null;
   time_zones: string[] | null;
+  past_titles: string[] | null;
+  industries: string[] | null;
+  tools: string[] | null;
+  education: string[] | null;
+  start_availability: string | null;
 };
 
 function appliedDate(iso: string) {
@@ -208,20 +214,6 @@ function Preview({
   onBack: () => void;
   onSetStatus: (id: string, status: string) => void;
 }) {
-  const name = firstName(a.applicant_name) || "Applicant";
-  const hasRate = a.hourly_rate != null && Number.isFinite(Number(a.hourly_rate));
-  const hasYears = format?.years_experience !== null && format?.years_experience !== undefined;
-  const field = (format?.field ?? "").trim();
-  const bullets = [...(format?.highlights ?? []).map((h) => h.trim()).filter(Boolean)];
-  const avail = format
-    ? availabilityBullet({
-        availability: format.availability_list,
-        hours: format.hours_per_week,
-        timeZones: format.time_zones,
-      })
-    : "";
-  if (avail) bullets.push(avail);
-
   return (
     <section className="flex min-w-0 flex-1 flex-col overflow-y-auto p-5">
       <div className="mb-3 flex items-center gap-2">
@@ -234,16 +226,24 @@ function Preview({
       </div>
 
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 space-y-1 text-sm">
-          <p className="font-semibold">{[name, a.role_title.trim()].filter(Boolean).join(" – ")}</p>
-          {hasRate && <p>${Number(a.hourly_rate).toFixed(2)}/hour</p>}
-          {(hasYears || field) && (
-            <p>
-              {hasYears ? `${format!.years_experience}+ years of experience` : "Experience"}
-              {field ? ` in ${field}` : ""}
-            </p>
-          )}
-        </div>
+        <StandardProfile
+          className="min-w-0"
+          data={{
+            name: a.applicant_name || "Applicant",
+            roleTitle: a.role_title,
+            hourlyRate: a.hourly_rate,
+            years: format?.years_experience,
+            pastTitles: format?.past_titles,
+            industries: format?.industries,
+            tools: format?.tools,
+            education: format?.education,
+            startAvailability: format?.start_availability,
+            highlights: format?.highlights,
+            availability: format?.availability_list,
+            hours: format?.hours_per_week,
+            timeZones: format?.time_zones,
+          }}
+        />
         <Select value={a.status} onValueChange={(v) => onSetStatus(a.id, v)}>
           <SelectTrigger className="w-36 shrink-0" aria-label="Change status"><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -264,12 +264,6 @@ function Preview({
         {voice && <VoiceIntroButton path={voice.voice_path} link={voice.voice_link} applicantName={a.applicant_name} />}
         <MessageApplicantButton applicationId={a.id} applicantName={a.applicant_name} />
       </div>
-
-      {bullets.length > 0 && (
-        <ul className="mt-4 list-disc space-y-0.5 pl-5 text-sm">
-          {bullets.map((b, i) => <li key={i}>{b}</li>)}
-        </ul>
-      )}
     </section>
   );
 }
