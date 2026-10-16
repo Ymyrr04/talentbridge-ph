@@ -270,3 +270,37 @@ function Preview({
     </section>
   );
 }
+
+function ViewCvButton({ path, originalFilename }: { path: string; originalFilename: string | null }) {
+  const [busy, setBusy] = useState(false);
+
+  async function openCv() {
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.storage.from("cv-uploads").createSignedUrl(path, 600);
+      if (error || !data?.signedUrl) { throw error ?? new Error("no url"); }
+      if (path.toLowerCase().endsWith(".pdf")) {
+        window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+      } else {
+        const res = await fetch(data.signedUrl);
+        if (!res.ok) { throw new Error("download failed"); }
+        const url = URL.createObjectURL(await res.blob());
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = originalFilename || "CV.docx";
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch {
+      toast.error("Could not open this CV.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Button variant="outline" size="sm" disabled={busy} onClick={() => { void openCv(); }}>
+      <FileText className="h-4 w-4" /> View CV
+    </Button>
+  );
+}
