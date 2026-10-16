@@ -3,15 +3,25 @@ export type StandardProfileData = {
   roleTitle: string;
   hourlyRate: number | string | null | undefined;
   years: number | null | undefined;
-  field: string | null | undefined;
+  pastTitles?: string[] | null | undefined;
+  industries?: string[] | null | undefined;
+  tools?: string[] | null | undefined;
+  education?: string[] | null | undefined;
+  startAvailability?: string | null | undefined;
   highlights: string[] | null | undefined;
   availability: string[] | null | undefined;
   hours: number | string | null | undefined;
   timeZones: string[] | null | undefined;
 };
 
-const AVAIL: Record<string, string> = { full_time: "full-time", part_time: "part-time", project: "project-based" };
+const AVAIL: Record<string, string> = { full_time: "Full-time", part_time: "Part-time", project: "Project-based" };
 const TZ: Record<string, string> = { us: "US", australia: "Australia", uk_eu: "UK/EU" };
+export const START_LABELS: Record<string, string> = {
+  immediately: "immediately",
+  "1_week": "within 1 week",
+  "2_weeks": "within 2 weeks",
+  "1_month": "within 1 month",
+};
 
 /** "a", "a and b", "a, b and c" */
 export function joinAnd(items: string[]): string {
@@ -21,15 +31,26 @@ export function joinAnd(items: string[]): string {
 
 export const firstName = (name: string | null | undefined) => (name ?? "").trim().split(/\s+/)[0] ?? "";
 
-export function availabilityBullet(d: Pick<StandardProfileData, "availability" | "hours" | "timeZones">): string | null {
+/** "$26k", "$26.5k" — one decimal only when needed. */
+export function annualSalary(rate: number, hours: number): string {
+  const k = (rate * hours * 52) / 1000;
+  const rounded = Math.round(k * 10) / 10;
+  const s = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+  return `$${s}k`;
+}
+
+/** "Available to start within 2 weeks. Full-time, 40 hrs/week, US hours." */
+export function availabilityLine(d: Pick<StandardProfileData, "availability" | "hours" | "timeZones" | "startAvailability">): string | null {
+  const sentences: string[] = [];
+  const start = d.startAvailability ? START_LABELS[d.startAvailability] : undefined;
+  if (start) sentences.push(`Available to start ${start}.`);
   const parts: string[] = [];
   const av = (d.availability ?? []).map((v) => AVAIL[v] ?? v);
-  if (av.length) parts.push(`Available ${joinAnd(av)}`);
+  if (av.length) parts.push(joinAnd(av));
   if (d.hours !== null && d.hours !== undefined && d.hours !== "") parts.push(`${d.hours} hrs/week`);
   const tz = d.timeZones ?? [];
   if (tz.includes("any")) parts.push("any hours");
   else if (tz.length) parts.push(`${joinAnd(tz.map((v) => TZ[v] ?? v))} hours`);
-  if (!parts.length) return null;
-  const s = parts.join(", ");
-  return av.length ? s : s.charAt(0).toUpperCase() + s.slice(1);
+  if (parts.length) sentences.push(parts.join(", ") + ".");
+  return sentences.length ? sentences.join(" ") : null;
 }
