@@ -166,8 +166,11 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
           setCand((c) => ({
             ...c,
             years: String(sg.years_experience),
-            industries: sg.field ? [sg.field] : c.industries,
+            pastTitles: sg.past_titles,
+            industries: sg.industries,
             highlights: sg.highlights,
+            tools: sg.tools,
+            education: sg.education,
             skills: sg.skills,
           }));
           toast.success("Suggestion filled in. Check every line, then save.");
