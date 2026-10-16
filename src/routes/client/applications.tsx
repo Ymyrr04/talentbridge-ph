@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, Inbox } from "lucide-react";
+import { ArrowLeft, FileText, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -34,6 +34,8 @@ type Application = {
   cover_note: string;
   status: string;
   created_at: string;
+  cv_path: string | null;
+  cv_original_filename: string | null;
 };
 
 type ProfileFormat = {
@@ -262,6 +264,7 @@ function Preview({
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {videoPath && <IntroVideoButton path={videoPath} applicantName={a.applicant_name} />}
         {voice && <VoiceIntroButton path={voice.voice_path} link={voice.voice_link} applicantName={a.applicant_name} />}
+        {a.cv_path && <ViewCvButton path={a.cv_path} originalFilename={a.cv_original_filename} />}
         <MessageApplicantButton applicationId={a.id} applicantName={a.applicant_name} />
       </div>
     </section>
