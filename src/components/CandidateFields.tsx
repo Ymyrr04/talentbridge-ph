@@ -68,7 +68,7 @@ export function publishErrors(v: CandidateValues): string[] {
 
 /** Generic chip-style tag input: type and press Enter or comma to add. */
 function TagInput({
-  id, label, placeholder, value, onChange, max, maxLen, helper, suggestions,
+  id, label, placeholder, value, onChange, max, maxLen, helper, suggestions, onTextChange,
 }: {
   id: string;
   label: string;
@@ -79,6 +79,7 @@ function TagInput({
   maxLen: number;
   helper?: string;
   suggestions?: string[];
+  onTextChange?: (t: string) => void;
 }) {
   const [text, setText] = useState("");
   const full = value.length >= max;
