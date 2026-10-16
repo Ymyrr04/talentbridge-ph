@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Plus, UserRoundPlus } from "lucide-react";
+import { ArrowRight, Lightbulb, Plus, UserRoundPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MAX_PROFILES, myApplicantProfiles } from "@/lib/applicant";
 import { EmptyState, PageHeader } from "@/components/AppShell";
