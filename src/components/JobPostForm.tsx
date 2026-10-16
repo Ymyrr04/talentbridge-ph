@@ -72,10 +72,18 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
   const [duration, setDuration] = useState(existing?.project_duration ?? "");
   const [zones, setZones] = useState<string[]>(existing?.time_zones ?? []);
   const [experience, setExperience] = useState(existing?.experience_level ?? "any");
-  const [rateMin, setRateMin] = useState(existing?.rate_min != null ? Number(existing.rate_min).toFixed(2) : "");
-  const [rateMax, setRateMax] = useState(existing?.rate_max != null ? Number(existing.rate_max).toFixed(2) : "");
-  const [hoursMin, setHoursMin] = useState(existing?.hours_min != null ? String(existing.hours_min) : "");
-  const [hoursMax, setHoursMax] = useState(existing?.hours_max != null ? String(existing.hours_max) : "");
+  const [rateMin0, rateMax0] = initPair(existing?.rate_min, existing?.rate_max, (n) => n.toFixed(2));
+  const [hoursMin0, hoursMax0] = initPair(existing?.hours_min, existing?.hours_max);
+  const [rateMin, setRateMin] = useState(rateMin0);
+  const [rateMax, setRateMax] = useState(rateMax0);
+  const [hoursMin, setHoursMin] = useState(hoursMin0);
+  const [hoursMax, setHoursMax] = useState(hoursMax0);
+  const [rateRange, setRateRange] = useState(
+    existing?.rate_min != null && existing?.rate_max != null && Number(existing.rate_min) !== Number(existing.rate_max),
+  );
+  const [hoursRange, setHoursRange] = useState(
+    existing?.hours_min != null && existing?.hours_max != null && existing.hours_min !== existing.hours_max,
+  );
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -91,6 +99,22 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
   function changeType(v: string) {
     setEmploymentType(v);
     if (v !== "project") setDuration("");
+  }
+  function toggleRateRange(on: boolean) {
+    setRateRange(on);
+    setRateMax(rateMin); // keep "From"; "To" matches it in both directions
+  }
+  function toggleHoursRange(on: boolean) {
+    setHoursRange(on);
+    setHoursMax(hoursMin);
+  }
+  function setFixedRate(v: string) {
+    setRateMin(v);
+    setRateMax(v);
+  }
+  function setFixedHours(v: string) {
+    setHoursMin(v);
+    setHoursMax(v);
   }
   function toggleZone(z: string, on: boolean) {
     setZones((cur) => (on ? [...new Set([...cur, z])] : cur.filter((x) => x !== z)));
