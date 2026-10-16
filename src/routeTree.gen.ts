@@ -19,7 +19,6 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as ApplicantApplicationsRouteImport } from './routes/applicant/applications'
 import { Route as ApplicantDashboardRouteImport } from './routes/applicant/dashboard'
-import { Route as ApplicantJobsRouteImport } from './routes/applicant/jobs'
 import { Route as ApplicantSettingsRouteImport } from './routes/applicant/settings'
 import { Route as ClientApplicationsRouteImport } from './routes/client/applications'
 import { Route as ClientBrowseRouteImport } from './routes/client/browse'
@@ -28,6 +27,8 @@ import { Route as ClientPricingRouteImport } from './routes/client/pricing'
 import { Route as ClientSettingsRouteImport } from './routes/client/settings'
 import { Route as SignupApplicantRouteImport } from './routes/signup/applicant'
 import { Route as SignupClientRouteImport } from './routes/signup/client'
+import { Route as ApplicantJobsIndexRouteImport } from './routes/applicant/jobs/index'
+import { Route as ApplicantJobsIdRouteImport } from './routes/applicant/jobs/$id'
 import { Route as ApplicantProfilesIndexRouteImport } from './routes/applicant/profiles/index'
 import { Route as ApplicantProfilesNewRouteImport } from './routes/applicant/profiles/new'
 import { Route as ClientJobsIndexRouteImport } from './routes/client/jobs/index'
@@ -85,11 +86,6 @@ const ApplicantDashboardRoute = ApplicantDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ApplicantRouteRoute,
 } as any)
-const ApplicantJobsRoute = ApplicantJobsRouteImport.update({
-  id: '/jobs',
-  path: '/jobs',
-  getParentRoute: () => ApplicantRouteRoute,
-} as any)
 const ApplicantSettingsRoute = ApplicantSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -129,6 +125,16 @@ const SignupClientRoute = SignupClientRouteImport.update({
   id: '/signup/client',
   path: '/signup/client',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApplicantJobsIndexRoute = ApplicantJobsIndexRouteImport.update({
+  id: '/jobs/',
+  path: '/jobs/',
+  getParentRoute: () => ApplicantRouteRoute,
+} as any)
+const ApplicantJobsIdRoute = ApplicantJobsIdRouteImport.update({
+  id: '/jobs/$id',
+  path: '/jobs/$id',
+  getParentRoute: () => ApplicantRouteRoute,
 } as any)
 const ApplicantProfilesIndexRoute = ApplicantProfilesIndexRouteImport.update({
   id: '/profiles/',
@@ -172,7 +178,6 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
-  '/applicant/jobs': typeof ApplicantJobsRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
   '/client/applications': typeof ClientApplicationsRoute
   '/client/browse': typeof ClientBrowseRoute
@@ -181,8 +186,10 @@ export interface FileRoutesByFullPath {
   '/client/settings': typeof ClientSettingsRoute
   '/signup/applicant': typeof SignupApplicantRoute
   '/signup/client': typeof SignupClientRoute
+  '/applicant/jobs/$id': typeof ApplicantJobsIdRoute
   '/applicant/profiles/new': typeof ApplicantProfilesNewRoute
   '/client/jobs/new': typeof ClientJobsNewRoute
+  '/applicant/jobs/': typeof ApplicantJobsIndexRoute
   '/applicant/profiles/': typeof ApplicantProfilesIndexRoute
   '/client/jobs/': typeof ClientJobsIndexRoute
   '/applicant/profiles/$id/edit': typeof ApplicantProfilesIdEditRoute
@@ -199,7 +206,6 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
-  '/applicant/jobs': typeof ApplicantJobsRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
   '/client/applications': typeof ClientApplicationsRoute
   '/client/browse': typeof ClientBrowseRoute
@@ -208,8 +214,10 @@ export interface FileRoutesByTo {
   '/client/settings': typeof ClientSettingsRoute
   '/signup/applicant': typeof SignupApplicantRoute
   '/signup/client': typeof SignupClientRoute
+  '/applicant/jobs/$id': typeof ApplicantJobsIdRoute
   '/applicant/profiles/new': typeof ApplicantProfilesNewRoute
   '/client/jobs/new': typeof ClientJobsNewRoute
+  '/applicant/jobs': typeof ApplicantJobsIndexRoute
   '/applicant/profiles': typeof ApplicantProfilesIndexRoute
   '/client/jobs': typeof ClientJobsIndexRoute
   '/applicant/profiles/$id/edit': typeof ApplicantProfilesIdEditRoute
@@ -227,7 +235,6 @@ export interface FileRoutesById {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
-  '/applicant/jobs': typeof ApplicantJobsRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
   '/client/applications': typeof ClientApplicationsRoute
   '/client/browse': typeof ClientBrowseRoute
@@ -236,8 +243,10 @@ export interface FileRoutesById {
   '/client/settings': typeof ClientSettingsRoute
   '/signup/applicant': typeof SignupApplicantRoute
   '/signup/client': typeof SignupClientRoute
+  '/applicant/jobs/$id': typeof ApplicantJobsIdRoute
   '/applicant/profiles/new': typeof ApplicantProfilesNewRoute
   '/client/jobs/new': typeof ClientJobsNewRoute
+  '/applicant/jobs/': typeof ApplicantJobsIndexRoute
   '/applicant/profiles/': typeof ApplicantProfilesIndexRoute
   '/client/jobs/': typeof ClientJobsIndexRoute
   '/applicant/profiles/$id/edit': typeof ApplicantProfilesIdEditRoute
@@ -256,7 +265,6 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
-    | '/applicant/jobs'
     | '/applicant/settings'
     | '/client/applications'
     | '/client/browse'
@@ -265,8 +273,10 @@ export interface FileRouteTypes {
     | '/client/settings'
     | '/signup/applicant'
     | '/signup/client'
+    | '/applicant/jobs/$id'
     | '/applicant/profiles/new'
     | '/client/jobs/new'
+    | '/applicant/jobs/'
     | '/applicant/profiles/'
     | '/client/jobs/'
     | '/applicant/profiles/$id/edit'
@@ -283,7 +293,6 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
-    | '/applicant/jobs'
     | '/applicant/settings'
     | '/client/applications'
     | '/client/browse'
@@ -292,8 +301,10 @@ export interface FileRouteTypes {
     | '/client/settings'
     | '/signup/applicant'
     | '/signup/client'
+    | '/applicant/jobs/$id'
     | '/applicant/profiles/new'
     | '/client/jobs/new'
+    | '/applicant/jobs'
     | '/applicant/profiles'
     | '/client/jobs'
     | '/applicant/profiles/$id/edit'
@@ -310,7 +321,6 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
-    | '/applicant/jobs'
     | '/applicant/settings'
     | '/client/applications'
     | '/client/browse'
@@ -319,8 +329,10 @@ export interface FileRouteTypes {
     | '/client/settings'
     | '/signup/applicant'
     | '/signup/client'
+    | '/applicant/jobs/$id'
     | '/applicant/profiles/new'
     | '/client/jobs/new'
+    | '/applicant/jobs/'
     | '/applicant/profiles/'
     | '/client/jobs/'
     | '/applicant/profiles/$id/edit'
@@ -411,13 +423,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApplicantDashboardRouteImport
       parentRoute: typeof ApplicantRouteRoute
     }
-    '/applicant/jobs': {
-      id: '/applicant/jobs'
-      path: '/jobs'
-      fullPath: '/applicant/jobs'
-      preLoaderRoute: typeof ApplicantJobsRouteImport
-      parentRoute: typeof ApplicantRouteRoute
-    }
     '/applicant/settings': {
       id: '/applicant/settings'
       path: '/settings'
@@ -473,6 +478,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/signup/client'
       preLoaderRoute: typeof SignupClientRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/applicant/jobs/': {
+      id: '/applicant/jobs/'
+      path: '/jobs'
+      fullPath: '/applicant/jobs/'
+      preLoaderRoute: typeof ApplicantJobsIndexRouteImport
+      parentRoute: typeof ApplicantRouteRoute
+    }
+    '/applicant/jobs/$id': {
+      id: '/applicant/jobs/$id'
+      path: '/jobs/$id'
+      fullPath: '/applicant/jobs/$id'
+      preLoaderRoute: typeof ApplicantJobsIdRouteImport
+      parentRoute: typeof ApplicantRouteRoute
     }
     '/applicant/profiles/': {
       id: '/applicant/profiles/'
@@ -534,9 +553,10 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 interface ApplicantRouteRouteChildren {
   ApplicantApplicationsRoute: typeof ApplicantApplicationsRoute
   ApplicantDashboardRoute: typeof ApplicantDashboardRoute
-  ApplicantJobsRoute: typeof ApplicantJobsRoute
   ApplicantSettingsRoute: typeof ApplicantSettingsRoute
+  ApplicantJobsIdRoute: typeof ApplicantJobsIdRoute
   ApplicantProfilesNewRoute: typeof ApplicantProfilesNewRoute
+  ApplicantJobsIndexRoute: typeof ApplicantJobsIndexRoute
   ApplicantProfilesIndexRoute: typeof ApplicantProfilesIndexRoute
   ApplicantProfilesIdEditRoute: typeof ApplicantProfilesIdEditRoute
 }
@@ -544,9 +564,10 @@ interface ApplicantRouteRouteChildren {
 const ApplicantRouteRouteChildren: ApplicantRouteRouteChildren = {
   ApplicantApplicationsRoute: ApplicantApplicationsRoute,
   ApplicantDashboardRoute: ApplicantDashboardRoute,
-  ApplicantJobsRoute: ApplicantJobsRoute,
   ApplicantSettingsRoute: ApplicantSettingsRoute,
+  ApplicantJobsIdRoute: ApplicantJobsIdRoute,
   ApplicantProfilesNewRoute: ApplicantProfilesNewRoute,
+  ApplicantJobsIndexRoute: ApplicantJobsIndexRoute,
   ApplicantProfilesIndexRoute: ApplicantProfilesIndexRoute,
   ApplicantProfilesIdEditRoute: ApplicantProfilesIdEditRoute,
 }
