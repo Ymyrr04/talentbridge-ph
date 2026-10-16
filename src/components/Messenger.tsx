@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 type Side = "client" | "applicant";
 
-export function Messenger({ userId, side, initial }: { userId: string; side: Side; initial?: string }) {
+export function Messenger({ userId, side, initial }: { userId: string; side: Side; initial?: string | undefined }) {
   const { data: convs = [], isLoading } = useQuery(myConversations);
   const [selected, setSelected] = useState<string | undefined>(initial);
   const conv = convs.find((c) => c.id === selected);
