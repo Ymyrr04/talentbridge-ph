@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, FileText, Inbox } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileText, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -36,6 +36,7 @@ type Application = {
   created_at: string;
   cv_path: string | null;
   cv_original_filename: string | null;
+  portfolio_url: string | null;
 };
 
 type ProfileFormat = {
@@ -265,6 +266,11 @@ function Preview({
         {videoPath && <IntroVideoButton path={videoPath} applicantName={a.applicant_name} />}
         {voice && <VoiceIntroButton path={voice.voice_path} link={voice.voice_link} applicantName={a.applicant_name} />}
         {a.cv_path && <ViewCvButton path={a.cv_path} originalFilename={a.cv_original_filename} />}
+        {a.portfolio_url?.startsWith("https://") && (
+          <Button variant="outline" size="sm" asChild>
+            <a href={a.portfolio_url} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-4 w-4" /> Portfolio</a>
+          </Button>
+        )}
         <MessageApplicantButton applicationId={a.id} applicantName={a.applicant_name} />
       </div>
     </section>

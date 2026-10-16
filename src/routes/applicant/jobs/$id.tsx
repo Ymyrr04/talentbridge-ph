@@ -83,6 +83,7 @@ function JobDetail({ id }: { id: string }) {
         <div>
           <h1 className="text-2xl font-semibold leading-tight">{job.title}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{postedAgo(job.created_at)}</p>
+          {job.portfolio_required && <span className="mt-2 inline-block rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">Portfolio required</span>}
         </div>
         {applied ? (
           <span className="inline-flex items-center gap-1 text-sm font-medium text-primary"><Check className="h-4 w-4" /> Applied</span>
@@ -116,7 +117,7 @@ function JobDetail({ id }: { id: string }) {
         <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-foreground/90">{job.description}</p>
       </section>
 
-      <ApplyDialog job={applying ? { id: job.id, title: job.title } : null} onClose={() => setApplying(false)} />
+      <ApplyDialog job={applying ? { id: job.id, title: job.title, portfolioRequired: job.portfolio_required } : null} onClose={() => setApplying(false)} />
     </div>
   );
 }
