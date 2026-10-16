@@ -141,10 +141,14 @@ export type Database = {
           employment_type: string | null
           experience_level: string | null
           hourly_rate: number | null
+          hours_max: number | null
+          hours_min: number | null
           hours_per_week: number | null
           id: string
           owner_id: string
           project_duration: string | null
+          rate_max: number | null
+          rate_min: number | null
           status: string
           time_zones: string[] | null
           title: string
@@ -156,10 +160,14 @@ export type Database = {
           employment_type?: string | null
           experience_level?: string | null
           hourly_rate?: number | null
+          hours_max?: number | null
+          hours_min?: number | null
           hours_per_week?: number | null
           id?: string
           owner_id?: string
           project_duration?: string | null
+          rate_max?: number | null
+          rate_min?: number | null
           status?: string
           time_zones?: string[] | null
           title: string
@@ -171,10 +179,14 @@ export type Database = {
           employment_type?: string | null
           experience_level?: string | null
           hourly_rate?: number | null
+          hours_max?: number | null
+          hours_min?: number | null
           hours_per_week?: number | null
           id?: string
           owner_id?: string
           project_duration?: string | null
+          rate_max?: number | null
+          rate_min?: number | null
           status?: string
           time_zones?: string[] | null
           title?: string
