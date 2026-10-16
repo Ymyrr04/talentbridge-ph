@@ -574,6 +574,10 @@ export type Database = {
         }[]
       }
       claim_suggestion_run: { Args: never; Returns: boolean }
+      client_can_view_profile_media: {
+        Args: { _profile_id: string }
+        Returns: boolean
+      }
       get_open_job: {
         Args: { _id: string }
         Returns: {
