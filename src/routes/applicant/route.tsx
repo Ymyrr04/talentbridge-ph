@@ -17,6 +17,7 @@ function ApplicantLayout() {
         { to: "/applicant/profiles", label: "Profiles" },
         { to: "/applicant/jobs", label: "Open Jobs" },
         { to: "/applicant/applications", label: "Applications" },
+        { to: "/applicant/messages", label: "Messages", unreadBadge: true },
         { to: "/applicant/settings", label: "Settings" },
       ]}
     >

@@ -79,6 +79,55 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          applicant_id: string
+          application_id: string
+          client_id: string
+          created_at: string
+          id: string
+          last_message_at: string
+        }
+        Insert: {
+          applicant_id: string
+          application_id: string
+          client_id: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          application_id?: string
+          client_id?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: true
+            referencedRelation: "job_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_applications: {
         Row: {
           applicant_id: string
@@ -234,6 +283,41 @@ export type Database = {
             columns: ["viewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_id?: string
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -420,6 +504,11 @@ export type Database = {
           status: string
         }[]
       }
+      is_participant: {
+        Args: { _conv: string; _user: string }
+        Returns: boolean
+      }
+      mark_read: { Args: { _conversation_id: string }; Returns: undefined }
       my_applications: {
         Args: never
         Returns: {
@@ -433,10 +522,25 @@ export type Database = {
           status: string
         }[]
       }
+      my_conversations: {
+        Args: never
+        Returns: {
+          application_id: string
+          id: string
+          job_title: string
+          last_body: string
+          last_message_at: string
+          last_sender_id: string
+          other_name: string
+          role_title: string
+          unread: number
+        }[]
+      }
       my_job_stats: {
         Args: never
         Returns: {
           applicants: number
+          contacted: number
           created_at: string
           id: string
           pending: number
@@ -454,12 +558,17 @@ export type Database = {
         Args: { _id: string; _status: string }
         Returns: undefined
       }
+      start_conversation: {
+        Args: { _application_id: string; _body: string }
+        Returns: string
+      }
       suggest_tools: {
         Args: { _q: string }
         Returns: {
           name: string
         }[]
       }
+      unread_message_count: { Args: never; Returns: number }
       valid_tool_list: { Args: { _t: string[] }; Returns: boolean }
     }
     Enums: {

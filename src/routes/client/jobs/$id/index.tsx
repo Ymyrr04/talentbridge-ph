@@ -32,7 +32,8 @@ function Page() {
     { label: "Shortlisted", value: String(job.shortlisted) },
   ];
   const bars = [
-    { label: "Pending", n: job.pending, cls: "bg-primary/60" },
+    { label: "Pending", n: job.pending, cls: "bg-primary/40" },
+    { label: "Contacted", n: job.contacted, cls: "bg-primary/70" },
     { label: "Shortlisted", n: job.shortlisted, cls: "bg-primary" },
     { label: "Not selected", n: job.rejected, cls: "bg-muted-foreground/40" },
   ];

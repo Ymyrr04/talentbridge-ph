@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const APPLICATION_STATUS_LABEL: Record<string, string> = {
   pending: "Pending",
+  contacted: "Contacted",
   shortlisted: "Shortlisted",
   rejected: "Not selected",
 };
@@ -43,6 +44,7 @@ export const myPublishedProfiles = queryOptions({
 
 export function ApplicationStatusClass(status: string) {
   if (status === "shortlisted") return "bg-primary/10 text-primary";
+  if (status === "contacted") return "bg-secondary text-secondary-foreground";
   if (status === "rejected") return "bg-muted text-muted-foreground";
   return "bg-accent/20 text-accent-foreground";
 }

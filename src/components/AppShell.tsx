@@ -1,16 +1,19 @@
 import type { ReactNode } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { unreadCount, useMessagesRealtime } from "@/lib/messages";
 import { Brand } from "./Brand";
 
-export type NavItem = { to: string; label: string; exact?: boolean };
+export type NavItem = { to: string; label: string; exact?: boolean; unreadBadge?: boolean };
 
 export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav: NavItem[]; children: ReactNode }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const hasMessages = nav.some((n) => n.unreadBadge);
+  useMessagesRealtime(hasMessages);
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -54,11 +57,22 @@ function NavLink({ item }: { item: NavItem }) {
     <Link
       to={item.to}
       activeOptions={{ exact: item.exact ?? false }}
-      className="whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       activeProps={{ className: "bg-secondary text-foreground" }}
     >
       {item.label}
+      {item.unreadBadge && <UnreadBadge />}
     </Link>
+  );
+}
+
+function UnreadBadge() {
+  const { data = 0 } = useQuery(unreadCount);
+  if (!data) return null;
+  return (
+    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground" aria-label={`${data} unread`}>
+      {data > 99 ? "99+" : data}
+    </span>
   );
 }
 

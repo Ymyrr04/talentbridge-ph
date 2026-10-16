@@ -19,10 +19,12 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as ApplicantApplicationsRouteImport } from './routes/applicant/applications'
 import { Route as ApplicantDashboardRouteImport } from './routes/applicant/dashboard'
+import { Route as ApplicantMessagesRouteImport } from './routes/applicant/messages'
 import { Route as ApplicantSettingsRouteImport } from './routes/applicant/settings'
 import { Route as ClientApplicationsRouteImport } from './routes/client/applications'
 import { Route as ClientBrowseRouteImport } from './routes/client/browse'
 import { Route as ClientDashboardRouteImport } from './routes/client/dashboard'
+import { Route as ClientMessagesRouteImport } from './routes/client/messages'
 import { Route as ClientPricingRouteImport } from './routes/client/pricing'
 import { Route as ClientSettingsRouteImport } from './routes/client/settings'
 import { Route as SignupApplicantRouteImport } from './routes/signup/applicant'
@@ -87,6 +89,11 @@ const ApplicantDashboardRoute = ApplicantDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ApplicantRouteRoute,
 } as any)
+const ApplicantMessagesRoute = ApplicantMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => ApplicantRouteRoute,
+} as any)
 const ApplicantSettingsRoute = ApplicantSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -105,6 +112,11 @@ const ClientBrowseRoute = ClientBrowseRouteImport.update({
 const ClientDashboardRoute = ClientDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => ClientRouteRoute,
+} as any)
+const ClientMessagesRoute = ClientMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => ClientRouteRoute,
 } as any)
 const ClientPricingRoute = ClientPricingRouteImport.update({
@@ -184,10 +196,12 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
+  '/applicant/messages': typeof ApplicantMessagesRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
   '/client/applications': typeof ClientApplicationsRoute
   '/client/browse': typeof ClientBrowseRoute
   '/client/dashboard': typeof ClientDashboardRoute
+  '/client/messages': typeof ClientMessagesRoute
   '/client/pricing': typeof ClientPricingRoute
   '/client/settings': typeof ClientSettingsRoute
   '/signup/applicant': typeof SignupApplicantRoute
@@ -213,10 +227,12 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
+  '/applicant/messages': typeof ApplicantMessagesRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
   '/client/applications': typeof ClientApplicationsRoute
   '/client/browse': typeof ClientBrowseRoute
   '/client/dashboard': typeof ClientDashboardRoute
+  '/client/messages': typeof ClientMessagesRoute
   '/client/pricing': typeof ClientPricingRoute
   '/client/settings': typeof ClientSettingsRoute
   '/signup/applicant': typeof SignupApplicantRoute
@@ -243,10 +259,12 @@ export interface FileRoutesById {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/applicant/applications': typeof ApplicantApplicationsRoute
   '/applicant/dashboard': typeof ApplicantDashboardRoute
+  '/applicant/messages': typeof ApplicantMessagesRoute
   '/applicant/settings': typeof ApplicantSettingsRoute
   '/client/applications': typeof ClientApplicationsRoute
   '/client/browse': typeof ClientBrowseRoute
   '/client/dashboard': typeof ClientDashboardRoute
+  '/client/messages': typeof ClientMessagesRoute
   '/client/pricing': typeof ClientPricingRoute
   '/client/settings': typeof ClientSettingsRoute
   '/signup/applicant': typeof SignupApplicantRoute
@@ -274,10 +292,12 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
+    | '/applicant/messages'
     | '/applicant/settings'
     | '/client/applications'
     | '/client/browse'
     | '/client/dashboard'
+    | '/client/messages'
     | '/client/pricing'
     | '/client/settings'
     | '/signup/applicant'
@@ -303,10 +323,12 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
+    | '/applicant/messages'
     | '/applicant/settings'
     | '/client/applications'
     | '/client/browse'
     | '/client/dashboard'
+    | '/client/messages'
     | '/client/pricing'
     | '/client/settings'
     | '/signup/applicant'
@@ -332,10 +354,12 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/applicant/applications'
     | '/applicant/dashboard'
+    | '/applicant/messages'
     | '/applicant/settings'
     | '/client/applications'
     | '/client/browse'
     | '/client/dashboard'
+    | '/client/messages'
     | '/client/pricing'
     | '/client/settings'
     | '/signup/applicant'
@@ -435,6 +459,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApplicantDashboardRouteImport
       parentRoute: typeof ApplicantRouteRoute
     }
+    '/applicant/messages': {
+      id: '/applicant/messages'
+      path: '/messages'
+      fullPath: '/applicant/messages'
+      preLoaderRoute: typeof ApplicantMessagesRouteImport
+      parentRoute: typeof ApplicantRouteRoute
+    }
     '/applicant/settings': {
       id: '/applicant/settings'
       path: '/settings'
@@ -461,6 +492,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/client/dashboard'
       preLoaderRoute: typeof ClientDashboardRouteImport
+      parentRoute: typeof ClientRouteRoute
+    }
+    '/client/messages': {
+      id: '/client/messages'
+      path: '/messages'
+      fullPath: '/client/messages'
+      preLoaderRoute: typeof ClientMessagesRouteImport
       parentRoute: typeof ClientRouteRoute
     }
     '/client/pricing': {
@@ -572,6 +610,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 interface ApplicantRouteRouteChildren {
   ApplicantApplicationsRoute: typeof ApplicantApplicationsRoute
   ApplicantDashboardRoute: typeof ApplicantDashboardRoute
+  ApplicantMessagesRoute: typeof ApplicantMessagesRoute
   ApplicantSettingsRoute: typeof ApplicantSettingsRoute
   ApplicantJobsIdRoute: typeof ApplicantJobsIdRoute
   ApplicantProfilesNewRoute: typeof ApplicantProfilesNewRoute
@@ -583,6 +622,7 @@ interface ApplicantRouteRouteChildren {
 const ApplicantRouteRouteChildren: ApplicantRouteRouteChildren = {
   ApplicantApplicationsRoute: ApplicantApplicationsRoute,
   ApplicantDashboardRoute: ApplicantDashboardRoute,
+  ApplicantMessagesRoute: ApplicantMessagesRoute,
   ApplicantSettingsRoute: ApplicantSettingsRoute,
   ApplicantJobsIdRoute: ApplicantJobsIdRoute,
   ApplicantProfilesNewRoute: ApplicantProfilesNewRoute,
@@ -599,6 +639,7 @@ interface ClientRouteRouteChildren {
   ClientApplicationsRoute: typeof ClientApplicationsRoute
   ClientBrowseRoute: typeof ClientBrowseRoute
   ClientDashboardRoute: typeof ClientDashboardRoute
+  ClientMessagesRoute: typeof ClientMessagesRoute
   ClientPricingRoute: typeof ClientPricingRoute
   ClientSettingsRoute: typeof ClientSettingsRoute
   ClientJobsNewRoute: typeof ClientJobsNewRoute
@@ -611,6 +652,7 @@ const ClientRouteRouteChildren: ClientRouteRouteChildren = {
   ClientApplicationsRoute: ClientApplicationsRoute,
   ClientBrowseRoute: ClientBrowseRoute,
   ClientDashboardRoute: ClientDashboardRoute,
+  ClientMessagesRoute: ClientMessagesRoute,
   ClientPricingRoute: ClientPricingRoute,
   ClientSettingsRoute: ClientSettingsRoute,
   ClientJobsNewRoute: ClientJobsNewRoute,

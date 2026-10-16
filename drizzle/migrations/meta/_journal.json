@@ -134,6 +134,20 @@
       "when": 1792166521597,
       "tag": "0018_my_job_stats",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792167296743,
+      "tag": "0019_messaging",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792167334260,
+      "tag": "0020_job_stats_contacted",
+      "breakpoints": true
     }
   ]
 }
