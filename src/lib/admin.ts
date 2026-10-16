@@ -1,3 +1,4 @@
+import { availabilityLabel } from "@/components/CandidateFields";
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -113,7 +114,7 @@ export async function exportApplicants(d: AdminData) {
     const ps = d.profiles.filter((p) => p.owner_id === u.id);
     const base = { full_name: u.name, email: u.email, phone: u.phone, joined: u.created_at };
     if (ps.length === 0) {
-      rows.push({ ...base, profile_role: "", status: "", hourly_rate_usd: "", experience: "", skills: "", summary: "", availability: "", hours_per_week: "", time_zones: "", english_level: "", cv_file: "" });
+      rows.push({ ...base, profile_role: "", status: "", hourly_rate_usd: "", experience: "", skills: "", summary: "", availability: "", hours_per_week: "", time_zones: "", cv_file: "" });
       continue;
     }
     for (const p of ps) {
@@ -134,10 +135,9 @@ export async function exportApplicants(d: AdminData) {
         experience: p.experience_level,
         skills: p.skills,
         summary: p.summary,
-        availability: p.availability,
+        availability: availabilityLabel(p.availability_list ?? (p.availability ? [p.availability] : [])),
         hours_per_week: p.hours_per_week,
         time_zones: p.time_zones,
-        english_level: p.english_level,
         cv_file: cvFile,
       });
     }
