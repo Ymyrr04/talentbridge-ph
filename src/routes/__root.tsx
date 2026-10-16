@@ -12,6 +12,7 @@ import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 
 const DevRoleSwitcher = import.meta.env.DEV ? lazy(() => import("@/dev/DevRoleSwitcher")) : null;
 import { supabase } from "@/integrations/supabase/client";
+import { dashboardPath, fetchMyRole } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
@@ -123,10 +124,34 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
+    // undefined = not known yet; null = signed out.
+    let currentId: string | null | undefined;
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      const nextId = session?.user.id ?? null;
+      const prevId = currentId;
+      currentId = nextId;
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      // Defer so no Supabase call runs inside the auth callback; never throw into the error page.
+      setTimeout(async () => {
+        try {
+          const switched = prevId != null && prevId !== nextId;
+          if (switched) {
+            await queryClient.cancelQueries();
+            queryClient.clear();
+            if (!nextId) {
+              await router.navigate({ to: "/login", replace: true });
+              return;
+            }
+            const role = await fetchMyRole(nextId);
+            await router.navigate({ to: role ? dashboardPath(role) : "/login", replace: true });
+            return;
+          }
+          await router.invalidate();
+          if (nextId) await queryClient.invalidateQueries();
+        } catch (err) {
+          console.error("Account change handling failed", err);
+        }
+      }, 0);
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);

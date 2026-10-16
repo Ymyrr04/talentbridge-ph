@@ -51,16 +51,40 @@ export function useMessagesRealtime(enabled: boolean) {
   const qc = useQueryClient();
   useEffect(() => {
     if (!enabled) return;
-    const channel = supabase
-      .channel("my-messages")
-      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, () => {
-        qc.invalidateQueries({ queryKey: ["conversations"] });
-        qc.invalidateQueries({ queryKey: ["unread-count"] });
-        qc.invalidateQueries({ queryKey: ["thread"] });
-      })
-      .subscribe();
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | undefined;
+    let poll: ReturnType<typeof setInterval> | undefined;
+    const refresh = () => {
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+      qc.invalidateQueries({ queryKey: ["unread-count"] });
+      qc.invalidateQueries({ queryKey: ["thread"] });
+    };
+    const fallback = (err: unknown) => {
+      console.error("Live messages unavailable, refreshing every 30s instead.", err);
+      if (!cancelled && !poll) poll = setInterval(refresh, 30_000);
+    };
+
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const userId = data.session?.user.id;
+        if (cancelled || !userId) return;
+        const id = Math.random().toString(36).slice(2, 10);
+        channel = supabase
+          .channel(`messages-${userId}-${id}`)
+          .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, refresh)
+          .subscribe((status, err) => {
+            if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") fallback(err ?? status);
+          });
+      } catch (err) {
+        fallback(err);
+      }
+    })();
+
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      if (poll) clearInterval(poll);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [enabled, qc]);
 }
