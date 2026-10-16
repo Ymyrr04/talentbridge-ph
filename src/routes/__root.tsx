@@ -40,10 +40,26 @@ function NotFoundComponent() {
   );
 }
 
+const STALE_CHUNK = /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Loading chunk .* failed/i;
+
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
+    // After a new publish, an open tab may ask for page files that no longer exist: reload once to get the new version.
+    try {
+      if (STALE_CHUNK.test(String(error?.message ?? error))) {
+        const key = "th-stale-reload";
+        const last = Number(sessionStorage.getItem(key) ?? 0);
+        if (Date.now() - last > 30_000) {
+          sessionStorage.setItem(key, String(Date.now()));
+          window.location.reload();
+          return;
+        }
+      }
+    } catch {
+      /* ignore */
+    }
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
