@@ -3,6 +3,8 @@ import { ExternalLink, Link2, Mic, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { RecordingMicrophone } from "@/components/RecordingMicrophone";
+import { useRecordingMedia } from "@/hooks/use-recording-media";
 import { isVocarooLink, readAudioDuration, signedVoiceUrl, validateAudioFile, VOICE_MAX_SECONDS, VOICE_TYPES } from "@/lib/voiceIntro";
 
 export type VoiceChange =
@@ -135,34 +137,19 @@ function ReplaceMenu({ onUpload, onRecord, onLink }: { onUpload: () => void; onR
 }
 
 function AudioRecorder({ onUse, onCancel }: { onUse: (b: Blob) => void; onCancel: () => void }) {
-  const streamRef = useRef<MediaStream | null>(null);
+  const media = useRecordingMedia(false);
   const recRef = useRef<MediaRecorder | null>(null);
-  const [ready, setReady] = useState(false);
   const [isRec, setIsRec] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [blob, setBlob] = useState<Blob | null>(null);
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-        if (cancelled) { s.getTracks().forEach((t) => t.stop()); return; }
-        streamRef.current = s;
-        setReady(true);
-      } catch (e) {
-        console.error(e);
-        toast.error("Allow microphone access to record.");
-        onCancel();
-      }
-    })();
     return () => {
-      cancelled = true;
-      if (recRef.current?.state === "recording") recRef.current.stop();
-      streamRef.current?.getTracks().forEach((t) => t.stop());
+      const rec = recRef.current;
+      if (rec) { rec.onstop = null; rec.ondataavailable = null; if (rec.state !== "inactive") rec.stop(); }
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!isRec) return;
@@ -183,18 +170,27 @@ function AudioRecorder({ onUse, onCancel }: { onUse: (b: Blob) => void; onCancel
   }, [blob]);
 
   function start() {
-    const s = streamRef.current;
-    if (!s) return;
+    const s = media.stream;
+    if (!s || !s.getAudioTracks().some((t) => t.enabled && !t.muted && t.readyState === "live")) {
+      toast.error("Your microphone isn't ready. Choose an active microphone before recording."); return;
+    }
+    try {
     const mime = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"].find((m) => MediaRecorder.isTypeSupported(m));
     const rec = new MediaRecorder(s, mime ? { mimeType: mime } : undefined);
     const chunks: Blob[] = [];
     rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
-    rec.onstop = () => { setBlob(new Blob(chunks, { type: (rec.mimeType || "audio/webm").split(";")[0] ?? "audio/webm" })); };
+    rec.onstop = () => {
+      const result = new Blob(chunks, { type: rec.mimeType || chunks[0]?.type || "audio/webm" });
+      if (!result.size) { toast.error("No recording was captured. Please try again."); return; }
+      setBlob(result);
+    };
+    rec.onerror = () => { setIsRec(false); toast.error("Recording failed. Check your microphone and try again."); };
     rec.start(1000);
     recRef.current = rec;
     setBlob(null);
     setElapsed(0);
     setIsRec(true);
+    } catch { toast.error("Could not start recording. Check microphone access."); }
   }
 
   function stop() {
@@ -216,7 +212,9 @@ function AudioRecorder({ onUse, onCancel }: { onUse: (b: Blob) => void; onCancel
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="space-y-3">
+      <RecordingMicrophone media={media} disabled={isRec} id="voice-microphone" />
+      <div className="flex flex-wrap items-center gap-3">
       <span className="rounded-full bg-muted px-3 py-1 text-sm font-medium tabular-nums">
         {isRec && <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-destructive" />}
         {fmt(elapsed)} / {fmt(VOICE_MAX_SECONDS)}
@@ -224,9 +222,10 @@ function AudioRecorder({ onUse, onCancel }: { onUse: (b: Blob) => void; onCancel
       {isRec ? (
         <Button type="button" variant="destructive" size="sm" onClick={stop}>Stop</Button>
       ) : (
-        <Button type="button" size="sm" disabled={!ready} onClick={start}>Start recording</Button>
+        <Button type="button" size="sm" disabled={!media.stream || media.muted} onClick={start}>Start recording</Button>
       )}
       <Button type="button" variant="ghost" size="sm" onClick={() => { stop(); onCancel(); }}>Cancel</Button>
+      </div>
     </div>
   );
 }

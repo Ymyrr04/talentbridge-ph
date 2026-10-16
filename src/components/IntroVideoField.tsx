@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Camera, Upload, Video } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { RecordingMicrophone } from "@/components/RecordingMicrophone";
+import { useRecordingMedia } from "@/hooks/use-recording-media";
 import { readDuration, signedVideoUrl, validateVideoFile, VIDEO_MAX_BYTES, VIDEO_MAX_SECONDS, VIDEO_TYPES } from "@/lib/introVideo";
 
 export type VideoChange =
@@ -100,34 +102,22 @@ function Recorder({ state, setState, onUse }: {
   onUse: (blob: Blob, duration: number) => void;
 }) {
   const liveRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const media = useRecordingMedia(true, state.stage === "live");
   const recRef = useRef<MediaRecorder | null>(null);
   const [isRec, setIsRec] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [reviewUrl, setReviewUrl] = useState<string | null>(null);
 
-  // Open camera in live stage
   useEffect(() => {
-    if (state.stage !== "live") return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        if (cancelled) { s.getTracks().forEach((t) => t.stop()); return; }
-        streamRef.current = s;
-        if (liveRef.current) liveRef.current.srcObject = s;
-      } catch (e) {
-        console.error(e);
-        toast.error("Allow camera and microphone access to record.");
-        setState(null);
-      }
-    })();
+    if (liveRef.current) liveRef.current.srcObject = media.stream;
+  }, [media.stream, state.stage]);
+
+  useEffect(() => {
     return () => {
-      cancelled = true;
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
+      const rec = recRef.current;
+      if (rec) { rec.onstop = null; rec.ondataavailable = null; if (rec.state !== "inactive") rec.stop(); }
     };
-  }, [state.stage, setState]);
+  }, []);
 
   // Timer + auto-stop
   useEffect(() => {
@@ -149,22 +139,28 @@ function Recorder({ state, setState, onUse }: {
   }, [state.blob]);
 
   function start() {
-    const s = streamRef.current;
-    if (!s) return;
-    const mime = ["video/webm;codecs=vp9,opus", "video/webm", "video/mp4"].find((m) => MediaRecorder.isTypeSupported(m));
+    const s = media.stream;
+    if (!s || !s.getAudioTracks().some((t) => t.enabled && !t.muted && t.readyState === "live")) {
+      toast.error("Your microphone isn't ready. Choose an active microphone before recording."); return;
+    }
+    try {
+    const mime = ["video/webm;codecs=vp8,opus", "video/webm;codecs=vp9,opus", "video/mp4", "video/webm"].find((m) => MediaRecorder.isTypeSupported(m));
     const rec = new MediaRecorder(s, mime ? { mimeType: mime } : undefined);
     const chunks: Blob[] = [];
     const t0 = Date.now();
     rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
     rec.onstop = () => {
-      const blob = new Blob(chunks, { type: (rec.mimeType || "video/webm").split(";")[0] ?? "video/webm" });
+      const blob = new Blob(chunks, { type: rec.mimeType || chunks[0]?.type || "video/webm" });
+      if (!blob.size) { toast.error("No recording was captured. Please try again."); return; }
       const duration = Math.min(VIDEO_MAX_SECONDS, Math.round((Date.now() - t0) / 1000));
       setState({ stage: "review", blob, duration });
     };
     rec.start(1000);
     recRef.current = rec;
+    rec.onerror = () => { setIsRec(false); toast.error("Recording failed. Check your microphone and try again."); };
     setElapsed(0);
     setIsRec(true);
+    } catch { toast.error("Could not start recording. Check camera and microphone access."); }
   }
 
   function stop() {
@@ -177,7 +173,7 @@ function Recorder({ state, setState, onUse }: {
       <div className="space-y-3">
         {reviewUrl && <video src={reviewUrl} controls playsInline className="aspect-video w-full rounded-lg bg-muted" />}
         <div className="flex flex-wrap gap-2">
-          <Button type="button" onClick={() => onUse(state.blob!, state.duration ?? 0)}>Use this video</Button>
+          <Button type="button" onClick={() => { if (state.blob) onUse(state.blob, state.duration ?? 0); }}>Use this video</Button>
           <Button type="button" variant="outline" onClick={() => setState({ stage: "live" })}>Retake</Button>
           <Button type="button" variant="ghost" onClick={() => setState(null)}>Cancel</Button>
         </div>
@@ -194,11 +190,12 @@ function Recorder({ state, setState, onUse }: {
           {fmt(elapsed)} / {fmt(VIDEO_MAX_SECONDS)}
         </span>
       </div>
+      <RecordingMicrophone media={media} disabled={isRec} id="video-microphone" />
       <div className="flex flex-wrap gap-2">
         {isRec ? (
           <Button type="button" variant="destructive" onClick={stop}>Stop</Button>
         ) : (
-          <Button type="button" onClick={start}>Start recording</Button>
+          <Button type="button" disabled={!media.stream || media.muted} onClick={start}>Start recording</Button>
         )}
         <Button type="button" variant="ghost" onClick={() => { stop(); setState(null); }}>Cancel</Button>
       </div>
