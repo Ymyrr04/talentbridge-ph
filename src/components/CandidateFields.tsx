@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+
 
 export { SKILL_OPTIONS } from "@/lib/skills";
 import { SKILL_OPTIONS } from "@/lib/skills";
@@ -64,7 +66,24 @@ const selectCls =
 export function CandidateFields({ value, onChange }: { value: CandidateValues; onChange: (v: CandidateValues) => void }) {
   const [query, setQuery] = useState("");
   const set = <K extends keyof CandidateValues>(k: K, v: CandidateValues[K]) => onChange({ ...value, [k]: v });
+  const [visible, setVisible] = useState(() => Math.max(1, (value.highlights ?? []).filter((h) => h.trim()).length));
+  const filled = (value.highlights ?? []).filter((h) => h.trim()).length;
+  const boxes = () => Array.from({ length: visible }, (_, j) => value.highlights[j] ?? "");
+  // Suggestions and saved profiles can arrive with more highlights than are shown.
+  useEffect(() => {
+    setVisible((v) => Math.max(v, filled || 1));
+  }, [filled]);
+  const addHighlight = () => {
+    if (visible >= HIGHLIGHT_COUNT) return;
+    set("highlights", [...boxes(), ""]);
+    setVisible((v) => Math.min(HIGHLIGHT_COUNT, v + 1));
+  };
+  const removeHighlight = (i: number) => {
+    set("highlights", boxes().filter((_, j) => j !== i));
+    setVisible((v) => Math.max(1, v - 1));
+  };
   const [catalog, setCatalog] = useState<string[]>([]);
+
   useEffect(() => {
     const q = query.trim();
     if (!q) { setCatalog([]); return; }
@@ -97,24 +116,40 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
       </div>
 
       <div className="space-y-2">
-        <Label>Highlights</Label>
-        {Array.from({ length: HIGHLIGHT_COUNT }, (_, i) => (
+        <Label>Highlights <span className="font-normal text-muted-foreground">({filled}/{HIGHLIGHT_COUNT})</span></Label>
+        {Array.from({ length: visible }, (_, i) => (
           <div key={i} className="space-y-1">
-            <Input
-              aria-label={`Highlight ${i + 1}`}
-              maxLength={HIGHLIGHT_MAX}
-              value={value.highlights[i] ?? ""}
-              onChange={(e) => {
-                const next = Array.from({ length: HIGHLIGHT_COUNT }, (_, j) => value.highlights[j] ?? "");
-                next[i] = e.target.value;
-                set("highlights", next);
-              }}
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                aria-label={`Highlight ${i + 1}`}
+                maxLength={HIGHLIGHT_MAX}
+                value={value.highlights[i] ?? ""}
+                onChange={(e) => {
+                  const next = Array.from({ length: visible }, (_, j) => value.highlights[j] ?? "");
+                  next[i] = e.target.value;
+                  set("highlights", next);
+                }}
+              />
+              {visible > 1 && (
+                <button
+                  type="button"
+                  aria-label={`Remove highlight ${i + 1}`}
+                  onClick={() => removeHighlight(i)}
+                  className="shrink-0 rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
             <p className="text-right text-xs text-muted-foreground">{(value.highlights[i] ?? "").length}/{HIGHLIGHT_MAX}</p>
           </div>
         ))}
+        <Button type="button" variant="outline" size="sm" onClick={addHighlight} disabled={visible >= HIGHLIGHT_COUNT}>
+          <Plus className="mr-1 h-4 w-4" /> Add highlight
+        </Button>
         <p className="text-xs text-muted-foreground">One achievement or core skill each. Use real numbers from your CV where you have them.</p>
       </div>
+
 
       <div className="space-y-1.5">
         <Label htmlFor="skill-search">Skills <span className="font-normal text-muted-foreground">(up to {MAX_SKILLS})</span></Label>
