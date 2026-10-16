@@ -76,6 +76,7 @@ export type Database = {
           created_at: string
           cv_original_filename: string | null
           cv_path: string | null
+          education: string[] | null
           english_level: string | null
           experience_level: string | null
           field: string | null
@@ -83,12 +84,16 @@ export type Database = {
           hourly_rate: number
           hours_per_week: number | null
           id: string
+          industries: string[] | null
           owner_id: string
+          past_titles: string[] | null
           role_title: string
           skills: string[] | null
+          start_availability: string | null
           status: string
           summary: string | null
           time_zones: string[] | null
+          tools: string[] | null
           updated_at: string
           video_duration_seconds: number | null
           video_path: string | null
@@ -102,6 +107,7 @@ export type Database = {
           created_at?: string
           cv_original_filename?: string | null
           cv_path?: string | null
+          education?: string[] | null
           english_level?: string | null
           experience_level?: string | null
           field?: string | null
@@ -109,12 +115,16 @@ export type Database = {
           hourly_rate: number
           hours_per_week?: number | null
           id?: string
+          industries?: string[] | null
           owner_id?: string
+          past_titles?: string[] | null
           role_title: string
           skills?: string[] | null
+          start_availability?: string | null
           status?: string
           summary?: string | null
           time_zones?: string[] | null
+          tools?: string[] | null
           updated_at?: string
           video_duration_seconds?: number | null
           video_path?: string | null
@@ -128,6 +138,7 @@ export type Database = {
           created_at?: string
           cv_original_filename?: string | null
           cv_path?: string | null
+          education?: string[] | null
           english_level?: string | null
           experience_level?: string | null
           field?: string | null
@@ -135,12 +146,16 @@ export type Database = {
           hourly_rate?: number
           hours_per_week?: number | null
           id?: string
+          industries?: string[] | null
           owner_id?: string
+          past_titles?: string[] | null
           role_title?: string
           skills?: string[] | null
+          start_availability?: string | null
           status?: string
           summary?: string | null
           time_zones?: string[] | null
+          tools?: string[] | null
           updated_at?: string
           video_duration_seconds?: number | null
           video_path?: string | null
@@ -608,10 +623,15 @@ export type Database = {
         Returns: {
           application_id: string
           availability_list: string[]
+          education: string[]
           field: string
           highlights: string[]
           hours_per_week: number
+          industries: string[]
+          past_titles: string[]
+          start_availability: string
           time_zones: string[]
+          tools: string[]
           years_experience: number
         }[]
       }
@@ -714,6 +734,10 @@ export type Database = {
       }
       unread_message_count: { Args: never; Returns: number }
       valid_highlights: { Args: { _h: string[] }; Returns: boolean }
+      valid_text_list: {
+        Args: { _max_items: number; _max_len: number; _t: string[] }
+        Returns: boolean
+      }
       valid_tool_list: { Args: { _t: string[] }; Returns: boolean }
     }
     Enums: {
