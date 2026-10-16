@@ -232,6 +232,13 @@
       "when": 1792182318844,
       "tag": "0032_get_open_job_allow_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792182401396,
+      "tag": "0033_portfolio_requirement",
+      "breakpoints": true
     }
   ]
 }

@@ -230,6 +230,7 @@ export type Database = {
           created_at: string
           id: string
           job_id: string
+          portfolio_url: string | null
           status: string
           updated_at: string
         }
@@ -240,6 +241,7 @@ export type Database = {
           created_at?: string
           id?: string
           job_id: string
+          portfolio_url?: string | null
           status?: string
           updated_at?: string
         }
@@ -250,6 +252,7 @@ export type Database = {
           created_at?: string
           id?: string
           job_id?: string
+          portfolio_url?: string | null
           status?: string
           updated_at?: string
         }
@@ -290,6 +293,7 @@ export type Database = {
           id: string
           must_have_tools: string[] | null
           owner_id: string
+          portfolio_required: boolean
           project_duration: string | null
           rate_max: number | null
           rate_min: number | null
@@ -310,6 +314,7 @@ export type Database = {
           id?: string
           must_have_tools?: string[] | null
           owner_id?: string
+          portfolio_required?: boolean
           project_duration?: string | null
           rate_max?: number | null
           rate_min?: number | null
@@ -330,6 +335,7 @@ export type Database = {
           id?: string
           must_have_tools?: string[] | null
           owner_id?: string
+          portfolio_required?: boolean
           project_duration?: string | null
           rate_max?: number | null
           rate_min?: number | null
@@ -561,7 +567,12 @@ export type Database = {
         }[]
       }
       apply_to_job: {
-        Args: { _job_id: string; _note: string; _profile_id: string }
+        Args: {
+          _job_id: string
+          _note: string
+          _portfolio_url?: string
+          _profile_id: string
+        }
         Returns: string
       }
       browse_jobs: {
@@ -573,6 +584,7 @@ export type Database = {
           hours_max: number
           hours_min: number
           id: string
+          portfolio_required: boolean
           rate_max: number
           rate_min: number
           title: string
@@ -605,6 +617,7 @@ export type Database = {
           hours_min: number
           id: string
           must_have_tools: string[]
+          portfolio_required: boolean
           project_duration: string
           rate_max: number
           rate_min: number
@@ -663,6 +676,7 @@ export type Database = {
           id: string
           job_id: string
           job_title: string
+          portfolio_url: string
           role_title: string
           status: string
         }[]
