@@ -92,6 +92,13 @@
       "when": 1792162628507,
       "tag": "0012_job_post_rate_hours",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792163081104,
+      "tag": "0013_job_post_rate_hour_ranges",
+      "breakpoints": true
     }
   ]
 }

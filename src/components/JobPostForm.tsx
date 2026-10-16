@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
+import { Calculator, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -38,6 +38,20 @@ const EXPERIENCE = [
   { value: "3_5", label: "3–5 years" },
   { value: "5_plus", label: "5+ years" },
 ];
+const WEEKS = 4.33;
+const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
+/** null = empty, undefined = invalid */
+function parseRate(v: string): number | null | undefined {
+  if (!v.trim()) return null;
+  const n = Number(v);
+  if (!Number.isFinite(n) || n < 1 || n > 500 || Math.abs(Math.round(n * 100) - n * 100) > 1e-6) return undefined;
+  return n;
+}
+function parseHours(v: string): number | null | undefined {
+  if (!v.trim()) return null;
+  const n = Number(v);
+  return Number.isInteger(n) && n >= 1 && n <= 60 ? n : undefined;
+}
 
 export function JobPostForm({ userId, existing }: { userId: string; existing?: Job }) {
   const navigate = useNavigate();
@@ -49,10 +63,21 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
   const [duration, setDuration] = useState(existing?.project_duration ?? "");
   const [zones, setZones] = useState<string[]>(existing?.time_zones ?? []);
   const [experience, setExperience] = useState(existing?.experience_level ?? "any");
-  const [rate, setRate] = useState(existing?.hourly_rate != null ? Number(existing.hourly_rate).toFixed(2) : "");
-  const [hours, setHours] = useState(existing?.hours_per_week != null ? String(existing.hours_per_week) : "");
+  const [rateMin, setRateMin] = useState(existing?.rate_min != null ? Number(existing.rate_min).toFixed(2) : "");
+  const [rateMax, setRateMax] = useState(existing?.rate_max != null ? Number(existing.rate_max).toFixed(2) : "");
+  const [hoursMin, setHoursMin] = useState(existing?.hours_min != null ? String(existing.hours_min) : "");
+  const [hoursMax, setHoursMax] = useState(existing?.hours_max != null ? String(existing.hours_max) : "");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const rMin = parseRate(rateMin), rMax = parseRate(rateMax);
+  const hMin = parseHours(hoursMin), hMax = parseHours(hoursMax);
+  const rateErr = rMin === undefined || rMax === undefined || (rMin != null && rMax != null && rMax < rMin);
+  const hoursErr = hMin === undefined || hMax === undefined || (hMin != null && hMax != null && hMax < hMin);
+  const estimate =
+    rMin != null && rMax != null && hMin != null && hMax != null && !rateErr && !hoursErr
+      ? { low: Math.round(rMin * hMin * WEEKS), high: Math.round(rMax * hMax * WEEKS) }
+      : null;
 
   function changeType(v: string) {
     setEmploymentType(v);
@@ -60,6 +85,10 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
   }
   function toggleZone(z: string, on: boolean) {
     setZones((cur) => (on ? [...new Set([...cur, z])] : cur.filter((x) => x !== z)));
+  }
+  function fmt2(v: string, set: (s: string) => void) {
+    const n = Number(v);
+    if (v.trim() && Number.isFinite(n)) set(n.toFixed(2));
   }
 
   async function onSubmit(e: FormEvent) {
@@ -69,18 +98,16 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
     const d = description.trim();
     if (!t || t.length > 100) return setError("Title is required (max 100 characters).");
     if (!d || d.length > 5000) return setError("Description is required (max 5,000 characters).");
-    const rateNum = rate.trim() ? Number(rate) : null;
-    const hoursNum = hours.trim() ? Number(hours) : null;
     const errs: string[] = [];
-    if (rateNum !== null && (!Number.isFinite(rateNum) || rateNum < 1 || rateNum > 500 || Math.abs(Math.round(rateNum * 100) - rateNum * 100) > 1e-6))
-      errs.push("Hourly rate must be between $1 and $500 (up to 2 decimals).");
-    if (hoursNum !== null && (!Number.isInteger(hoursNum) || hoursNum < 1 || hoursNum > 60))
-      errs.push("Hours per week must be a whole number between 1 and 60.");
+    if (rMin === undefined || rMax === undefined) errs.push("Hourly rate must be between $1 and $500 (up to 2 decimals).");
+    else if (rMin != null && rMax != null && rMax < rMin) errs.push("Hourly rate \"To\" must be at least \"From\".");
+    if (hMin === undefined || hMax === undefined) errs.push("Hours per week must be whole numbers between 1 and 60.");
+    else if (hMin != null && hMax != null && hMax < hMin) errs.push("Hours per week \"To\" must be at least \"From\".");
     if (status === "open") {
       if (!employmentType) errs.push("Choose an employment type.");
       if (employmentType === "project" && !duration) errs.push("Choose a project timeline.");
-      if (rateNum === null) errs.push("Enter an hourly rate.");
-      if (hoursNum === null) errs.push("Enter hours per week.");
+      if (rMin == null || rMax == null) errs.push("Enter both hourly rate amounts.");
+      if (hMin == null || hMax == null) errs.push("Enter both hours per week amounts.");
       if (zones.length === 0) errs.push("Pick at least one working hours option.");
     }
     if (errs.length) {
@@ -94,8 +121,10 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
       status,
       employment_type: employmentType || null,
       project_duration: employmentType === "project" && duration ? duration : null,
-      hourly_rate: rateNum,
-      hours_per_week: hoursNum,
+      rate_min: rMin ?? null,
+      rate_max: rMax ?? null,
+      hours_min: hMin ?? null,
+      hours_max: hMax ?? null,
       time_zones: zones.length ? zones : null,
       experience_level: experience || null,
     };
@@ -146,21 +175,48 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
             </Select>
           </div>
         )}
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="rate">Hourly rate (USD)</Label>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
-              <Input id="rate" type="number" inputMode="decimal" min={1} max={500} step="0.01" className="pl-7" placeholder="0.00" value={rate} onChange={(e) => setRate(e.target.value)} onBlur={() => { const n = Number(rate); if (rate.trim() && Number.isFinite(n)) setRate(n.toFixed(2)); }} />
-            </div>
-            <p className="text-xs text-muted-foreground">Between $1 and $500 per hour.</p>
+        <div className="space-y-1.5">
+          <Label>Hourly rate (USD)</Label>
+          <div className="grid grid-cols-2 gap-3 sm:max-w-md">
+            {([["rate-from", "From", rateMin, setRateMin], ["rate-to", "To", rateMax, setRateMax]] as const).map(([id, lbl, v, set]) => (
+              <div key={id} className="space-y-1">
+                <Label htmlFor={id} className="text-xs font-normal text-muted-foreground">{lbl}</Label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+                  <Input id={id} type="number" inputMode="decimal" min={1} max={500} step="0.01" className="pl-7" placeholder="0.00" aria-invalid={rateErr} value={v} onChange={(e) => set(e.target.value)} onBlur={() => fmt2(v, set)} />
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="hours">Hours per week</Label>
-            <Input id="hours" type="number" inputMode="numeric" min={1} max={60} step={1} value={hours} onChange={(e) => setHours(e.target.value)} />
-            <p className="text-xs text-muted-foreground">Between 1 and 60 hours.</p>
-          </div>
+          <p className={`text-xs ${rateErr ? "text-destructive" : "text-muted-foreground"}`}>Between $1 and $500. Use the same amount for a fixed rate.</p>
         </div>
+        <div className="space-y-1.5">
+          <Label>Hours per week</Label>
+          <div className="grid grid-cols-2 gap-3 sm:max-w-md">
+            {([["hours-from", "From", hoursMin, setHoursMin], ["hours-to", "To", hoursMax, setHoursMax]] as const).map(([id, lbl, v, set]) => (
+              <div key={id} className="space-y-1">
+                <Label htmlFor={id} className="text-xs font-normal text-muted-foreground">{lbl}</Label>
+                <Input id={id} type="number" inputMode="numeric" min={1} max={60} step={1} aria-invalid={hoursErr} value={v} onChange={(e) => set(e.target.value)} />
+              </div>
+            ))}
+          </div>
+          <p className={`text-xs ${hoursErr ? "text-destructive" : "text-muted-foreground"}`}>Between 1 and 60. Use the same number for fixed hours.</p>
+        </div>
+        {estimate && (
+          <div className="flex items-start gap-3 rounded-xl bg-muted p-4" aria-live="polite">
+            <Calculator className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+            <div>
+              <p className="text-sm">
+                Estimated cost:{" "}
+                <span className="font-semibold">
+                  {estimate.low === estimate.high ? usd(estimate.low) : `${usd(estimate.low)} – ${usd(estimate.high)}`}
+                </span>{" "}
+                per month
+              </p>
+              <p className="text-xs text-muted-foreground">Based on 4.33 weeks per month. Estimate only.</p>
+            </div>
+          </div>
+        )}
         <div className="space-y-2">
           <Label>Working hours</Label>
           <div className="flex flex-wrap gap-4">
