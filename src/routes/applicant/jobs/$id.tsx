@@ -58,7 +58,7 @@ function JobDetail({ id }: { id: string }) {
   useEffect(() => {
     if (!job || recorded.current === id) return;
     recorded.current = id;
-    void supabase.rpc("record_job_view", { _job_id: id });
+    void supabase.rpc("record_job_view", { _job_id: id }).then(({ error }) => { if (error) console.error(error.message); });
   }, [id, job]);
 
   if (!job) return <Unavailable />;
