@@ -210,7 +210,7 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
         )}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between gap-3">
-            <Label>Hourly rate (USD)</Label>
+            <Label htmlFor={rateRange ? undefined : "rate"}>Hourly rate (USD)</Label>
             <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
               <Switch checked={rateRange} onCheckedChange={toggleRateRange} aria-label="Set a rate range" />
               Set a range
@@ -242,9 +242,9 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
         </div>
         <div className="space-y-1.5">
           <div className="flex items-center justify-between gap-3">
-            <Label>Hours per week</Label>
+            <Label htmlFor={hoursRange ? undefined : "hours"}>Hours per week</Label>
             <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
-              <Switch checked={hoursRange} onCheckedChange={toggleHoursRange} aria-label="Set a hours range" />
+              <Switch checked={hoursRange} onCheckedChange={toggleHoursRange} aria-label="Set an hours range" />
               Set a range
             </label>
           </div>
