@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Plus, UserRoundPlus } from "lucide-react";
+import { ArrowRight, Lightbulb, Plus, UserRoundPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MAX_PROFILES, myApplicantProfiles } from "@/lib/applicant";
 import { EmptyState, PageHeader } from "@/components/AppShell";
@@ -32,6 +32,22 @@ function Page() {
           ) : undefined
         }
       />
+      {!full && (
+        <section className="mb-6 flex gap-4 rounded-2xl border border-primary/15 bg-primary/5 p-5">
+          <Lightbulb className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+          <div>
+            <h3 className="font-display font-semibold">Make up to 3 focused profiles</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Each profile can target a different role. Tailor the title, rate, skills and CV to that role so
+              employers see right away why you&apos;re a fit. For example: one as a Virtual Assistant, one as a
+              Bookkeeper, one as a Social Media Manager. When you apply, pick the profile that best matches the job.
+            </p>
+            <Button asChild size="sm" className="mt-4">
+              <Link to="/applicant/profiles/new"><Plus className="h-4 w-4" /> Create a Profile</Link>
+            </Button>
+          </div>
+        </section>
+      )}
       <h2 className="mb-4 font-display text-lg font-semibold">Your Profiles</h2>
       {isLoading ? null : profiles.length === 0 ? (
         <EmptyState
