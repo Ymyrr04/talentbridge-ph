@@ -115,14 +115,18 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     } catch (err) {
       if (newVideo) await removeVideo(newVideo);
       if (newVoice) await removeVoice(newVoice);
-      const msg = err instanceof Error ? err.message : "";
+      // Supabase returns a plain object here, not an Error, so read its fields directly.
+      const e = (err ?? {}) as { message?: unknown; code?: unknown };
+      const msg = typeof e.message === "string" ? e.message : "";
+      const code = typeof e.code === "string" ? e.code : "";
       // A profile can only be created by an applicant account; admins may open the page but not save.
       setError(
-        /row-level security|42501/i.test(msg)
+        code === "42501" || /row-level security/i.test(msg)
           ? "This account can’t save applicant profiles — it isn’t an applicant account. Sign in as an applicant."
           : msg || "Something went wrong.",
       );
     } finally {
+
 
       setSaving(false);
     }
