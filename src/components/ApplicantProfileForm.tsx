@@ -166,7 +166,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
           setCand((c) => ({
             ...c,
             years: String(sg.years_experience),
-            field: sg.field,
+            industries: sg.field ? [sg.field] : c.industries,
             highlights: sg.highlights,
             skills: sg.skills,
           }));
@@ -238,7 +238,11 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
             roleTitle,
             hourlyRate: rate,
             years: cand.years === "" ? null : Number(cand.years),
-            field: cand.field,
+            pastTitles: cand.pastTitles,
+            industries: cand.industries,
+            tools: cand.tools,
+            education: cand.education.map((l) => l.trim()).filter(Boolean),
+            startAvailability: cand.startAvailability || null,
             highlights: cand.highlights,
             availability: cand.availability,
             hours: cand.hours,
