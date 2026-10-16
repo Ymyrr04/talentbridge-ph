@@ -3,13 +3,15 @@ import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const adminData = queryOptions({
-  queryKey: ["admin-data", 2],
+  queryKey: ["admin-data", 3],
   queryFn: async () => {
-    const [users, profiles, jobs] = await Promise.all([
+    const [users, profiles, jobs, cvs] = await Promise.all([
       supabase.rpc("admin_list_users"),
       supabase.from("applicant_profiles").select("*").order("created_at"),
       supabase.from("job_posts").select("*").order("created_at"),
+      supabase.from("applicant_cvs").select("*"),
     ]);
+    if (cvs.error) throw cvs.error;
     if (users.error) throw users.error;
     if (profiles.error) throw profiles.error;
     if (jobs.error) throw jobs.error;
@@ -27,6 +29,7 @@ export const adminData = queryOptions({
       },
       profiles: profiles.data,
       jobs: jobs.data,
+      cvs: cvs.data ?? [],
     };
   },
 });
@@ -113,20 +116,21 @@ export async function exportApplicants(d: AdminData) {
   for (const u of accountsOf(d).applicants) {
     const ps = d.profiles.filter((p) => p.owner_id === u.id);
     const base = { full_name: u.name, email: u.email, phone: u.phone, joined: u.created_at };
+    const cv = (d.cvs ?? []).find((c) => c.owner_id === u.id);
+    let cvFile = "";
+    if (cv) {
+      const { data } = await supabase.storage.from("cv-uploads").download(cv.cv_path);
+      if (data) {
+        const ext = cv.cv_path.split(".").pop();
+        cvFile = `cvs/${safe(u.name || u.email)}_${u.id.slice(0, 8)}.${ext}`;
+        cvs.file(cvFile.slice(4), data);
+      } else cvFile = "(missing)";
+    }
     if (ps.length === 0) {
-      rows.push({ ...base, profile_role: "", status: "", hourly_rate_usd: "", experience: "", skills: "", summary: "", availability: "", hours_per_week: "", time_zones: "", cv_file: "" });
+      rows.push({ ...base, profile_role: "", status: "", hourly_rate_usd: "", experience: "", skills: "", summary: "", availability: "", hours_per_week: "", time_zones: "", cv_file: cvFile });
       continue;
     }
     for (const p of ps) {
-      let cvFile = "";
-      if (p.cv_path) {
-        const { data } = await supabase.storage.from("cv-uploads").download(p.cv_path);
-        if (data) {
-          const ext = p.cv_path.split(".").pop();
-          cvFile = `cvs/${safe(u.name || u.email)}_${p.id.slice(0, 8)}.${ext}`;
-          cvs.file(cvFile.slice(4), data);
-        } else cvFile = "(missing)";
-      }
       rows.push({
         ...base,
         profile_role: p.role_title,

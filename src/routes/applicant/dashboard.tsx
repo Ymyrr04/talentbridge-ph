@@ -38,9 +38,7 @@ function Page() {
           <div>
             <h3 className="font-display font-semibold">Make up to 3 focused profiles</h3>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Each profile can target a different role. Tailor the title, rate, skills and CV to that role so
-              employers see right away why you&apos;re a fit. For example: one as a Virtual Assistant, one as a
-              Bookkeeper, one as a Social Media Manager. When you apply, pick the profile that best matches the job.
+              Each profile can target a different role. Tailor the title, rate, skills and summary to that role so employers see right away why you're a fit. All your profiles use the same CV, so keep each one true to your real experience. When you apply, pick the profile that best matches the job.
             </p>
             <Button asChild size="sm" className="mt-4">
               <Link to="/applicant/profiles/new"><Plus className="h-4 w-4" /> Create a Profile</Link>

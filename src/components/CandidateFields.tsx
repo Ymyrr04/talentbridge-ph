@@ -128,6 +128,7 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
         <Label htmlFor="summary">Summary</Label>
         <Textarea id="summary" rows={5} maxLength={SUMMARY_MAX} value={value.summary} onChange={(e) => set("summary", e.target.value)} placeholder="A short overview of your experience and strengths." />
         <p className="text-xs text-muted-foreground">{value.summary.length}/{SUMMARY_MAX}</p>
+        <p className="text-xs text-muted-foreground">Only include experience that's in your CV.</p>
       </div>
 
       <div className="space-y-2">
