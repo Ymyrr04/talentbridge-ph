@@ -215,12 +215,6 @@ function Preview({
   const bullets = [...(format?.highlights ?? []).map((h) => h.trim()).filter(Boolean)];
   const avail = format
     ? availabilityBullet({
-        name: a.applicant_name,
-        roleTitle: a.role_title,
-        hourlyRate: a.hourly_rate,
-        years: format.years_experience,
-        field: format.field,
-        highlights: format.highlights,
         availability: format.availability_list,
         hours: format.hours_per_week,
         timeZones: format.time_zones,
