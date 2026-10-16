@@ -33,6 +33,8 @@ export type Database = {
           summary: string | null
           time_zones: string[] | null
           updated_at: string
+          video_duration_seconds: number | null
+          video_path: string | null
         }
         Insert: {
           availability?: string | null
@@ -52,6 +54,8 @@ export type Database = {
           summary?: string | null
           time_zones?: string[] | null
           updated_at?: string
+          video_duration_seconds?: number | null
+          video_path?: string | null
         }
         Update: {
           availability?: string | null
@@ -71,6 +75,8 @@ export type Database = {
           summary?: string | null
           time_zones?: string[] | null
           updated_at?: string
+          video_duration_seconds?: number | null
+          video_path?: string | null
         }
         Relationships: [
           {
@@ -492,6 +498,13 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      incoming_application_videos: {
+        Args: never
+        Returns: {
+          application_id: string
+          video_path: string
+        }[]
       }
       incoming_applications: {
         Args: never
