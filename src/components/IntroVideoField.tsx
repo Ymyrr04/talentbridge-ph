@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Camera, Upload, Video } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { readDuration, signedVideoUrl, validateVideoFile, VIDEO_MAX_SECONDS, VIDEO_TYPES } from "@/lib/introVideo";
+import { readDuration, signedVideoUrl, validateVideoFile, VIDEO_MAX_BYTES, VIDEO_MAX_SECONDS, VIDEO_TYPES } from "@/lib/introVideo";
 
 export type VideoChange =
   | { kind: "keep" }
@@ -88,7 +88,7 @@ export function IntroVideoField({ existingPath, value, onChange }: {
 
       <input ref={fileRef} type="file" accept={VIDEO_TYPES.join(",")} className="sr-only"
         onChange={(e) => { void onFile(e.target.files?.[0]); e.target.value = ""; }} />
-      <p className="text-xs text-muted-foreground">MP4, WebM or MOV · up to 2 minutes · max 50 MB.</p>
+      <p className="text-xs text-muted-foreground">MP4, WebM or MOV · up to 2 minutes · max {VIDEO_MAX_BYTES / (1024 * 1024)} MB.</p>
       <p className="text-sm text-muted-foreground">Your video is only shared with employers you apply to.</p>
     </div>
   );

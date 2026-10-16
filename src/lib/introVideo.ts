@@ -1,13 +1,13 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const VIDEO_BUCKET = "intro-videos";
-export const VIDEO_MAX_BYTES = 50 * 1024 * 1024;
+export const VIDEO_MAX_BYTES = 300 * 1024 * 1024;
 export const VIDEO_MAX_SECONDS = 120;
 export const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 
 export function validateVideoFile(f: File): string | null {
   if (!VIDEO_TYPES.includes(f.type)) return "Please choose an MP4, WebM or MOV video.";
-  if (f.size > VIDEO_MAX_BYTES) return "Video must be 50 MB or smaller.";
+  if (f.size > VIDEO_MAX_BYTES) return `Video must be ${VIDEO_MAX_BYTES / (1024 * 1024)} MB or smaller.`;
   return null;
 }
 
