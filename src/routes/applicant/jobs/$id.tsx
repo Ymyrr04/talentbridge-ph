@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calculator, Check } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ApplyDialog } from "@/components/ApplyDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { myApplications, myPublishedProfiles } from "@/lib/applications";
 import {
   DURATION_LABEL, EMPLOYMENT_LABEL, EXPERIENCE_LABEL, ZONE_LABEL,
-  formatHours, formatMonthly, formatRate, postedAgo,
+  formatHours, formatRate, postedAgo,
 } from "@/lib/jobFormat";
 
 const jobQuery = (id: string) =>
@@ -65,7 +65,6 @@ function JobDetail({ id }: { id: string }) {
   const applied = apps.some((a) => a.job_id === id);
   const rate = formatRate(job.rate_min, job.rate_max);
   const hours = formatHours(job.hours_min, job.hours_max);
-  const monthly = formatMonthly(job.rate_min, job.rate_max, job.hours_min, job.hours_max);
   const facts: [string, string | null][] = [
     ["Employment type", job.employment_type ? EMPLOYMENT_LABEL[job.employment_type] ?? null : null],
     ["Project timeline", job.employment_type === "project" && job.project_duration ? DURATION_LABEL[job.project_duration] ?? null : null],
@@ -101,15 +100,6 @@ function JobDetail({ id }: { id: string }) {
         ))}
       </dl>
 
-      {monthly && (
-        <div className="flex items-start gap-3 rounded-lg bg-muted p-4">
-          <Calculator className="mt-0.5 h-4 w-4 text-muted-foreground" />
-          <div>
-            <p className="text-sm">Estimated cost: <span className="font-semibold">{monthly}</span> per month</p>
-            <p className="text-xs text-muted-foreground">Based on 4.33 weeks per month. Estimate only.</p>
-          </div>
-        </div>
-      )}
 
       {job.must_have_tools && job.must_have_tools.length > 0 && (
         <section>
