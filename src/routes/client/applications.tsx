@@ -83,7 +83,7 @@ function ClientApplicationsPage() {
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: 0, pending: 0, contacted: 0, shortlisted: 0, rejected: 0 };
     for (const a of jobFilter === "all" ? data : data.filter((x) => x.job_id === jobFilter)) {
-      c.all += 1;
+      c["all"] = (c["all"] ?? 0) + 1;
       c[a.status] = (c[a.status] ?? 0) + 1;
     }
     return c;
