@@ -24,10 +24,9 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     skills: existing?.skills ?? [],
     experience: existing?.experience_level ?? "",
     summary: existing?.summary ?? "",
-    availability: existing?.availability ?? "",
+    availability: existing?.availability_list ?? (existing?.availability ? [existing.availability] : []),
     hours: existing?.hours_per_week != null ? String(existing.hours_per_week) : "",
     timeZones: existing?.time_zones ?? [],
-    english: existing?.english_level ?? "",
   });
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -70,10 +69,9 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         skills: cand.skills.length ? cand.skills : null,
         experience_level: cand.experience || null,
         summary: cand.summary.trim() || null,
-        availability: cand.availability || null,
+        availability_list: cand.availability.length ? cand.availability : null,
         hours_per_week: hours,
         time_zones: cand.timeZones.length ? cand.timeZones : null,
-        english_level: cand.english || null,
         ...(newPath && file ? { cv_path: newPath, cv_original_filename: file.name } : {}),
       };
       const { error } = existing

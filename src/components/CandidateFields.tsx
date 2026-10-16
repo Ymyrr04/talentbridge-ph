@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export const SKILL_OPTIONS = [
   "Virtual Assistance", "Customer Support", "Data Entry", "Bookkeeping", "QuickBooks", "Xero", "Excel",
@@ -26,6 +25,7 @@ export const AVAILABILITY = [
   { value: "part_time", label: "Part-time" },
   { value: "project", label: "Project-based" },
 ];
+export const ANY_HOURS = { value: "any", label: "Any hours (flexible)" };
 export const TIME_ZONES = [
   { value: "us", label: "US hours" },
   { value: "australia", label: "Australia hours" },
@@ -41,10 +41,9 @@ export type CandidateValues = {
   skills: string[];
   experience: string;
   summary: string;
-  availability: string;
+  availability: string[];
   hours: string;
   timeZones: string[];
-  english: string;
 };
 
 /** Returns a list of missing items required to publish. */
@@ -53,10 +52,9 @@ export function publishErrors(v: CandidateValues): string[] {
   if (v.skills.length === 0) errs.push("at least 1 skill");
   if (!v.experience) errs.push("experience");
   if (!v.summary.trim()) errs.push("summary");
-  if (!v.availability) errs.push("availability");
+  if (v.availability.length === 0) errs.push("at least 1 availability");
   if (!v.hours) errs.push("hours per week");
-  if (v.timeZones.length === 0) errs.push("at least 1 time zone");
-  if (!v.english) errs.push("English level");
+  if (v.timeZones.length === 0) errs.push("at least 1 working-hours option");
   return errs;
 }
 
@@ -134,13 +132,19 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
 
       <div className="space-y-2">
         <Label>Availability</Label>
-        <RadioGroup value={value.availability} onValueChange={(v) => set("availability", v)} className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4">
           {AVAILABILITY.map((o) => (
             <label key={o.value} className="flex items-center gap-2 text-sm">
-              <RadioGroupItem value={o.value} /> {o.label}
+              <Checkbox
+                checked={value.availability.includes(o.value)}
+                onCheckedChange={(c) =>
+                  set("availability", c ? [...value.availability, o.value] : value.availability.filter((x) => x !== o.value))
+                }
+              />
+              {o.label}
             </label>
           ))}
-        </RadioGroup>
+        </div>
         <div className="max-w-40 space-y-1.5 pt-1">
           <Label htmlFor="hours">Hours per week</Label>
           <Input id="hours" type="number" min={1} max={60} step={1} value={value.hours} onChange={(e) => set("hours", e.target.value)} />
@@ -150,12 +154,19 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
       <div className="space-y-2">
         <Label>Can work for clients in</Label>
         <div className="flex flex-wrap gap-4">
-          {TIME_ZONES.map((o) => (
+          {[ANY_HOURS, ...TIME_ZONES].map((o) => (
             <label key={o.value} className="flex items-center gap-2 text-sm">
               <Checkbox
                 checked={value.timeZones.includes(o.value)}
                 onCheckedChange={(c) =>
-                  set("timeZones", c ? [...value.timeZones, o.value] : value.timeZones.filter((x) => x !== o.value))
+                  set(
+                    "timeZones",
+                    !c
+                      ? value.timeZones.filter((x) => x !== o.value)
+                      : o.value === "any"
+                        ? ["any"]
+                        : [...value.timeZones.filter((x) => x !== "any"), o.value],
+                  )
                 }
               />
               {o.label}
@@ -164,13 +175,11 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="english">English level</Label>
-        <select id="english" className={selectCls} value={value.english} onChange={(e) => set("english", e.target.value)}>
-          <option value="">Select…</option>
-          {ENGLISH.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-      </div>
     </>
   );
+}
+
+/** Labels for a saved availability list, joined with ", ". */
+export function availabilityLabel(list: string[] | null | undefined): string {
+  return (list ?? []).map((v) => AVAILABILITY.find((o) => o.value === v)?.label ?? v).join(", ");
 }

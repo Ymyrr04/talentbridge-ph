@@ -17,6 +17,7 @@ export type Database = {
       applicant_profiles: {
         Row: {
           availability: string | null
+          availability_list: string[] | null
           created_at: string
           cv_original_filename: string | null
           cv_path: string | null
@@ -35,6 +36,7 @@ export type Database = {
         }
         Insert: {
           availability?: string | null
+          availability_list?: string[] | null
           created_at?: string
           cv_original_filename?: string | null
           cv_path?: string | null
@@ -53,6 +55,7 @@ export type Database = {
         }
         Update: {
           availability?: string | null
+          availability_list?: string[] | null
           created_at?: string
           cv_original_filename?: string | null
           cv_path?: string | null
