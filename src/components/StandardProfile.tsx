@@ -1,4 +1,4 @@
-import { annualSalary, availabilityLine, joinAnd, type StandardProfileData } from "@/lib/standardProfile";
+import { availabilityLine, joinAnd, type StandardProfileData } from "@/lib/standardProfile";
 
 /** The one shared "standard format" view of an applicant profile. */
 export function StandardProfile({ data, className = "", rateLabel }: { data: StandardProfileData; className?: string; rateLabel?: string }) {
@@ -6,8 +6,6 @@ export function StandardProfile({ data, className = "", rateLabel }: { data: Sta
   const role = data.roleTitle.trim();
   const rate = Number(data.hourlyRate);
   const hasRate = data.hourlyRate !== "" && data.hourlyRate != null && Number.isFinite(rate);
-  const hours = Number(data.hours);
-  const hasHours = data.hours !== "" && data.hours != null && Number.isFinite(hours) && hours > 0;
   const hasYears = data.years !== null && data.years !== undefined && !Number.isNaN(data.years);
   const pastTitles = (data.pastTitles ?? []).map((t) => t.trim()).filter(Boolean);
   const industries = (data.industries ?? []).map((t) => t.trim()).filter(Boolean);
@@ -23,14 +21,7 @@ export function StandardProfile({ data, className = "", rateLabel }: { data: Sta
       <p className="text-base font-semibold">{name || "Your name"}</p>
       {role && <p><Label>Role:</Label> {role}</p>}
       {hasRate ? (
-        <p>
-          <Label>Hourly rate:</Label> ${rate.toFixed(2)}/hr
-          {hasHours && (
-            <>
-              {"  "}<Label>Annual salary:</Label> {annualSalary(rate, hours)}/year ({hours}hrs/week)
-            </>
-          )}
-        </p>
+        <p><Label>Hourly rate:</Label> ${rate.toFixed(2)}/hr</p>
       ) : rateLabel ? (
         <p>{rateLabel}</p>
       ) : null}
