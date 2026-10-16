@@ -26,7 +26,7 @@ export function formatHours(min: N, max: N): string | null {
 export function formatMonthly(rMin: N, rMax: N, hMin: N, hMax: N): string | null {
   const v = [num(rMin), num(rMax), num(hMin), num(hMax)];
   if (v.some((x) => x == null)) return null;
-  const [a, b, c, d] = v as number[];
+  const [a, b, c, d] = v as [number, number, number, number];
   const low = Math.round(a * c * WEEKS), high = Math.round(b * d * WEEKS);
   const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
   return low === high ? usd(low) : `${usd(low)} – ${usd(high)}`;
