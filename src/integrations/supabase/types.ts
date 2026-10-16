@@ -266,7 +266,7 @@ export type Database = {
         Returns: {
           hourly_rate: number
           id: string
-          name: string
+          initials: string
           role_title: string
           updated_at: string
         }[]
@@ -281,7 +281,6 @@ export type Database = {
       incoming_applications: {
         Args: never
         Returns: {
-          applicant_email: string
           applicant_name: string
           cover_note: string
           created_at: string
