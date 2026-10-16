@@ -74,3 +74,13 @@ export async function openCvFile(path: string) {
   if (error) throw error;
   window.open(data.signedUrl, "_blank", "noopener");
 }
+
+export const myAccountName = (userId: string) =>
+  queryOptions({
+    queryKey: ["my-account-name", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("name").eq("id", userId).maybeSingle();
+      if (error) throw error;
+      return data?.name ?? "";
+    },
+  });
