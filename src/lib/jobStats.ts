@@ -10,6 +10,7 @@ export const myJobStats = queryOptions({
       ...r,
       views: Number(r.views), applicants: Number(r.applicants),
       pending: Number(r.pending), shortlisted: Number(r.shortlisted), rejected: Number(r.rejected),
+      contacted: Number(r.contacted),
     }));
   },
 });
