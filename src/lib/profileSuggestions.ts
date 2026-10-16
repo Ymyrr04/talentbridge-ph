@@ -17,7 +17,7 @@ const clip = (v: unknown, max: number) => (typeof v === "string" ? v.trim().repl
 export function cleanSuggestions(raw: unknown): ProfileSuggestion[] {
   const list = (raw && typeof raw === "object" && Array.isArray((raw as { suggestions?: unknown }).suggestions)
     ? (raw as { suggestions: unknown[] }).suggestions
-    : []) as Record<string, unknown>[];
+    : []) as Partial<Record<"role_title" | "years_experience" | "field" | "highlights" | "skills", unknown>>[];
   const out: ProfileSuggestion[] = [];
   for (const s of list) {
     if (!s || typeof s !== "object") continue;
