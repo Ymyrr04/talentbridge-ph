@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { removeVideo } from "@/lib/introVideo";
 import { removeVoice } from "@/lib/voiceIntro";
-import { MAX_PROFILES, myApplicantProfiles, removeCv } from "@/lib/applicant";
+import { MAX_PROFILES, myApplicantProfiles, myCv } from "@/lib/applicant";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ function Page() {
   const qc = useQueryClient();
   const key = myApplicantProfiles(user.id).queryKey;
   const { data: profiles = [], isLoading } = useQuery(myApplicantProfiles(user.id));
+  const { data: cv } = useQuery(myCv(user.id));
   const full = profiles.length >= MAX_PROFILES;
 
   const toggle = useMutation({
@@ -34,11 +35,10 @@ function Page() {
   });
 
   const del = useMutation({
-    mutationFn: async ({ id, cv }: { id: string; cv: string | null }) => {
+    mutationFn: async ({ id }: { id: string }) => {
       const { data: row } = await supabase.from("applicant_profiles").select("video_path, voice_path").eq("id", id).maybeSingle();
       const { error } = await supabase.from("applicant_profiles").delete().eq("id", id);
       if (error) throw error;
-      await removeCv(cv);
       await removeVideo(row?.video_path);
       await removeVoice(row?.voice_path);
     },
@@ -86,8 +86,8 @@ function Page() {
                   <Badge variant={published ? "default" : "secondary"}>{published ? "Published" : "Draft"}</Badge>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">${Number(p.hourly_rate).toFixed(2)}/hr</p>
-                {p.cv_path ? (
-                  <button onClick={() => openCv(p.cv_path!)} className="mt-3 inline-flex items-center gap-1.5 self-start text-sm text-primary hover:underline">
+                {cv ? (
+                  <button onClick={() => openCv(cv.cv_path)} className="mt-3 inline-flex items-center gap-1.5 self-start text-sm text-primary hover:underline">
                     <FileText className="h-4 w-4" /> View CV
                   </button>
                 ) : (
@@ -109,8 +109,8 @@ function Page() {
                     </Button>
                     <ConfirmDelete
                       title="Delete this profile?"
-                      description={`“${p.role_title}” and its CV will be permanently removed.`}
-                      onConfirm={() => del.mutate({ id: p.id, cv: p.cv_path })}
+                      description={`“${p.role_title}” will be permanently removed. Your CV stays in Settings.`}
+                      onConfirm={() => del.mutate({ id: p.id })}
                       trigger={<Button variant="ghost" size="sm" className="text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /> Delete</Button>}
                     />
                   </div>

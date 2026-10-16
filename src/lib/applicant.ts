@@ -43,3 +43,34 @@ export async function removeCv(path: string | null | undefined) {
   const { error } = await supabase.storage.from("cv-uploads").remove([path]);
   if (error) console.error("Failed to remove CV", error);
 }
+
+export const myCv = (userId: string) =>
+  queryOptions({
+    queryKey: ["applicant-cv", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("applicant_cvs").select("*").eq("owner_id", userId).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+/** Uploads a new CV, saves it as the applicant's single CV, and removes the old file. */
+export async function replaceCv(userId: string, file: File, oldPath: string | null | undefined) {
+  const v = validateCv(file);
+  if (v) throw new Error(v);
+  const path = await uploadCv(userId, file);
+  const { error } = await supabase
+    .from("applicant_cvs")
+    .upsert({ owner_id: userId, cv_path: path, cv_original_filename: file.name }, { onConflict: "owner_id" });
+  if (error) {
+    await removeCv(path);
+    throw error;
+  }
+  if (oldPath && oldPath !== path) await removeCv(oldPath);
+}
+
+export async function openCvFile(path: string) {
+  const { data, error } = await supabase.storage.from("cv-uploads").createSignedUrl(path, 60);
+  if (error) throw error;
+  window.open(data.signedUrl, "_blank", "noopener");
+}

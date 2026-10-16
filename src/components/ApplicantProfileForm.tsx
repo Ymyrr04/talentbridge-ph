@@ -1,11 +1,11 @@
 import { useState, type FormEvent } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { FileText, Upload } from "lucide-react";
+import { FileText } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
-import { removeCv, uploadCv, validateCv } from "@/lib/applicant";
+import { myCv } from "@/lib/applicant";
 import { CandidateFields, publishErrors, SUMMARY_MAX, type CandidateValues } from "@/components/CandidateFields";
 import { IntroVideoField, type VideoChange } from "@/components/IntroVideoField";
 import { removeVideo, uploadVideo } from "@/lib/introVideo";
@@ -22,7 +22,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
   const qc = useQueryClient();
   const [roleTitle, setRoleTitle] = useState(existing?.role_title ?? "");
   const [rate, setRate] = useState(existing ? String(existing.hourly_rate) : "");
-  const [file, setFile] = useState<File | null>(null);
+  const { data: cv, isLoading: cvLoading } = useQuery(myCv(userId));
   const [status, setStatus] = useState<"draft" | "published">(existing?.status === "published" ? "published" : "draft");
   const [cand, setCand] = useState<CandidateValues>({
     skills: existing?.skills ?? [],
@@ -55,22 +55,20 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
       return;
     }
     if (status === "published") {
+      if (!cv) {
+        toast.error("Upload your CV in Settings before publishing.");
+        return;
+      }
       const missing = publishErrors(cand);
       if (missing.length) {
         toast.error("To publish, please add: " + missing.join(", ") + ".");
         return;
       }
     }
-    if (file) {
-      const v = validateCv(file);
-      if (v) return setError(v);
-    }
     setSaving(true);
-    let newPath: string | null = null;
     let newVideo: string | null = null;
     let newVoice: string | null = null;
     try {
-      if (file) newPath = await uploadCv(userId, file);
       if (voice.kind === "file") newVoice = await uploadVoice(userId, profileId, voice.blob);
       if (video.kind === "new") newVideo = await uploadVideo(userId, profileId, video.blob);
       const values = {
@@ -88,13 +86,11 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         ...(voice.kind === "link" ? { voice_path: null, voice_link: voice.url } : {}),
         ...(voice.kind === "remove" ? { voice_path: null, voice_link: null } : {}),
         ...(video.kind === "remove" ? { video_path: null, video_duration_seconds: null } : {}),
-        ...(newPath && file ? { cv_path: newPath, cv_original_filename: file.name } : {}),
       };
       const { error } = existing
         ? await supabase.from("applicant_profiles").update(values).eq("id", existing.id)
         : await supabase.from("applicant_profiles").insert({ ...values, id: profileId, owner_id: userId });
       if (error) throw error;
-      if (newPath && existing?.cv_path) await removeCv(existing.cv_path);
       if (voice.kind !== "keep" && existing?.voice_path) await removeVoice(existing.voice_path);
       if (video.kind !== "keep" && existing?.video_path) await removeVideo(existing.video_path);
       await qc.invalidateQueries({ queryKey: ["applicant-profiles", userId] });
@@ -102,7 +98,6 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
       toast.success(existing ? "Profile updated" : "Profile created");
       navigate({ to: "/applicant/profiles" });
     } catch (err) {
-      if (newPath) await removeCv(newPath);
       if (newVideo) await removeVideo(newVideo);
       if (newVoice) await removeVoice(newVoice);
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -110,8 +105,6 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
       setSaving(false);
     }
   }
-
-  const currentCv = existing?.cv_path ? existing.cv_original_filename?.trim() || "CV uploaded" : null;
 
   return (
     <form onSubmit={onSubmit} className="max-w-2xl space-y-6">
@@ -131,32 +124,19 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         </div>
         <CandidateFields value={cand} onChange={setCand} />
         <div className="space-y-1.5">
-          <Label htmlFor="cv">CV <span className="font-normal text-muted-foreground">(PDF or DOCX, max 5 MB)</span></Label>
-          <label htmlFor="cv" className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed px-4 py-4 text-sm transition-colors hover:bg-muted">
-            {file ? <FileText className="h-5 w-5 text-primary" /> : <Upload className="h-5 w-5 text-muted-foreground" />}
-            <span className="truncate">
-              {file ? file.name : currentCv ? `Current file: ${currentCv} — click to replace` : "Click to choose a file"}
-            </span>
-          </label>
-          <input
-            id="cv"
-            type="file"
-            className="sr-only"
-            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            onChange={(e) => {
-              const f = e.target.files?.[0] ?? null;
-              if (f) {
-                const v = validateCv(f);
-                if (v) {
-                  setError(v);
-                  e.target.value = "";
-                  return;
-                }
-              }
-              setError(null);
-              setFile(f);
-            }}
-          />
+          <Label>CV</Label>
+          {cvLoading ? null : cv ? (
+            <p className="flex items-center gap-2 rounded-lg border px-4 py-3 text-sm">
+              <FileText className="h-4 w-4 shrink-0 text-primary" />
+              <span className="min-w-0 truncate">Uses your CV: {cv.cv_original_filename || "CV uploaded"}</span>
+              <span className="text-muted-foreground">·</span>
+              <Link to="/applicant/settings" className="shrink-0 text-primary hover:underline">Manage in Settings</Link>
+            </p>
+          ) : (
+            <p className="rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground">
+              <Link to="/applicant/settings" className="text-primary hover:underline">Upload your CV in Settings</Link> before publishing.
+            </p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="status">Status</Label>

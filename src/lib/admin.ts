@@ -3,13 +3,15 @@ import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const adminData = queryOptions({
-  queryKey: ["admin-data", 2],
+  queryKey: ["admin-data", 3],
   queryFn: async () => {
-    const [users, profiles, jobs] = await Promise.all([
+    const [users, profiles, jobs, cvs] = await Promise.all([
       supabase.rpc("admin_list_users"),
       supabase.from("applicant_profiles").select("*").order("created_at"),
       supabase.from("job_posts").select("*").order("created_at"),
+      supabase.from("applicant_cvs").select("*"),
     ]);
+    if (cvs.error) throw cvs.error;
     if (users.error) throw users.error;
     if (profiles.error) throw profiles.error;
     if (jobs.error) throw jobs.error;
@@ -27,6 +29,7 @@ export const adminData = queryOptions({
       },
       profiles: profiles.data,
       jobs: jobs.data,
+      cvs: cvs.data ?? [],
     };
   },
 });
