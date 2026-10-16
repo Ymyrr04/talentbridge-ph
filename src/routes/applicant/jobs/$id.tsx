@@ -100,7 +100,6 @@ function JobDetail({ id }: { id: string }) {
         ))}
       </dl>
 
-
       {job.must_have_tools && job.must_have_tools.length > 0 && (
         <section>
           <h2 className="text-sm font-semibold">Must-have tools</h2>
