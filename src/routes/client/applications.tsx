@@ -56,8 +56,7 @@ function ClientApplicationsPage() {
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{a.job_title}</p>
                   <h3 className="mt-1 font-semibold">{a.applicant_name || "Unnamed applicant"}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {a.role_title} · ${Number(a.hourly_rate)}/hr ·{" "}
-                    <a href={`mailto:${a.applicant_email}`} className="text-primary underline-offset-2 hover:underline">{a.applicant_email}</a>
+                    {a.role_title} · ${Number(a.hourly_rate)}/hr
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
