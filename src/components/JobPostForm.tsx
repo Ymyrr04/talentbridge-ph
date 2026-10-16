@@ -72,7 +72,7 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
     const rateNum = rate.trim() ? Number(rate) : null;
     const hoursNum = hours.trim() ? Number(hours) : null;
     const errs: string[] = [];
-    if (rateNum !== null && (!Number.isFinite(rateNum) || rateNum < 1 || rateNum > 500 || Math.round(rateNum * 100) !== rateNum * 100))
+    if (rateNum !== null && (!Number.isFinite(rateNum) || rateNum < 1 || rateNum > 500 || Math.abs(Math.round(rateNum * 100) - rateNum * 100) > 1e-6))
       errs.push("Hourly rate must be between $1 and $500 (up to 2 decimals).");
     if (hoursNum !== null && (!Number.isInteger(hoursNum) || hoursNum < 1 || hoursNum > 60))
       errs.push("Hours per week must be a whole number between 1 and 60.");
