@@ -34,6 +34,7 @@ import { Route as ApplicantProfilesNewRouteImport } from './routes/applicant/pro
 import { Route as ClientJobsIndexRouteImport } from './routes/client/jobs/index'
 import { Route as ClientJobsNewRouteImport } from './routes/client/jobs/new'
 import { Route as ApplicantProfilesIdEditRouteImport } from './routes/applicant/profiles/$id/edit'
+import { Route as ClientJobsIdIndexRouteImport } from './routes/client/jobs/$id/index'
 import { Route as ClientJobsIdEditRouteImport } from './routes/client/jobs/$id/edit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -161,6 +162,11 @@ const ApplicantProfilesIdEditRoute = ApplicantProfilesIdEditRouteImport.update({
   path: '/profiles/$id/edit',
   getParentRoute: () => ApplicantRouteRoute,
 } as any)
+const ClientJobsIdIndexRoute = ClientJobsIdIndexRouteImport.update({
+  id: '/jobs/$id/',
+  path: '/jobs/$id/',
+  getParentRoute: () => ClientRouteRoute,
+} as any)
 const ClientJobsIdEditRoute = ClientJobsIdEditRouteImport.update({
   id: '/jobs/$id/edit',
   path: '/jobs/$id/edit',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/client/jobs/': typeof ClientJobsIndexRoute
   '/applicant/profiles/$id/edit': typeof ApplicantProfilesIdEditRoute
   '/client/jobs/$id/edit': typeof ClientJobsIdEditRoute
+  '/client/jobs/$id/': typeof ClientJobsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/client/jobs': typeof ClientJobsIndexRoute
   '/applicant/profiles/$id/edit': typeof ApplicantProfilesIdEditRoute
   '/client/jobs/$id/edit': typeof ClientJobsIdEditRoute
+  '/client/jobs/$id': typeof ClientJobsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/client/jobs/': typeof ClientJobsIndexRoute
   '/applicant/profiles/$id/edit': typeof ApplicantProfilesIdEditRoute
   '/client/jobs/$id/edit': typeof ClientJobsIdEditRoute
+  '/client/jobs/$id/': typeof ClientJobsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/client/jobs/'
     | '/applicant/profiles/$id/edit'
     | '/client/jobs/$id/edit'
+    | '/client/jobs/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/client/jobs'
     | '/applicant/profiles/$id/edit'
     | '/client/jobs/$id/edit'
+    | '/client/jobs/$id'
   id:
     | '__root__'
     | '/'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/client/jobs/'
     | '/applicant/profiles/$id/edit'
     | '/client/jobs/$id/edit'
+    | '/client/jobs/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -528,6 +540,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApplicantProfilesIdEditRouteImport
       parentRoute: typeof ApplicantRouteRoute
     }
+    '/client/jobs/$id/': {
+      id: '/client/jobs/$id/'
+      path: '/jobs/$id'
+      fullPath: '/client/jobs/$id/'
+      preLoaderRoute: typeof ClientJobsIdIndexRouteImport
+      parentRoute: typeof ClientRouteRoute
+    }
     '/client/jobs/$id/edit': {
       id: '/client/jobs/$id/edit'
       path: '/jobs/$id/edit'
@@ -585,6 +604,7 @@ interface ClientRouteRouteChildren {
   ClientJobsNewRoute: typeof ClientJobsNewRoute
   ClientJobsIndexRoute: typeof ClientJobsIndexRoute
   ClientJobsIdEditRoute: typeof ClientJobsIdEditRoute
+  ClientJobsIdIndexRoute: typeof ClientJobsIdIndexRoute
 }
 
 const ClientRouteRouteChildren: ClientRouteRouteChildren = {
@@ -596,6 +616,7 @@ const ClientRouteRouteChildren: ClientRouteRouteChildren = {
   ClientJobsNewRoute: ClientJobsNewRoute,
   ClientJobsIndexRoute: ClientJobsIndexRoute,
   ClientJobsIdEditRoute: ClientJobsIdEditRoute,
+  ClientJobsIdIndexRoute: ClientJobsIdIndexRoute,
 }
 
 const ClientRouteRouteWithChildren = ClientRouteRoute._addFileChildren(

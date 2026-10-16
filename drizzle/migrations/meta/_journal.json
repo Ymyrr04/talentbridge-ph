@@ -127,6 +127,13 @@
       "when": 1792165700817,
       "tag": "0017_job_views_and_details",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792166521597,
+      "tag": "0018_my_job_stats",
+      "breakpoints": true
     }
   ]
 }

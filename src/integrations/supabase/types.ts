@@ -433,6 +433,22 @@ export type Database = {
           status: string
         }[]
       }
+      my_job_stats: {
+        Args: never
+        Returns: {
+          applicants: number
+          created_at: string
+          id: string
+          pending: number
+          rate_max: number
+          rate_min: number
+          rejected: number
+          shortlisted: number
+          status: string
+          title: string
+          views: number
+        }[]
+      }
       record_job_view: { Args: { _job_id: string }; Returns: undefined }
       set_application_status: {
         Args: { _id: string; _status: string }
