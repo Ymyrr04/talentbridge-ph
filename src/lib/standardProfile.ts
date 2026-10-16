@@ -31,13 +31,6 @@ export function joinAnd(items: string[]): string {
 
 export const firstName = (name: string | null | undefined) => (name ?? "").trim().split(/\s+/)[0] ?? "";
 
-/** "$26k", "$26.5k" — one decimal only when needed. */
-export function annualSalary(rate: number, hours: number): string {
-  const k = (rate * hours * 52) / 1000;
-  const rounded = Math.round(k * 10) / 10;
-  const s = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
-  return `$${s}k`;
-}
 
 /** "Available to start within 2 weeks. Full-time, 40 hrs/week, US hours." */
 export function availabilityLine(d: Pick<StandardProfileData, "availability" | "hours" | "timeZones" | "startAvailability">): string | null {

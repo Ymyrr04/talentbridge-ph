@@ -6,8 +6,6 @@ export function StandardProfile({ data, className = "", rateLabel }: { data: Sta
   const role = data.roleTitle.trim();
   const rate = Number(data.hourlyRate);
   const hasRate = data.hourlyRate !== "" && data.hourlyRate != null && Number.isFinite(rate);
-  const hours = Number(data.hours);
-  const hasHours = data.hours !== "" && data.hours != null && Number.isFinite(hours) && hours > 0;
   const hasYears = data.years !== null && data.years !== undefined && !Number.isNaN(data.years);
   const pastTitles = (data.pastTitles ?? []).map((t) => t.trim()).filter(Boolean);
   const industries = (data.industries ?? []).map((t) => t.trim()).filter(Boolean);
