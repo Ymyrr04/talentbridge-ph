@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Calculator, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -40,8 +40,6 @@ const EXPERIENCE = [
   { value: "3_5", label: "3–5 years" },
   { value: "5_plus", label: "5+ years" },
 ];
-const WEEKS = 4.33;
-const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 /** null = empty, undefined = invalid */
 function parseRate(v: string): number | null | undefined {
   if (!v.trim()) return null;
@@ -74,6 +72,7 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
   const [zones, setZones] = useState<string[]>(existing?.time_zones ?? []);
   const [experience, setExperience] = useState(existing?.experience_level ?? "any");
   const [tools, setTools] = useState<string[]>(existing?.must_have_tools ?? []);
+  const [portfolio, setPortfolio] = useState(existing?.portfolio_required ?? false);
   const [rateMin0, rateMax0] = initPair(existing?.rate_min, existing?.rate_max, (n) => n.toFixed(2));
   const [hoursMin0, hoursMax0] = initPair(existing?.hours_min, existing?.hours_max);
   const [rateMin, setRateMin] = useState(rateMin0);
@@ -93,10 +92,6 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
   const hMin = parseHours(hoursMin), hMax = parseHours(hoursMax);
   const rateErr = rMin === undefined || rMax === undefined || (rMin != null && rMax != null && rMax < rMin);
   const hoursErr = hMin === undefined || hMax === undefined || (hMin != null && hMax != null && hMax < hMin);
-  const estimate =
-    rMin != null && rMax != null && hMin != null && hMax != null && !rateErr && !hoursErr
-      ? { low: Math.round(rMin * hMin * WEEKS), high: Math.round(rMax * hMax * WEEKS) }
-      : null;
 
   function changeType(v: string) {
     setEmploymentType(v);
@@ -163,6 +158,7 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
       time_zones: zones.length ? zones : null,
       experience_level: experience || null,
       must_have_tools: tools.length ? tools : null,
+      portfolio_required: portfolio,
     };
     const { error } = existing
       ? await supabase.from("job_posts").update(values).eq("id", existing.id)
@@ -269,21 +265,6 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
             {hoursRange ? 'Between 1 and 60 hours. "To" must be at least "From".' : "Between 1 and 60 hours."}
           </p>
         </div>
-        {estimate && (
-          <div className="flex items-start gap-3 rounded-xl bg-muted p-4" aria-live="polite">
-            <Calculator className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
-            <div>
-              <p className="text-sm">
-                Estimated cost:{" "}
-                <span className="font-semibold">
-                  {estimate.low === estimate.high ? usd(estimate.low) : `${usd(estimate.low)} – ${usd(estimate.high)}`}
-                </span>{" "}
-                per month
-              </p>
-              <p className="text-xs text-muted-foreground">Based on 4.33 weeks per month. Estimate only.</p>
-            </div>
-          </div>
-        )}
         <div className="space-y-2">
           <Label>Working hours</Label>
           <div className="flex flex-wrap gap-4">
@@ -304,6 +285,13 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
           </Select>
         </div>
         <ToolsInput value={tools} onChange={setTools} />
+        <label className="flex cursor-pointer items-start justify-between gap-4">
+          <span>
+            <span className="block text-sm font-medium">Require portfolio</span>
+            <span className="block text-xs text-muted-foreground">Applicants must include a link to their work.</span>
+          </span>
+          <Switch checked={portfolio} onCheckedChange={setPortfolio} aria-label="Require portfolio" />
+        </label>
         <div className="space-y-1.5">
           <Label>Status</Label>
           <Select value={status} onValueChange={setStatus}>

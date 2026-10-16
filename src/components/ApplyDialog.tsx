@@ -5,29 +5,38 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { myPublishedProfiles } from "@/lib/applications";
 
-export type ApplyJob = { id: string; title: string };
+export type ApplyJob = { id: string; title: string; portfolioRequired?: boolean };
 
 export function ApplyDialog({ job, onClose }: { job: ApplyJob | null; onClose: () => void }) {
   const { data: profiles } = useSuspenseQuery(myPublishedProfiles);
   const qc = useQueryClient();
   const [profileId, setProfileId] = useState("");
   const [note, setNote] = useState("");
+  const [portfolio, setPortfolio] = useState("");
   const [busy, setBusy] = useState(false);
   const selected = profileId || profiles[0]?.id || "";
 
   async function submit() {
     if (!job || !selected) return;
+    const url = portfolio.trim();
+    if (job.portfolioRequired && !url) { toast.error("This job requires a portfolio link."); return; }
+    if (url && (!/^https:\/\/[^\s/.]+\.[^\s]+$/i.test(url) || url.length > 300)) {
+      toast.error("Enter a link starting with https:// (max 300 characters).");
+      return;
+    }
     setBusy(true);
-    const { error } = await supabase.rpc("apply_to_job", { _job_id: job.id, _profile_id: selected, _note: note.trim() });
+    const { error } = await supabase.rpc("apply_to_job", { _job_id: job.id, _profile_id: selected, _note: note.trim(), _portfolio_url: url || undefined });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Application sent");
     setNote("");
+    setPortfolio("");
     setProfileId("");
     await qc.invalidateQueries({ queryKey: ["my-applications"] });
     onClose();
@@ -57,6 +66,11 @@ export function ApplyDialog({ job, onClose }: { job: ApplyJob | null; onClose: (
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="portfolio">Portfolio link{job?.portfolioRequired && <span className="text-destructive"> *</span>}</Label>
+              <Input id="portfolio" type="url" inputMode="url" maxLength={300} placeholder="https://" value={portfolio} onChange={(e) => setPortfolio(e.target.value)} required={!!job?.portfolioRequired} />
+              <p className="text-xs text-muted-foreground">Your website, Behance, Google Drive folder, GitHub or similar.</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="note">Short note (optional)</Label>
