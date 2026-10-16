@@ -145,6 +145,7 @@ export type Database = {
           hours_min: number | null
           hours_per_week: number | null
           id: string
+          must_have_tools: string[] | null
           owner_id: string
           project_duration: string | null
           rate_max: number | null
@@ -164,6 +165,7 @@ export type Database = {
           hours_min?: number | null
           hours_per_week?: number | null
           id?: string
+          must_have_tools?: string[] | null
           owner_id?: string
           project_duration?: string | null
           rate_max?: number | null
@@ -183,6 +185,7 @@ export type Database = {
           hours_min?: number | null
           hours_per_week?: number | null
           id?: string
+          must_have_tools?: string[] | null
           owner_id?: string
           project_duration?: string | null
           rate_max?: number | null
@@ -327,6 +330,7 @@ export type Database = {
         Args: { _id: string; _status: string }
         Returns: undefined
       }
+      valid_tool_list: { Args: { _t: string[] }; Returns: boolean }
     }
     Enums: {
       app_role: "applicant" | "client" | "admin"
