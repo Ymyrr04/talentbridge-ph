@@ -48,7 +48,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   useEffect(() => {
     // After a new publish, an open tab may ask for page files that no longer exist: reload once to get the new version.
     try {
-      if (STALE_CHUNK.test(String(error?.message ?? error))) {
+      if (STALE_CHUNK.test(error instanceof Error ? error.message : String(error))) {
         const key = "th-stale-reload";
         const last = Number(sessionStorage.getItem(key) ?? 0);
         if (Date.now() - last > 30_000) {
