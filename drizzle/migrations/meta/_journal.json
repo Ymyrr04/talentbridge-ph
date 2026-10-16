@@ -78,6 +78,13 @@
       "when": 1792162270460,
       "tag": "0010_hide_applicant_identity",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792162364138,
+      "tag": "0011_harden_signup_roles",
+      "breakpoints": true
     }
   ]
 }
