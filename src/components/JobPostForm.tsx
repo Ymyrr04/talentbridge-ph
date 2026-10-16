@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
+import { ToolsInput } from "@/components/ToolsInput";
 
 type Job = Tables<"job_posts">;
 
@@ -72,6 +73,7 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
   const [duration, setDuration] = useState(existing?.project_duration ?? "");
   const [zones, setZones] = useState<string[]>(existing?.time_zones ?? []);
   const [experience, setExperience] = useState(existing?.experience_level ?? "any");
+  const [tools, setTools] = useState<string[]>(existing?.must_have_tools ?? []);
   const [rateMin0, rateMax0] = initPair(existing?.rate_min, existing?.rate_max, (n) => n.toFixed(2));
   const [hoursMin0, hoursMax0] = initPair(existing?.hours_min, existing?.hours_max);
   const [rateMin, setRateMin] = useState(rateMin0);
@@ -160,6 +162,7 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
       hours_max: hMax ?? null,
       time_zones: zones.length ? zones : null,
       experience_level: experience || null,
+      must_have_tools: tools.length ? tools : null,
     };
     const { error } = existing
       ? await supabase.from("job_posts").update(values).eq("id", existing.id)
@@ -300,6 +303,7 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
             </SelectContent>
           </Select>
         </div>
+        <ToolsInput value={tools} onChange={setTools} />
         <div className="space-y-1.5">
           <Label>Status</Label>
           <Select value={status} onValueChange={setStatus}>
