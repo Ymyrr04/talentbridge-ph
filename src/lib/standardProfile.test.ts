@@ -4,7 +4,7 @@ import { annualSalary, availabilityLine, firstName } from "./standardProfile";
 describe("standard profile", () => {
   it("builds the availability line", () => {
     expect(availabilityLine({ availability: ["full_time", "part_time"], hours: 40, timeZones: ["us", "australia"], startAvailability: "2_weeks" }))
-      .toBe("Available to start within 2 weeks. Full-time and part-time, 40 hrs/week, US and Australia hours.");
+      .toBe("Available to start within 2 weeks. Full-time and Part-time, 40 hrs/week, US and Australia hours.");
   });
   it("uses 'any hours' when flexible", () => {
     expect(availabilityLine({ availability: ["project"], hours: 20, timeZones: ["any"], startAvailability: "immediately" }))
