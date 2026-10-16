@@ -116,10 +116,6 @@ export async function exportApplicants(d: AdminData) {
   for (const u of accountsOf(d).applicants) {
     const ps = d.profiles.filter((p) => p.owner_id === u.id);
     const base = { full_name: u.name, email: u.email, phone: u.phone, joined: u.created_at };
-    if (ps.length === 0) {
-      rows.push({ ...base, profile_role: "", status: "", hourly_rate_usd: "", experience: "", skills: "", summary: "", availability: "", hours_per_week: "", time_zones: "", cv_file: "" });
-      continue;
-    }
     const cv = (d.cvs ?? []).find((c) => c.owner_id === u.id);
     let cvFile = "";
     if (cv) {
@@ -129,6 +125,10 @@ export async function exportApplicants(d: AdminData) {
         cvFile = `cvs/${safe(u.name || u.email)}_${u.id.slice(0, 8)}.${ext}`;
         cvs.file(cvFile.slice(4), data);
       } else cvFile = "(missing)";
+    }
+    if (ps.length === 0) {
+      rows.push({ ...base, profile_role: "", status: "", hourly_rate_usd: "", experience: "", skills: "", summary: "", availability: "", hours_per_week: "", time_zones: "", cv_file: cvFile });
+      continue;
     }
     for (const p of ps) {
       rows.push({
