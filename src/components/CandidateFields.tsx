@@ -5,12 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export const SKILL_OPTIONS = [
-  "Virtual Assistance", "Customer Support", "Data Entry", "Bookkeeping", "QuickBooks", "Xero", "Excel",
-  "Google Workspace", "Social Media Management", "Canva", "Graphic Design", "Video Editing", "Copywriting",
-  "SEO", "Email Marketing", "HubSpot", "Shopify", "WordPress", "Web Development", "Python", "JavaScript",
-  "AI Tools", "Project Management", "Lead Generation", "Cold Calling", "Recruitment",
-];
+export { SKILL_OPTIONS } from "@/lib/skills";
+import { SKILL_OPTIONS } from "@/lib/skills";
 export const MAX_SKILLS = 15;
 export const SUMMARY_MAX = 500;
 export const HIGHLIGHT_MAX = 160;
