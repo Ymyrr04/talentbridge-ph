@@ -120,6 +120,13 @@
       "when": 1792164646874,
       "tag": "0016_tool_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792165700817,
+      "tag": "0017_job_views_and_details",
+      "breakpoints": true
     }
   ]
 }

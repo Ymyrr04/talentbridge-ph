@@ -1,78 +1,18 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { Briefcase, Check } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { EmptyState, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { myApplications, myPublishedProfiles } from "@/lib/applications";
+import { myPublishedProfiles } from "@/lib/applications";
 
-const jobsQuery = queryOptions({
-  queryKey: ["browse-jobs"],
-  queryFn: async () => {
-    const { data, error } = await supabase.rpc("browse_jobs");
-    if (error) throw error;
-    return data ?? [];
-  },
-});
+export type ApplyJob = { id: string; title: string };
 
-export const Route = createFileRoute("/applicant/jobs")({
-  head: () => ({ meta: [{ title: "Open Jobs — TalentHub" }, { name: "robots", content: "noindex" }] }),
-  loader: ({ context }) =>
-    Promise.all([
-      context.queryClient.ensureQueryData(jobsQuery),
-      context.queryClient.ensureQueryData(myApplications),
-      context.queryClient.ensureQueryData(myPublishedProfiles),
-    ]),
-  component: JobsPage,
-});
-
-type Job = { id: string; title: string; description: string; created_at: string };
-
-function JobsPage() {
-  const { data } = useSuspenseQuery(jobsQuery);
-  const { data: apps } = useSuspenseQuery(myApplications);
-  const applied = new Set(apps.map((a) => a.job_id));
-  const [applying, setApplying] = useState<Job | null>(null);
-
-  return (
-    <>
-      <PageHeader title="Open Jobs" subtitle={`${data.length} open role${data.length === 1 ? "" : "s"} from clients`} />
-      {data.length === 0 ? (
-        <EmptyState icon={<Briefcase className="h-6 w-6" />} title="No open jobs yet" body="Job posts that clients publish will appear here." />
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {data.map((j) => (
-            <article key={j.id} className="flex flex-col rounded-xl border bg-card p-5 shadow-sm">
-              <h3 className="font-semibold leading-snug">{j.title}</h3>
-              <p className="mt-2 line-clamp-4 flex-1 text-sm text-muted-foreground">{j.description}</p>
-              <div className="mt-4 flex items-center justify-between gap-2">
-                <p className="text-xs text-muted-foreground">
-                  Posted {new Date(j.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
-                </p>
-                {applied.has(j.id) ? (
-                  <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
-                    <Check className="h-4 w-4" /> Applied
-                  </span>
-                ) : (
-                  <Button size="sm" onClick={() => setApplying(j)}>Apply</Button>
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
-      <ApplyDialog job={applying} onClose={() => setApplying(null)} />
-    </>
-  );
-}
-
-function ApplyDialog({ job, onClose }: { job: Job | null; onClose: () => void }) {
+export function ApplyDialog({ job, onClose }: { job: ApplyJob | null; onClose: () => void }) {
   const { data: profiles } = useSuspenseQuery(myPublishedProfiles);
   const qc = useQueryClient();
   const [profileId, setProfileId] = useState("");
