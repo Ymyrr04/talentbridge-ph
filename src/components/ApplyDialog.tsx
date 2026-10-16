@@ -31,7 +31,7 @@ export function ApplyDialog({ job, onClose }: { job: ApplyJob | null; onClose: (
       return;
     }
     setBusy(true);
-    const { error } = await supabase.rpc("apply_to_job", { _job_id: job.id, _profile_id: selected, _note: note.trim(), _portfolio_url: url || undefined });
+    const { error } = await supabase.rpc("apply_to_job", { _job_id: job.id, _profile_id: selected, _note: note.trim(), _portfolio_url: url });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Application sent");
