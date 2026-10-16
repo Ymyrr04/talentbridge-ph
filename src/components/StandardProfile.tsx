@@ -1,7 +1,7 @@
 import { availabilityBullet, firstName, type StandardProfileData } from "@/lib/standardProfile";
 
 /** The one shared "standard format" view of an applicant profile. */
-export function StandardProfile({ data, className = "" }: { data: StandardProfileData; className?: string }) {
+export function StandardProfile({ data, className = "", rateLabel }: { data: StandardProfileData; className?: string; rateLabel?: string }) {
   const name = firstName(data.name);
   const role = data.roleTitle.trim();
   const rate = Number(data.hourlyRate);
@@ -14,7 +14,7 @@ export function StandardProfile({ data, className = "" }: { data: StandardProfil
   return (
     <div className={`space-y-1 text-sm ${className}`}>
       <p className="font-semibold">{[name, role].filter(Boolean).join(" – ") || "Your role title"}</p>
-      {hasRate && <p>${rate.toFixed(2)}/hour</p>}
+      {hasRate ? <p>${rate.toFixed(2)}/hour</p> : rateLabel ? <p>{rateLabel}</p> : null}
       {(hasYears || field) && (
         <p>
           {hasYears ? `${data.years}+ years of experience` : "Experience"}
