@@ -589,6 +589,7 @@ export type Database = {
         }[]
       }
       claim_suggestion_run: { Args: never; Returns: boolean }
+      client_can_view_cv: { Args: { _path: string }; Returns: boolean }
       client_can_view_profile_media: {
         Args: { _profile_id: string }
         Returns: boolean
@@ -656,6 +657,8 @@ export type Database = {
           applicant_name: string
           cover_note: string
           created_at: string
+          cv_original_filename: string
+          cv_path: string
           hourly_rate: number
           id: string
           job_id: string
