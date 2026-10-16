@@ -10,6 +10,7 @@ import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, incomingApplications 
 
 export const Route = createFileRoute("/client/applications")({
   head: () => ({ meta: [{ title: "Applications — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  validateSearch: (s: Record<string, unknown>): { job?: string } => (typeof s.job === "string" ? { job: s.job } : {}),
   loader: ({ context }) => context.queryClient.ensureQueryData(incomingApplications),
   component: ClientApplicationsPage,
 });
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/client/applications")({
 function ClientApplicationsPage() {
   const { data } = useSuspenseQuery(incomingApplications);
   const qc = useQueryClient();
-  const [jobFilter, setJobFilter] = useState("all");
+  const [jobFilter, setJobFilter] = useState(Route.useSearch().job ?? "all");
   const jobs = Array.from(new Map(data.map((a) => [a.job_id, a.job_title])).entries());
   const shown = jobFilter === "all" ? data : data.filter((a) => a.job_id === jobFilter);
 
