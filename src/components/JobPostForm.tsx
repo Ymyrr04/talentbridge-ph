@@ -175,21 +175,48 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
             </Select>
           </div>
         )}
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="rate">Hourly rate (USD)</Label>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
-              <Input id="rate" type="number" inputMode="decimal" min={1} max={500} step="0.01" className="pl-7" placeholder="0.00" value={rate} onChange={(e) => setRate(e.target.value)} onBlur={() => { const n = Number(rate); if (rate.trim() && Number.isFinite(n)) setRate(n.toFixed(2)); }} />
-            </div>
-            <p className="text-xs text-muted-foreground">Between $1 and $500 per hour.</p>
+        <div className="space-y-1.5">
+          <Label>Hourly rate (USD)</Label>
+          <div className="grid grid-cols-2 gap-3 sm:max-w-md">
+            {([["rate-from", "From", rateMin, setRateMin], ["rate-to", "To", rateMax, setRateMax]] as const).map(([id, lbl, v, set]) => (
+              <div key={id} className="space-y-1">
+                <Label htmlFor={id} className="text-xs font-normal text-muted-foreground">{lbl}</Label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+                  <Input id={id} type="number" inputMode="decimal" min={1} max={500} step="0.01" className="pl-7" placeholder="0.00" aria-invalid={rateErr} value={v} onChange={(e) => set(e.target.value)} onBlur={() => fmt2(v, set)} />
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="hours">Hours per week</Label>
-            <Input id="hours" type="number" inputMode="numeric" min={1} max={60} step={1} value={hours} onChange={(e) => setHours(e.target.value)} />
-            <p className="text-xs text-muted-foreground">Between 1 and 60 hours.</p>
-          </div>
+          <p className={`text-xs ${rateErr ? "text-destructive" : "text-muted-foreground"}`}>Between $1 and $500. Use the same amount for a fixed rate.</p>
         </div>
+        <div className="space-y-1.5">
+          <Label>Hours per week</Label>
+          <div className="grid grid-cols-2 gap-3 sm:max-w-md">
+            {([["hours-from", "From", hoursMin, setHoursMin], ["hours-to", "To", hoursMax, setHoursMax]] as const).map(([id, lbl, v, set]) => (
+              <div key={id} className="space-y-1">
+                <Label htmlFor={id} className="text-xs font-normal text-muted-foreground">{lbl}</Label>
+                <Input id={id} type="number" inputMode="numeric" min={1} max={60} step={1} aria-invalid={hoursErr} value={v} onChange={(e) => set(e.target.value)} />
+              </div>
+            ))}
+          </div>
+          <p className={`text-xs ${hoursErr ? "text-destructive" : "text-muted-foreground"}`}>Between 1 and 60. Use the same number for fixed hours.</p>
+        </div>
+        {estimate && (
+          <div className="flex items-start gap-3 rounded-xl bg-muted p-4" aria-live="polite">
+            <Calculator className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+            <div>
+              <p className="text-sm">
+                Estimated cost:{" "}
+                <span className="font-semibold">
+                  {estimate.low === estimate.high ? usd(estimate.low) : `${usd(estimate.low)} – ${usd(estimate.high)}`}
+                </span>{" "}
+                per month
+              </p>
+              <p className="text-xs text-muted-foreground">Based on 4.33 weeks per month. Estimate only.</p>
+            </div>
+          </div>
+        )}
         <div className="space-y-2">
           <Label>Working hours</Label>
           <div className="flex flex-wrap gap-4">
