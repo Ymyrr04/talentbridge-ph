@@ -115,8 +115,15 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     } catch (err) {
       if (newVideo) await removeVideo(newVideo);
       if (newVoice) await removeVoice(newVoice);
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      const msg = err instanceof Error ? err.message : "";
+      // A profile can only be created by an applicant account; admins may open the page but not save.
+      setError(
+        /row-level security|42501/i.test(msg)
+          ? "This account can’t save applicant profiles — it isn’t an applicant account. Sign in as an applicant."
+          : msg || "Something went wrong.",
+      );
     } finally {
+
       setSaving(false);
     }
   }
