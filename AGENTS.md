@@ -20,3 +20,4 @@
 - Preview-only test helpers live in src/dev/ and are only loaded behind import.meta.env.DEV — keeps sample credentials and login shortcuts out of the published site.
 - Messaging: one realtime subscription lives in AppShell (useMessagesRealtime) and invalidates message queries — pages never open their own channels, avoiding duplicate connections.
 - useEffect callbacks always use a block body ({ ... }) — newer browsers return Promises from DOM calls like scrollIntoView, and React crashes if an effect returns a non-function.
+- AI features run in createServerFn (*.functions.ts) with helpers in *.server.ts under src/lib, never Supabase Edge Functions — TanStack Start keeps server logic in one runtime; inputs like CVs are read server-side from the caller's own storage.
