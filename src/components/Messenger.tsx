@@ -76,7 +76,9 @@ function Thread({ userId, conv, side, onBack }: { userId: string; conv: Conv; si
     });
   }, [hasUnread, conv.id, qc]);
 
-  useEffect(() => endRef.current?.scrollIntoView({ block: "end" }), [msgs.length]);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ block: "end" });
+  }, [msgs.length]);
 
   const lastMine = [...msgs].reverse().find((m) => m.sender_id === userId);
 
