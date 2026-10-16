@@ -49,6 +49,8 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
   const [duration, setDuration] = useState(existing?.project_duration ?? "");
   const [zones, setZones] = useState<string[]>(existing?.time_zones ?? []);
   const [experience, setExperience] = useState(existing?.experience_level ?? "any");
+  const [rate, setRate] = useState(existing?.hourly_rate != null ? Number(existing.hourly_rate).toFixed(2) : "");
+  const [hours, setHours] = useState(existing?.hours_per_week != null ? String(existing.hours_per_week) : "");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -67,15 +69,23 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
     const d = description.trim();
     if (!t || t.length > 100) return setError("Title is required (max 100 characters).");
     if (!d || d.length > 5000) return setError("Description is required (max 5,000 characters).");
+    const rateNum = rate.trim() ? Number(rate) : null;
+    const hoursNum = hours.trim() ? Number(hours) : null;
+    const errs: string[] = [];
+    if (rateNum !== null && (!Number.isFinite(rateNum) || rateNum < 1 || rateNum > 500 || Math.abs(Math.round(rateNum * 100) - rateNum * 100) > 1e-6))
+      errs.push("Hourly rate must be between $1 and $500 (up to 2 decimals).");
+    if (hoursNum !== null && (!Number.isInteger(hoursNum) || hoursNum < 1 || hoursNum > 60))
+      errs.push("Hours per week must be a whole number between 1 and 60.");
     if (status === "open") {
-      const errs: string[] = [];
       if (!employmentType) errs.push("Choose an employment type.");
       if (employmentType === "project" && !duration) errs.push("Choose a project timeline.");
+      if (rateNum === null) errs.push("Enter an hourly rate.");
+      if (hoursNum === null) errs.push("Enter hours per week.");
       if (zones.length === 0) errs.push("Pick at least one working hours option.");
-      if (errs.length) {
-        errs.forEach((m) => toast.error(m));
-        return;
-      }
+    }
+    if (errs.length) {
+      errs.forEach((m) => toast.error(m));
+      return;
     }
     setSaving(true);
     const values = {
@@ -84,6 +94,8 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
       status,
       employment_type: employmentType || null,
       project_duration: employmentType === "project" && duration ? duration : null,
+      hourly_rate: rateNum,
+      hours_per_week: hoursNum,
       time_zones: zones.length ? zones : null,
       experience_level: experience || null,
     };
@@ -134,6 +146,21 @@ export function JobPostForm({ userId, existing }: { userId: string; existing?: J
             </Select>
           </div>
         )}
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="rate">Hourly rate (USD)</Label>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+              <Input id="rate" type="number" inputMode="decimal" min={1} max={500} step="0.01" className="pl-7" placeholder="0.00" value={rate} onChange={(e) => setRate(e.target.value)} onBlur={() => { const n = Number(rate); if (rate.trim() && Number.isFinite(n)) setRate(n.toFixed(2)); }} />
+            </div>
+            <p className="text-xs text-muted-foreground">Between $1 and $500 per hour.</p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="hours">Hours per week</Label>
+            <Input id="hours" type="number" inputMode="numeric" min={1} max={60} step={1} value={hours} onChange={(e) => setHours(e.target.value)} />
+            <p className="text-xs text-muted-foreground">Between 1 and 60 hours.</p>
+          </div>
+        </div>
         <div className="space-y-2">
           <Label>Working hours</Label>
           <div className="flex flex-wrap gap-4">
