@@ -204,6 +204,13 @@
       "when": 1792179430151,
       "tag": "0028_allow_eight_highlights",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1792180360838,
+      "tag": "0029_client_profile_media_access",
+      "breakpoints": true
     }
   ]
 }
