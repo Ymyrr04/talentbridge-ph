@@ -190,6 +190,13 @@
       "when": 1792172061070,
       "tag": "0026_standard_profile_format",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1792172514744,
+      "tag": "0027_ai_profile_suggestions",
+      "breakpoints": true
     }
   ]
 }

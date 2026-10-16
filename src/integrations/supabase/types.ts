@@ -14,6 +14,32 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_suggestion_runs: {
+        Row: {
+          created_at: string
+          id: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          owner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_suggestion_runs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       applicant_cvs: {
         Row: {
           cv_original_filename: string | null
@@ -375,6 +401,35 @@ export type Database = {
           },
         ]
       }
+      profile_suggestions: {
+        Row: {
+          created_at: string
+          cv_path: string
+          owner_id: string
+          payload: Json
+        }
+        Insert: {
+          created_at?: string
+          cv_path: string
+          owner_id: string
+          payload: Json
+        }
+        Update: {
+          created_at?: string
+          cv_path?: string
+          owner_id?: string
+          payload?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_suggestions_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -518,6 +573,7 @@ export type Database = {
           updated_at: string
         }[]
       }
+      claim_suggestion_run: { Args: never; Returns: boolean }
       get_open_job: {
         Args: { _id: string }
         Returns: {
@@ -634,6 +690,10 @@ export type Database = {
         }[]
       }
       record_job_view: { Args: { _job_id: string }; Returns: undefined }
+      save_profile_suggestions: {
+        Args: { _cv_path: string; _payload: Json }
+        Returns: undefined
+      }
       set_application_status: {
         Args: { _id: string; _status: string }
         Returns: undefined
