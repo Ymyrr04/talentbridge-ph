@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+
 
 export { SKILL_OPTIONS } from "@/lib/skills";
 import { SKILL_OPTIONS } from "@/lib/skills";
@@ -64,7 +66,24 @@ const selectCls =
 export function CandidateFields({ value, onChange }: { value: CandidateValues; onChange: (v: CandidateValues) => void }) {
   const [query, setQuery] = useState("");
   const set = <K extends keyof CandidateValues>(k: K, v: CandidateValues[K]) => onChange({ ...value, [k]: v });
+  const [visible, setVisible] = useState(() => Math.max(1, (value.highlights ?? []).filter((h) => h.trim()).length));
+  const filled = (value.highlights ?? []).filter((h) => h.trim()).length;
+  const boxes = () => Array.from({ length: visible }, (_, j) => value.highlights[j] ?? "");
+  // Suggestions and saved profiles can arrive with more highlights than are shown.
+  useEffect(() => {
+    setVisible((v) => Math.max(v, filled || 1));
+  }, [filled]);
+  const addHighlight = () => {
+    if (visible >= HIGHLIGHT_COUNT) return;
+    set("highlights", [...boxes(), ""]);
+    setVisible((v) => Math.min(HIGHLIGHT_COUNT, v + 1));
+  };
+  const removeHighlight = (i: number) => {
+    set("highlights", boxes().filter((_, j) => j !== i));
+    setVisible((v) => Math.max(1, v - 1));
+  };
   const [catalog, setCatalog] = useState<string[]>([]);
+
   useEffect(() => {
     const q = query.trim();
     if (!q) { setCatalog([]); return; }
