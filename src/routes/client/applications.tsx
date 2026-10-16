@@ -10,7 +10,7 @@ import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, incomingApplications 
 
 export const Route = createFileRoute("/client/applications")({
   head: () => ({ meta: [{ title: "Applications — TalentHub" }, { name: "robots", content: "noindex" }] }),
-  validateSearch: (s: Record<string, unknown>): { job?: string } => (typeof s.job === "string" ? { job: s.job } : {}),
+  validateSearch: (s: Record<string, unknown>): { job?: string } => (typeof s["job"] === "string" ? { job: s["job"] } : {}),
   loader: ({ context }) => context.queryClient.ensureQueryData(incomingApplications),
   component: ClientApplicationsPage,
 });
