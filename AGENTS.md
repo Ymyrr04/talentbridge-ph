@@ -18,3 +18,4 @@
 - CVs live in the private `cv-uploads` bucket under `{user_id}/`; views use short-lived signed URLs and the app removes the file when its profile is deleted or the CV replaced.
 - Cross-role reads (applications, jobs board, talent) go through SECURITY DEFINER RPCs that return only allowed columns — base-table RLS stays owner-only.
 - Preview-only test helpers live in src/dev/ and are only loaded behind import.meta.env.DEV — keeps sample credentials and login shortcuts out of the published site.
+- Messaging: one realtime subscription lives in AppShell (useMessagesRealtime) and invalidates message queries — pages never open their own channels, avoiding duplicate connections.
