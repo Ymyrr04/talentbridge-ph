@@ -52,6 +52,8 @@ export type Database = {
           cv_path: string | null
           english_level: string | null
           experience_level: string | null
+          field: string | null
+          highlights: string[] | null
           hourly_rate: number
           hours_per_week: number | null
           id: string
@@ -66,6 +68,7 @@ export type Database = {
           video_path: string | null
           voice_link: string | null
           voice_path: string | null
+          years_experience: number | null
         }
         Insert: {
           availability?: string | null
@@ -75,6 +78,8 @@ export type Database = {
           cv_path?: string | null
           english_level?: string | null
           experience_level?: string | null
+          field?: string | null
+          highlights?: string[] | null
           hourly_rate: number
           hours_per_week?: number | null
           id?: string
@@ -89,6 +94,7 @@ export type Database = {
           video_path?: string | null
           voice_link?: string | null
           voice_path?: string | null
+          years_experience?: number | null
         }
         Update: {
           availability?: string | null
@@ -98,6 +104,8 @@ export type Database = {
           cv_path?: string | null
           english_level?: string | null
           experience_level?: string | null
+          field?: string | null
+          highlights?: string[] | null
           hourly_rate?: number
           hours_per_week?: number | null
           id?: string
@@ -112,6 +120,7 @@ export type Database = {
           video_path?: string | null
           voice_link?: string | null
           voice_path?: string | null
+          years_experience?: number | null
         }
         Relationships: [
           {
@@ -534,6 +543,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      incoming_application_profiles: {
+        Args: never
+        Returns: {
+          application_id: string
+          availability_list: string[]
+          field: string
+          highlights: string[]
+          hours_per_week: number
+          time_zones: string[]
+          years_experience: number
+        }[]
+      }
       incoming_application_videos: {
         Args: never
         Returns: {
@@ -628,6 +649,7 @@ export type Database = {
         }[]
       }
       unread_message_count: { Args: never; Returns: number }
+      valid_highlights: { Args: { _h: string[] }; Returns: boolean }
       valid_tool_list: { Args: { _t: string[] }; Returns: boolean }
     }
     Enums: {
