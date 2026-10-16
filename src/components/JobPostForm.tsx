@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 
 type Job = Tables<"job_posts">;
 
@@ -51,6 +52,14 @@ function parseHours(v: string): number | null | undefined {
   if (!v.trim()) return null;
   const n = Number(v);
   return Number.isInteger(n) && n >= 1 && n <= 60 ? n : undefined;
+}
+/** [min, max] strings; on edit a one-sided saved value mirrors to both. */
+function initPair(min: number | null | undefined, max: number | null | undefined, fmt?: (n: number) => string): [string, string] {
+  const a = min != null ? (fmt ? fmt(min) : String(min)) : "";
+  const b = max != null ? (fmt ? fmt(max) : String(max)) : "";
+  if (a && !b) return [a, a];
+  if (!a && b) return [b, b];
+  return [a, b];
 }
 
 export function JobPostForm({ userId, existing }: { userId: string; existing?: Job }) {
