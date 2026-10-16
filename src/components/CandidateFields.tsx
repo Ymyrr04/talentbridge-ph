@@ -1,25 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-
+import { Textarea } from "@/components/ui/textarea";
 
 export { SKILL_OPTIONS } from "@/lib/skills";
 import { SKILL_OPTIONS } from "@/lib/skills";
 export const MAX_SKILLS = 15;
-export const SUMMARY_MAX = 500;
 export const HIGHLIGHT_MAX = 160;
 export const HIGHLIGHT_COUNT = 8;
-export const FIELD_MAX = 60;
-export const EXPERIENCE = [
-  { value: "under_1", label: "Under 1 year" },
-  { value: "1_3", label: "1–3 years" },
-  { value: "3_5", label: "3–5 years" },
-  { value: "5_plus", label: "5+ years" },
-];
+export const MAX_PAST_TITLES = 6;
+export const PAST_TITLE_MAX = 80;
+export const MAX_INDUSTRIES = 10;
+export const INDUSTRY_MAX = 40;
+export const MAX_TOOLS = 40;
+export const TOOL_MAX = 40;
+export const MAX_EDUCATION = 8;
+export const EDUCATION_MAX = 120;
 export const AVAILABILITY = [
   { value: "full_time", label: "Full-time" },
   { value: "part_time", label: "Part-time" },
@@ -31,37 +33,119 @@ export const TIME_ZONES = [
   { value: "australia", label: "Australia hours" },
   { value: "uk_eu", label: "UK/EU hours" },
 ];
-export const ENGLISH = [
-  { value: "conversational", label: "Conversational" },
-  { value: "fluent", label: "Fluent" },
-  { value: "near_native", label: "Near-native" },
+export const START_OPTIONS = [
+  { value: "immediately", label: "Immediately" },
+  { value: "1_week", label: "Within 1 week" },
+  { value: "2_weeks", label: "Within 2 weeks" },
+  { value: "1_month", label: "Within 1 month" },
 ];
 
 export type CandidateValues = {
   skills: string[];
   years: string;
-  field: string;
+  pastTitles: string[];
+  industries: string[];
   highlights: string[];
+  tools: string[];
+  education: string[];
   availability: string[];
   hours: string;
   timeZones: string[];
+  startAvailability: string;
 };
 
 /** Returns a list of missing items required to publish. */
 export function publishErrors(v: CandidateValues): string[] {
   const errs: string[] = [];
-  if (v.skills.length === 0) errs.push("at least 1 skill");
   if (v.years === "") errs.push("years of experience");
-  if (!v.field.trim()) errs.push("field or industry");
+  if (v.pastTitles.length === 0) errs.push("at least 1 past job title");
+  if (v.industries.length === 0) errs.push("at least 1 industry");
   if (v.highlights.filter((h) => h.trim()).length < 3) errs.push("at least 3 highlights");
-  if (v.availability.length === 0) errs.push("at least 1 availability");
   if (!v.hours) errs.push("hours per week");
-  if (v.timeZones.length === 0) errs.push("at least 1 working-hours option");
+  if (!v.startAvailability) errs.push("when you can start");
   return errs;
 }
 
-const selectCls =
-  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+/** Generic chip-style tag input: type and press Enter or comma to add. */
+function TagInput({
+  id, label, placeholder, value, onChange, max, maxLen, helper, suggestions,
+}: {
+  id: string;
+  label: string;
+  placeholder: string;
+  value: string[];
+  onChange: (v: string[]) => void;
+  max: number;
+  maxLen: number;
+  helper?: string;
+  suggestions?: string[];
+}) {
+  const [text, setText] = useState("");
+  const full = value.length >= max;
+
+  const add = (raw: string) => {
+    const t = raw.trim().replace(/\s+/g, " ");
+    if (!t) return;
+    if (value.some((x) => x.toLowerCase() === t.toLowerCase())) { setText(""); return; }
+    if (t.length > maxLen) { toast.error(`Each item can be up to ${maxLen} characters.`); return; }
+    if (value.length >= max) { toast.error(`You can add up to ${max} items.`); return; }
+    onChange([...value, t]);
+    setText("");
+  };
+  const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") { e.preventDefault(); add(text); }
+    else if (e.key === "Backspace" && !text && value.length) onChange(value.slice(0, -1));
+  };
+  const open = (suggestions ?? []).filter((s) => !value.some((v) => v.toLowerCase() === s.toLowerCase()));
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <Label htmlFor={id}>{label}</Label>
+        <span className="text-xs text-muted-foreground">{value.length}/{max}</span>
+      </div>
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {value.map((t) => (
+            <span key={t} className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+              {t}
+              <button type="button" aria-label={`Remove ${t}`} onClick={() => onChange(value.filter((x) => x !== t))} className="rounded-full hover:text-destructive">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="relative">
+        <Input
+          id={id}
+          value={text}
+          disabled={full}
+          maxLength={maxLen + 5}
+          placeholder={full ? "Limit reached" : placeholder}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (v.includes(",")) {
+              const parts = v.split(",");
+              for (const p of parts.slice(0, -1)) add(p);
+              setText(parts[parts.length - 1] ?? "");
+            } else setText(v);
+          }}
+          onKeyDown={onKey}
+        />
+        {open.length > 0 && text.trim() && (
+          <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-md border bg-popover shadow-md">
+            {open.map((s) => (
+              <button key={s} type="button" onMouseDown={(e) => { e.preventDefault(); add(s); }}
+                className="block w-full px-3 py-2 text-left text-sm text-popover-foreground hover:bg-accent">{s}</button>
+            ))}
+          </div>
+        )}
+      </div>
+      {helper && <p className="text-xs text-muted-foreground">{helper}</p>}
+    </div>
+  );
+}
 
 export function CandidateFields({ value, onChange }: { value: CandidateValues; onChange: (v: CandidateValues) => void }) {
   const [query, setQuery] = useState("");
@@ -102,18 +186,46 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
     .filter((s) => !has(s));
   const full = value.skills.length >= MAX_SKILLS;
 
+  const [toolQuery, setToolQuery] = useState("");
+  const { data: toolMatches = [] } = useQuery({
+    queryKey: ["suggest-tools", toolQuery.trim().toLowerCase()],
+    enabled: toolQuery.trim().length > 0,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("suggest_tools", { _q: toolQuery.trim() });
+      if (error) throw error;
+      return (data ?? []).map((r) => r.name);
+    },
+  });
+
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-[10rem_1fr]">
-        <div className="space-y-1.5">
-          <Label htmlFor="years">Years of experience</Label>
-          <Input id="years" type="number" min={0} max={50} step={1} value={value.years} onChange={(e) => set("years", e.target.value)} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="field">Field or industry</Label>
-          <Input id="field" maxLength={FIELD_MAX} placeholder="workflow automation" value={value.field} onChange={(e) => set("field", e.target.value)} />
-        </div>
+      <div className="max-w-40 space-y-1.5">
+        <Label htmlFor="years">Years of experience</Label>
+        <Input id="years" type="number" min={0} max={50} step={1} value={value.years} onChange={(e) => set("years", e.target.value)} />
       </div>
+
+      <TagInput
+        id="past-titles"
+        label="Past job titles"
+        placeholder="e.g. Virtual Assistant — press Enter to add"
+        value={value.pastTitles}
+        onChange={(v) => set("pastTitles", v)}
+        max={MAX_PAST_TITLES}
+        maxLen={PAST_TITLE_MAX}
+        helper="Roles you've held before, most recent first."
+      />
+
+      <TagInput
+        id="industries"
+        label="Industry expertise"
+        placeholder="Healthcare"
+        value={value.industries}
+        onChange={(v) => set("industries", v)}
+        max={MAX_INDUSTRIES}
+        maxLen={INDUSTRY_MAX}
+      />
 
       <div className="space-y-2">
         <Label>Highlights <span className="font-normal text-muted-foreground">({filled}/{HIGHLIGHT_COUNT})</span></Label>
@@ -150,7 +262,6 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
         <p className="text-xs text-muted-foreground">One achievement or core skill each. Use real numbers from your CV where you have them.</p>
       </div>
 
-
       <div className="space-y-1.5">
         <Label htmlFor="skill-search">Skills <span className="font-normal text-muted-foreground">(up to {MAX_SKILLS})</span></Label>
         {value.skills.length > 0 && (
@@ -166,7 +277,7 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
           </div>
         )}
         <Input id="skill-search" placeholder={full ? "Skill limit reached" : "Search skills…"} disabled={full} value={query} onChange={(e) => setQuery(e.target.value)} />
-        {!full && (
+        {!full && query.trim() && (
           <div className="flex max-h-36 flex-wrap gap-2 overflow-y-auto rounded-md border p-2">
             {matches.length === 0 ? (
               <p className="text-xs text-muted-foreground">No matching skills.</p>
@@ -180,6 +291,37 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
             )}
           </div>
         )}
+      </div>
+
+      <TagInput
+        id="tools"
+        label="Software & tools"
+        placeholder="Type a tool and press Enter"
+        value={value.tools}
+        onChange={(v) => set("tools", v)}
+        max={MAX_TOOLS}
+        maxLen={TOOL_MAX}
+        suggestions={toolMatches}
+      />
+      {/* keep toolQuery in sync via a hidden input pattern: reuse TagInput text by lifting state */}
+      <input type="hidden" value={toolQuery} onChange={() => setToolQuery(toolQuery)} />
+
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="education">Education & certifications</Label>
+          <span className="text-xs text-muted-foreground">{value.education.length}/{MAX_EDUCATION}</span>
+        </div>
+        <Textarea
+          id="education"
+          rows={3}
+          placeholder={"One per line, e.g.\nBS Nursing, University of the Philippines\nGoogle Data Analytics Certificate"}
+          value={value.education.join("\n")}
+          onChange={(e) => {
+            const lines = e.target.value.split("\n").slice(0, MAX_EDUCATION).map((l) => l.slice(0, EDUCATION_MAX));
+            set("education", lines);
+          }}
+        />
+        <p className="text-xs text-muted-foreground">One line per item, up to {MAX_EDUCATION}.</p>
       </div>
 
       <div className="space-y-2">
@@ -197,9 +339,23 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
             </label>
           ))}
         </div>
-        <div className="max-w-40 space-y-1.5 pt-1">
-          <Label htmlFor="hours">Hours per week</Label>
-          <Input id="hours" type="number" min={1} max={60} step={1} value={value.hours} onChange={(e) => set("hours", e.target.value)} />
+        <div className="grid gap-4 pt-1 sm:grid-cols-2">
+          <div className="max-w-40 space-y-1.5">
+            <Label htmlFor="hours">Hours per week</Label>
+            <Input id="hours" type="number" min={1} max={60} step={1} value={value.hours} onChange={(e) => set("hours", e.target.value)} />
+          </div>
+          <div className="max-w-56 space-y-1.5">
+            <Label htmlFor="start">Can start</Label>
+            <select
+              id="start"
+              value={value.startAvailability}
+              onChange={(e) => set("startAvailability", e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <option value="">Select…</option>
+              {START_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -226,7 +382,6 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
           ))}
         </div>
       </div>
-
     </>
   );
 }
