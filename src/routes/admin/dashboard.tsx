@@ -239,21 +239,16 @@ function Page() {
                           )}
                         </TableCell>
                         <TableCell className="text-sm">
-                          {ps.filter((p) => p.cv_path).length === 0 ? (
-                            <span className="text-muted-foreground">—</span>
-                          ) : (
-                            ps
-                              .filter((p) => p.cv_path)
-                              .map((p) => (
-                                <button
-                                  key={p.id}
-                                  onClick={() => viewCv(p.cv_path!)}
-                                  className="flex items-center gap-1 text-primary hover:underline"
-                                >
-                                  <FileText className="h-3.5 w-3.5" /> {p.cv_original_filename || "CV"}
-                                </button>
-                              ))
-                          )}
+                          {(() => {
+                            const cv = (data.cvs ?? []).find((c) => c.owner_id === u.id);
+                            return cv ? (
+                              <button onClick={() => viewCv(cv.cv_path)} className="flex items-center gap-1 text-primary hover:underline">
+                                <FileText className="h-3.5 w-3.5" /> {cv.cv_original_filename || "CV"}
+                              </button>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            );
+                          })()}
                         </TableCell>
                       </TableRow>
                     );

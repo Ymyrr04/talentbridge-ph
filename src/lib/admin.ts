@@ -120,16 +120,17 @@ export async function exportApplicants(d: AdminData) {
       rows.push({ ...base, profile_role: "", status: "", hourly_rate_usd: "", experience: "", skills: "", summary: "", availability: "", hours_per_week: "", time_zones: "", cv_file: "" });
       continue;
     }
+    const cv = (d.cvs ?? []).find((c) => c.owner_id === u.id);
+    let cvFile = "";
+    if (cv) {
+      const { data } = await supabase.storage.from("cv-uploads").download(cv.cv_path);
+      if (data) {
+        const ext = cv.cv_path.split(".").pop();
+        cvFile = `cvs/${safe(u.name || u.email)}_${u.id.slice(0, 8)}.${ext}`;
+        cvs.file(cvFile.slice(4), data);
+      } else cvFile = "(missing)";
+    }
     for (const p of ps) {
-      let cvFile = "";
-      if (p.cv_path) {
-        const { data } = await supabase.storage.from("cv-uploads").download(p.cv_path);
-        if (data) {
-          const ext = p.cv_path.split(".").pop();
-          cvFile = `cvs/${safe(u.name || u.email)}_${p.id.slice(0, 8)}.${ext}`;
-          cvs.file(cvFile.slice(4), data);
-        } else cvFile = "(missing)";
-      }
       rows.push({
         ...base,
         profile_role: p.role_title,
