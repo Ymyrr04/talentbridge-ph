@@ -35,6 +35,8 @@ export type Database = {
           updated_at: string
           video_duration_seconds: number | null
           video_path: string | null
+          voice_link: string | null
+          voice_path: string | null
         }
         Insert: {
           availability?: string | null
@@ -56,6 +58,8 @@ export type Database = {
           updated_at?: string
           video_duration_seconds?: number | null
           video_path?: string | null
+          voice_link?: string | null
+          voice_path?: string | null
         }
         Update: {
           availability?: string | null
@@ -77,6 +81,8 @@ export type Database = {
           updated_at?: string
           video_duration_seconds?: number | null
           video_path?: string | null
+          voice_link?: string | null
+          voice_path?: string | null
         }
         Relationships: [
           {
@@ -504,6 +510,14 @@ export type Database = {
         Returns: {
           application_id: string
           video_path: string
+        }[]
+      }
+      incoming_application_voices: {
+        Args: never
+        Returns: {
+          application_id: string
+          voice_link: string
+          voice_path: string
         }[]
       }
       incoming_applications: {

@@ -169,6 +169,13 @@
       "when": 1792170145347,
       "tag": "0023_intro_videos",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792170283385,
+      "tag": "0024_voice_intros",
+      "breakpoints": true
     }
   ]
 }
