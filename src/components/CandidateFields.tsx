@@ -1,4 +1,5 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
+// TagInput text is lifted via onTextChange where suggestions need it.
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, X } from "lucide-react";
@@ -129,8 +130,13 @@ function TagInput({
             if (v.includes(",")) {
               const parts = v.split(",");
               for (const p of parts.slice(0, -1)) add(p);
-              setText(parts[parts.length - 1] ?? "");
-            } else setText(v);
+              const rest = parts[parts.length - 1] ?? "";
+              setText(rest);
+              onTextChange?.(rest);
+            } else {
+              setText(v);
+              onTextChange?.(v);
+            }
           }}
           onKeyDown={onKey}
         />
