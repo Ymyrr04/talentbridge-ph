@@ -7,6 +7,7 @@ import { EmptyState, PageHeader } from "@/components/AppShell";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, incomingApplications } from "@/lib/applications";
+import { MessageApplicantButton } from "@/components/MessageApplicantButton";
 
 export const Route = createFileRoute("/client/applications")({
   head: () => ({ meta: [{ title: "Applications — TalentHub" }, { name: "robots", content: "noindex" }] }),
@@ -60,7 +61,8 @@ function ClientApplicationsPage() {
                     {a.role_title} · ${Number(a.hourly_rate)}/hr
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <MessageApplicantButton applicationId={a.id} applicantName={a.applicant_name} />
                   <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${ApplicationStatusClass(a.status)}`}>
                     {APPLICATION_STATUS_LABEL[a.status]}
                   </span>
