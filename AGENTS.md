@@ -19,3 +19,4 @@
 - Cross-role reads (applications, jobs board, talent) go through SECURITY DEFINER RPCs that return only allowed columns — base-table RLS stays owner-only.
 - Preview-only test helpers live in src/dev/ and are only loaded behind import.meta.env.DEV — keeps sample credentials and login shortcuts out of the published site.
 - Messaging: one realtime subscription lives in AppShell (useMessagesRealtime) and invalidates message queries — pages never open their own channels, avoiding duplicate connections.
+- useEffect callbacks always use a block body ({ ... }) — newer browsers return Promises from DOM calls like scrollIntoView, and React crashes if an effect returns a non-function.
