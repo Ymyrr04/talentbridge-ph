@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { FileText } from "lucide-react";
+import { FileText, Sparkles } from "lucide-react";
+import { ProfileSuggestionsDialog } from "@/components/ProfileSuggestionsDialog";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -25,6 +26,14 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
   const [rate, setRate] = useState(existing ? String(existing.hourly_rate) : "");
   const { data: cv, isLoading: cvLoading } = useQuery(myCv(userId));
   const { data: accountName } = useQuery(myAccountName(userId));
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [autoAsked, setAutoAsked] = useState(false);
+  useEffect(() => {
+    if (!existing && !autoAsked && !cvLoading && cv) {
+      setAutoAsked(true);
+      setSuggestOpen(true);
+    }
+  }, [existing, autoAsked, cvLoading, cv]);
   const [status, setStatus] = useState<"draft" | "published">(existing?.status === "published" ? "published" : "draft");
   const [cand, setCand] = useState<CandidateValues>({
     skills: existing?.skills ?? [],
@@ -113,6 +122,39 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
   }
 
   return (
+    <>
+    {!existing && !cvLoading && (
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <Button type="button" variant="outline" disabled={!cv} onClick={() => setSuggestOpen(true)}>
+          <Sparkles className="h-4 w-4" /> Suggest from my CV
+        </Button>
+        {!cv && (
+          <p className="text-sm text-muted-foreground">
+            <Link to="/applicant/settings" className="text-primary hover:underline">Upload your CV in Settings</Link> to get profile suggestions.
+          </p>
+        )}
+      </div>
+    )}
+    {!existing && cv && (
+      <ProfileSuggestionsDialog
+        open={suggestOpen}
+        onOpenChange={setSuggestOpen}
+        userId={userId}
+        cvPath={cv.cv_path}
+        accountName={accountName}
+        onUse={(sg) => {
+          setRoleTitle(sg.role_title);
+          setCand((c) => ({
+            ...c,
+            years: String(sg.years_experience),
+            field: sg.field,
+            highlights: sg.highlights,
+            skills: sg.skills,
+          }));
+          toast.success("Suggestion filled in. Check every line, then save.");
+        }}
+      />
+    )}
     <div className="grid gap-6 lg:grid-cols-[minmax(0,42rem)_minmax(0,22rem)] lg:items-start">
     <form onSubmit={onSubmit} className="space-y-6">
       <div className="space-y-5 rounded-2xl border bg-card p-6">
@@ -186,5 +228,6 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         />
       </aside>
     </div>
+    </>
   );
 }
