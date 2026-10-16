@@ -21,17 +21,11 @@ export const Route = createFileRoute("/client/browse")({
   component: BrowsePage,
 });
 
-function initials(name: string) {
-  return name.split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "?";
-}
-
 function BrowsePage() {
   const { data } = useSuspenseQuery(talentQuery);
   const [q, setQ] = useState("");
   const term = q.trim().toLowerCase();
-  const list = term
-    ? data.filter((t) => t.role_title.toLowerCase().includes(term) || t.name.toLowerCase().includes(term))
-    : data;
+  const list = term ? data.filter((t) => t.role_title.toLowerCase().includes(term)) : data;
 
   return (
     <>
@@ -42,7 +36,7 @@ function BrowsePage() {
         <>
           <div className="relative mb-6 max-w-md">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by role or name" className="pl-9" aria-label="Search talent" />
+            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by role" className="pl-9" aria-label="Search talent by role" />
           </div>
           {list.length === 0 ? (
             <p className="text-sm text-muted-foreground">No matches for “{q}”.</p>
@@ -52,11 +46,10 @@ function BrowsePage() {
                 <div key={t.id} className="rounded-xl border bg-card p-5 shadow-sm">
                   <div className="flex items-center gap-3">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
-                      {initials(t.name)}
+                      {t.initials}
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate font-semibold">{t.name || "Unnamed"}</p>
-                      <p className="truncate text-sm text-muted-foreground">{t.role_title}</p>
+                      <p className="truncate font-semibold">{t.role_title}</p>
                     </div>
                   </div>
                   <p className="mt-4 text-lg font-semibold">
