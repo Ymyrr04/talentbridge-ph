@@ -38,11 +38,15 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
   const [cand, setCand] = useState<CandidateValues>({
     skills: existing?.skills ?? [],
     years: existing?.years_experience != null ? String(existing.years_experience) : "",
-    field: existing?.field ?? "",
+    pastTitles: existing?.past_titles ?? [],
+    industries: existing?.industries ?? [],
     highlights: existing?.highlights ?? [],
+    tools: existing?.tools ?? [],
+    education: existing?.education ?? [],
     availability: existing?.availability_list ?? (existing?.availability ? [existing.availability] : []),
     hours: existing?.hours_per_week != null ? String(existing.hours_per_week) : "",
     timeZones: existing?.time_zones ?? [],
+    startAvailability: existing?.start_availability ?? "",
   });
   const [video, setVideo] = useState<VideoChange>({ kind: "keep" });
   const [voice, setVoice] = useState<VoiceChange>({ kind: "keep" });
@@ -91,11 +95,15 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         status,
         skills: cand.skills.length ? cand.skills : null,
         years_experience: years,
-        field: cand.field.trim() || null,
+        past_titles: cand.pastTitles.length ? cand.pastTitles : null,
+        industries: cand.industries.length ? cand.industries : null,
         highlights: highlights.length ? highlights : null,
+        tools: cand.tools.length ? cand.tools : null,
+        education: cand.education.map((l) => l.trim()).filter(Boolean).length ? cand.education.map((l) => l.trim()).filter(Boolean) : null,
         availability_list: cand.availability.length ? cand.availability : null,
         hours_per_week: hours,
         time_zones: cand.timeZones.length ? cand.timeZones : null,
+        start_availability: cand.startAvailability || null,
         ...(newVideo && video.kind === "new" ? { video_path: newVideo, video_duration_seconds: video.duration } : {}),
         ...(voice.kind === "file" && newVoice ? { voice_path: newVoice, voice_link: null } : {}),
         ...(voice.kind === "link" ? { voice_path: null, voice_link: voice.url } : {}),
