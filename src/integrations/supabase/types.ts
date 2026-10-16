@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      applicant_cvs: {
+        Row: {
+          cv_original_filename: string | null
+          cv_path: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          cv_original_filename?: string | null
+          cv_path: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Update: {
+          cv_original_filename?: string | null
+          cv_path?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applicant_cvs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       applicant_profiles: {
         Row: {
           availability: string | null
