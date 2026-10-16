@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState, PageHeader } from "@/components/AppShell";
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, incomingApplications } from "@/lib/applications";
 import { MessageApplicantButton } from "@/components/MessageApplicantButton";
+import { IntroVideoButton } from "@/components/IntroVideoButton";
 
 export const Route = createFileRoute("/client/applications")({
   head: () => ({ meta: [{ title: "Applications — TalentHub" }, { name: "robots", content: "noindex" }] }),
@@ -18,6 +19,14 @@ export const Route = createFileRoute("/client/applications")({
 
 function ClientApplicationsPage() {
   const { data } = useSuspenseQuery(incomingApplications);
+  const { data: videos } = useQuery({
+    queryKey: ["incoming-application-videos"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("incoming_application_videos");
+      if (error) throw error;
+      return Object.fromEntries((data ?? []).map((r) => [r.application_id, r.video_path])) as Record<string, string>;
+    },
+  });
   const qc = useQueryClient();
   const [jobFilter, setJobFilter] = useState(Route.useSearch().job ?? "all");
   const jobs = Array.from(new Map(data.map((a) => [a.job_id, a.job_title])).entries());
@@ -62,6 +71,7 @@ function ClientApplicationsPage() {
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
+                  {videos?.[a.id] && <IntroVideoButton path={videos[a.id]!} applicantName={a.applicant_name} />}
                   <MessageApplicantButton applicationId={a.id} applicantName={a.applicant_name} />
                   <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${ApplicationStatusClass(a.status)}`}>
                     {APPLICATION_STATUS_LABEL[a.status]}

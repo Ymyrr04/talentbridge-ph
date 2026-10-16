@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { FileText, Upload, Video } from "lucide-react";
+import { FileText, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { removeCv, uploadCv, validateCv } from "@/lib/applicant";
 import { CandidateFields, publishErrors, SUMMARY_MAX, type CandidateValues } from "@/components/CandidateFields";
+import { IntroVideoField, type VideoChange } from "@/components/IntroVideoField";
+import { removeVideo, uploadVideo } from "@/lib/introVideo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +30,8 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     hours: existing?.hours_per_week != null ? String(existing.hours_per_week) : "",
     timeZones: existing?.time_zones ?? [],
   });
+  const [video, setVideo] = useState<VideoChange>({ kind: "keep" });
+  const [profileId] = useState(() => existing?.id ?? crypto.randomUUID());
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -60,8 +64,10 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
     }
     setSaving(true);
     let newPath: string | null = null;
+    let newVideo: string | null = null;
     try {
       if (file) newPath = await uploadCv(userId, file);
+      if (video.kind === "new") newVideo = await uploadVideo(userId, profileId, video.blob);
       const values = {
         role_title: title,
         hourly_rate: hourly,
@@ -72,19 +78,23 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         availability_list: cand.availability.length ? cand.availability : null,
         hours_per_week: hours,
         time_zones: cand.timeZones.length ? cand.timeZones : null,
+        ...(newVideo && video.kind === "new" ? { video_path: newVideo, video_duration_seconds: video.duration } : {}),
+        ...(video.kind === "remove" ? { video_path: null, video_duration_seconds: null } : {}),
         ...(newPath && file ? { cv_path: newPath, cv_original_filename: file.name } : {}),
       };
       const { error } = existing
         ? await supabase.from("applicant_profiles").update(values).eq("id", existing.id)
-        : await supabase.from("applicant_profiles").insert({ ...values, owner_id: userId });
+        : await supabase.from("applicant_profiles").insert({ ...values, id: profileId, owner_id: userId });
       if (error) throw error;
       if (newPath && existing?.cv_path) await removeCv(existing.cv_path);
+      if (video.kind !== "keep" && existing?.video_path) await removeVideo(existing.video_path);
       await qc.invalidateQueries({ queryKey: ["applicant-profiles", userId] });
       if (existing) await qc.invalidateQueries({ queryKey: ["applicant-profile", existing.id] });
       toast.success(existing ? "Profile updated" : "Profile created");
       navigate({ to: "/applicant/profiles" });
     } catch (err) {
       if (newPath) await removeCv(newPath);
+      if (newVideo) await removeVideo(newVideo);
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setSaving(false);
@@ -153,14 +163,7 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         </div>
       </div>
 
-      <div aria-disabled className="rounded-2xl border bg-muted/50 p-6 opacity-60">
-        <div className="flex items-center gap-2">
-          <Video className="h-5 w-5 text-muted-foreground" />
-          <p className="font-medium">Intro Videos (optional) – Coming soon</p>
-        </div>
-        <p className="mt-1 text-sm text-muted-foreground">Record short intro videos to stand out to employers.</p>
-        <Button type="button" variant="outline" size="sm" className="mt-4" disabled>Add video</Button>
-      </div>
+      <IntroVideoField existingPath={existing?.video_path ?? null} value={video} onChange={setVideo} />
 
       {error && <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
       <div className="flex gap-3">

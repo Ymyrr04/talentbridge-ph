@@ -162,6 +162,13 @@
       "when": 1792170061056,
       "tag": "0022_applicant_availability_list",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792170145347,
+      "tag": "0023_intro_videos",
+      "breakpoints": true
     }
   ]
 }
