@@ -42,6 +42,11 @@ type ProfileFormat = {
   availability_list: string[] | null;
   hours_per_week: number | null;
   time_zones: string[] | null;
+  past_titles: string[] | null;
+  industries: string[] | null;
+  tools: string[] | null;
+  education: string[] | null;
+  start_availability: string | null;
 };
 
 function appliedDate(iso: string) {
