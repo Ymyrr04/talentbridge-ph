@@ -183,6 +183,13 @@
       "when": 1792171294480,
       "tag": "0025_applicant_cvs",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792172061070,
+      "tag": "0026_standard_profile_format",
+      "breakpoints": true
     }
   ]
 }

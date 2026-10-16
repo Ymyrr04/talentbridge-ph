@@ -10,6 +10,7 @@ import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, incomingApplications 
 import { MessageApplicantButton } from "@/components/MessageApplicantButton";
 import { IntroVideoButton } from "@/components/IntroVideoButton";
 import { VoiceIntroButton } from "@/components/VoiceIntroButton";
+import { StandardProfile } from "@/components/StandardProfile";
 
 export const Route = createFileRoute("/client/applications")({
   head: () => ({ meta: [{ title: "Applications — TalentHub" }, { name: "robots", content: "noindex" }] }),
@@ -20,6 +21,14 @@ export const Route = createFileRoute("/client/applications")({
 
 function ClientApplicationsPage() {
   const { data } = useSuspenseQuery(incomingApplications);
+  const { data: formats } = useQuery({
+    queryKey: ["incoming-application-profiles"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("incoming_application_profiles");
+      if (error) throw error;
+      return Object.fromEntries((data ?? []).map((r) => [r.application_id, r]));
+    },
+  });
   const { data: videos } = useQuery({
     queryKey: ["incoming-application-videos"],
     queryFn: async () => {
@@ -74,10 +83,20 @@ function ClientApplicationsPage() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{a.job_title}</p>
-                  <h3 className="mt-1 font-semibold">{a.applicant_name || "Unnamed applicant"}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {a.role_title} · ${Number(a.hourly_rate)}/hr
-                  </p>
+                  <StandardProfile
+                    className="mt-1"
+                    data={{
+                      name: a.applicant_name || "Applicant",
+                      roleTitle: a.role_title,
+                      hourlyRate: a.hourly_rate,
+                      years: formats?.[a.id]?.years_experience,
+                      field: formats?.[a.id]?.field,
+                      highlights: formats?.[a.id]?.highlights,
+                      availability: formats?.[a.id]?.availability_list,
+                      hours: formats?.[a.id]?.hours_per_week,
+                      timeZones: formats?.[a.id]?.time_zones,
+                    }}
+                  />
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {videos?.[a.id] && <IntroVideoButton path={videos[a.id]!} applicantName={a.applicant_name} />}

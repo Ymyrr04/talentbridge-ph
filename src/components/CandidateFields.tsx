@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export const SKILL_OPTIONS = [
@@ -14,6 +13,9 @@ export const SKILL_OPTIONS = [
 ];
 export const MAX_SKILLS = 15;
 export const SUMMARY_MAX = 500;
+export const HIGHLIGHT_MAX = 160;
+export const HIGHLIGHT_COUNT = 5;
+export const FIELD_MAX = 60;
 export const EXPERIENCE = [
   { value: "under_1", label: "Under 1 year" },
   { value: "1_3", label: "1–3 years" },
@@ -39,8 +41,9 @@ export const ENGLISH = [
 
 export type CandidateValues = {
   skills: string[];
-  experience: string;
-  summary: string;
+  years: string;
+  field: string;
+  highlights: string[];
   availability: string[];
   hours: string;
   timeZones: string[];
@@ -50,8 +53,9 @@ export type CandidateValues = {
 export function publishErrors(v: CandidateValues): string[] {
   const errs: string[] = [];
   if (v.skills.length === 0) errs.push("at least 1 skill");
-  if (!v.experience) errs.push("experience");
-  if (!v.summary.trim()) errs.push("summary");
+  if (v.years === "") errs.push("years of experience");
+  if (!v.field.trim()) errs.push("field or industry");
+  if (v.highlights.filter((h) => h.trim()).length < 3) errs.push("at least 3 highlights");
   if (v.availability.length === 0) errs.push("at least 1 availability");
   if (!v.hours) errs.push("hours per week");
   if (v.timeZones.length === 0) errs.push("at least 1 working-hours option");
@@ -85,6 +89,37 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
 
   return (
     <>
+      <div className="grid gap-4 sm:grid-cols-[10rem_1fr]">
+        <div className="space-y-1.5">
+          <Label htmlFor="years">Years of experience</Label>
+          <Input id="years" type="number" min={0} max={50} step={1} value={value.years} onChange={(e) => set("years", e.target.value)} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="field">Field or industry</Label>
+          <Input id="field" maxLength={FIELD_MAX} placeholder="workflow automation" value={value.field} onChange={(e) => set("field", e.target.value)} />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Highlights</Label>
+        {Array.from({ length: HIGHLIGHT_COUNT }, (_, i) => (
+          <div key={i} className="space-y-1">
+            <Input
+              aria-label={`Highlight ${i + 1}`}
+              maxLength={HIGHLIGHT_MAX}
+              value={value.highlights[i] ?? ""}
+              onChange={(e) => {
+                const next = Array.from({ length: HIGHLIGHT_COUNT }, (_, j) => value.highlights[j] ?? "");
+                next[i] = e.target.value;
+                set("highlights", next);
+              }}
+            />
+            <p className="text-right text-xs text-muted-foreground">{(value.highlights[i] ?? "").length}/{HIGHLIGHT_MAX}</p>
+          </div>
+        ))}
+        <p className="text-xs text-muted-foreground">One achievement or core skill each. Use real numbers from your CV where you have them.</p>
+      </div>
+
       <div className="space-y-1.5">
         <Label htmlFor="skill-search">Skills <span className="font-normal text-muted-foreground">(up to {MAX_SKILLS})</span></Label>
         {value.skills.length > 0 && (
@@ -114,21 +149,6 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
             )}
           </div>
         )}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="experience">Experience</Label>
-        <select id="experience" className={selectCls} value={value.experience} onChange={(e) => set("experience", e.target.value)}>
-          <option value="">Select…</option>
-          {EXPERIENCE.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="summary">Summary</Label>
-        <Textarea id="summary" rows={5} maxLength={SUMMARY_MAX} value={value.summary} onChange={(e) => set("summary", e.target.value)} placeholder="A short overview of your experience and strengths." />
-        <p className="text-xs text-muted-foreground">{value.summary.length}/{SUMMARY_MAX}</p>
-        <p className="text-xs text-muted-foreground">Only include experience that's in your CV.</p>
       </div>
 
       <div className="space-y-2">

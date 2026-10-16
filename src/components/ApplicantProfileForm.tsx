@@ -5,8 +5,9 @@ import { FileText } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
-import { myCv } from "@/lib/applicant";
-import { CandidateFields, publishErrors, SUMMARY_MAX, type CandidateValues } from "@/components/CandidateFields";
+import { myAccountName, myCv } from "@/lib/applicant";
+import { StandardProfile } from "@/components/StandardProfile";
+import { CandidateFields, publishErrors, type CandidateValues } from "@/components/CandidateFields";
 import { IntroVideoField, type VideoChange } from "@/components/IntroVideoField";
 import { removeVideo, uploadVideo } from "@/lib/introVideo";
 import { VoiceIntroField, type VoiceChange } from "@/components/VoiceIntroField";
@@ -23,11 +24,13 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
   const [roleTitle, setRoleTitle] = useState(existing?.role_title ?? "");
   const [rate, setRate] = useState(existing ? String(existing.hourly_rate) : "");
   const { data: cv, isLoading: cvLoading } = useQuery(myCv(userId));
+  const { data: accountName } = useQuery(myAccountName(userId));
   const [status, setStatus] = useState<"draft" | "published">(existing?.status === "published" ? "published" : "draft");
   const [cand, setCand] = useState<CandidateValues>({
     skills: existing?.skills ?? [],
-    experience: existing?.experience_level ?? "",
-    summary: existing?.summary ?? "",
+    years: existing?.years_experience != null ? String(existing.years_experience) : "",
+    field: existing?.field ?? "",
+    highlights: existing?.highlights ?? [],
     availability: existing?.availability_list ?? (existing?.availability ? [existing.availability] : []),
     hours: existing?.hours_per_week != null ? String(existing.hours_per_week) : "",
     timeZones: existing?.time_zones ?? [],
@@ -50,10 +53,12 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
       toast.error("Hours per week must be a whole number between 1 and 60.");
       return;
     }
-    if (cand.summary.length > SUMMARY_MAX) {
-      toast.error(`Summary must be ${SUMMARY_MAX} characters or fewer.`);
+    const years = cand.years === "" ? null : Number(cand.years);
+    if (years !== null && (!Number.isInteger(years) || years < 0 || years > 50)) {
+      toast.error("Years of experience must be a whole number between 0 and 50.");
       return;
     }
+    const highlights = cand.highlights.map((h) => h.trim()).filter(Boolean);
     if (status === "published") {
       if (!cv) {
         toast.error("Upload your CV in Settings before publishing.");
@@ -76,8 +81,9 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         hourly_rate: hourly,
         status,
         skills: cand.skills.length ? cand.skills : null,
-        experience_level: cand.experience || null,
-        summary: cand.summary.trim() || null,
+        years_experience: years,
+        field: cand.field.trim() || null,
+        highlights: highlights.length ? highlights : null,
         availability_list: cand.availability.length ? cand.availability : null,
         hours_per_week: hours,
         time_zones: cand.timeZones.length ? cand.timeZones : null,
@@ -107,7 +113,8 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
   }
 
   return (
-    <form onSubmit={onSubmit} className="max-w-2xl space-y-6">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,42rem)_minmax(0,22rem)] lg:items-start">
+    <form onSubmit={onSubmit} className="space-y-6">
       <div className="space-y-5 rounded-2xl border bg-card p-6">
         <div className="space-y-1.5">
           <Label htmlFor="title">Role title</Label>
@@ -162,5 +169,22 @@ export function ApplicantProfileForm({ userId, existing }: { userId: string; exi
         <Button asChild variant="ghost"><Link to="/applicant/profiles">Cancel</Link></Button>
       </div>
     </form>
+      <aside className="rounded-2xl border bg-card p-6 lg:sticky lg:top-6">
+        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">Preview</p>
+        <StandardProfile
+          data={{
+            name: accountName,
+            roleTitle,
+            hourlyRate: rate,
+            years: cand.years === "" ? null : Number(cand.years),
+            field: cand.field,
+            highlights: cand.highlights,
+            availability: cand.availability,
+            hours: cand.hours,
+            timeZones: cand.timeZones,
+          }}
+        />
+      </aside>
+    </div>
   );
 }
