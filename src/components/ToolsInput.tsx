@@ -32,7 +32,7 @@ export function ToolsInput({ value, onChange }: { value: string[]; onChange: (v:
 
   const add = (raw: string) => {
     const r = addTool(value, raw);
-    if (typeof r === "string") return toast.error(r);
+    if (typeof r === "string") { toast.error(r); return; }
     onChange(r);
     setText("");
   };
@@ -66,7 +66,7 @@ export function ToolsInput({ value, onChange }: { value: string[]; onChange: (v:
             const v = e.target.value;
             if (v.includes(",")) { const parts = v.split(","); let cur = value;
               for (const p of parts.slice(0, -1)) { const r = addTool(cur, p); if (typeof r === "string") { toast.error(r); break; } cur = r; }
-              onChange(cur); setText(parts[parts.length - 1]); }
+              onChange(cur); setText(parts[parts.length - 1] ?? ""); }
             else setText(v);
           }}
           onKeyDown={onKey} />
