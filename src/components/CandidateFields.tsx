@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,9 +66,23 @@ const selectCls =
 export function CandidateFields({ value, onChange }: { value: CandidateValues; onChange: (v: CandidateValues) => void }) {
   const [query, setQuery] = useState("");
   const set = <K extends keyof CandidateValues>(k: K, v: CandidateValues[K]) => onChange({ ...value, [k]: v });
-  const matches = SKILL_OPTIONS.filter(
-    (s) => !value.skills.includes(s) && s.toLowerCase().includes(query.trim().toLowerCase()),
-  );
+  const [catalog, setCatalog] = useState<string[]>([]);
+  useEffect(() => {
+    const q = query.trim();
+    if (!q) { setCatalog([]); return; }
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      try {
+        const { data } = await supabase.rpc("suggest_tools", { _q: q });
+        if (!cancelled) setCatalog(((data ?? []) as { name: string }[]).map((r) => r.name));
+      } catch { /* suggestions are optional */ }
+    }, 200);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [query]);
+  const has = (s: string) => value.skills.some((x) => x.toLowerCase() === s.toLowerCase());
+  const local = SKILL_OPTIONS.filter((s) => s.toLowerCase().includes(query.trim().toLowerCase()));
+  const matches = [...local, ...catalog.filter((c) => !local.some((l) => l.toLowerCase() === c.toLowerCase()))]
+    .filter((s) => !has(s));
   const full = value.skills.length >= MAX_SKILLS;
 
   return (
