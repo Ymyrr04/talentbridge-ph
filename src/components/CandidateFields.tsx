@@ -1,5 +1,4 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
-// TagInput text is lifted via onTextChange where suggestions need it.
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, X } from "lucide-react";
@@ -309,9 +308,8 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
         max={MAX_TOOLS}
         maxLen={TOOL_MAX}
         suggestions={toolMatches}
+        onTextChange={setToolQuery}
       />
-      {/* keep toolQuery in sync via a hidden input pattern: reuse TagInput text by lifting state */}
-      <input type="hidden" value={toolQuery} onChange={() => setToolQuery(toolQuery)} />
 
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
