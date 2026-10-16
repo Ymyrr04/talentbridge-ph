@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { FileText, Pencil, Plus, Trash2, UserRoundPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { removeVideo } from "@/lib/introVideo";
 import { MAX_PROFILES, myApplicantProfiles, removeCv } from "@/lib/applicant";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
@@ -33,9 +34,11 @@ function Page() {
 
   const del = useMutation({
     mutationFn: async ({ id, cv }: { id: string; cv: string | null }) => {
+      const { data: row } = await supabase.from("applicant_profiles").select("video_path").eq("id", id).maybeSingle();
       const { error } = await supabase.from("applicant_profiles").delete().eq("id", id);
       if (error) throw error;
       await removeCv(cv);
+      await removeVideo(row?.video_path);
     },
     onSuccess: () => {
       toast.success("Profile deleted");

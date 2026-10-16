@@ -19,6 +19,14 @@ export const Route = createFileRoute("/client/applications")({
 
 function ClientApplicationsPage() {
   const { data } = useSuspenseQuery(incomingApplications);
+  const { data: videos } = useQuery({
+    queryKey: ["incoming-application-videos"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("incoming_application_videos");
+      if (error) throw error;
+      return Object.fromEntries((data ?? []).map((r) => [r.application_id, r.video_path])) as Record<string, string>;
+    },
+  });
   const qc = useQueryClient();
   const [jobFilter, setJobFilter] = useState(Route.useSearch().job ?? "all");
   const jobs = Array.from(new Map(data.map((a) => [a.job_id, a.job_title])).entries());
