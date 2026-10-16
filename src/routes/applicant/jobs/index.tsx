@@ -45,8 +45,8 @@ function JobsPage() {
               <article key={j.id} className="flex flex-col rounded-xl border bg-card p-5 shadow-sm">
                 <h3 className="font-semibold leading-snug">{j.title}</h3>
                 {facts.length > 0 && <p className="mt-1.5 text-sm font-medium text-foreground/80">{facts.join(" · ")}</p>}
-                <p className="mt-2 line-clamp-2 flex-1 text-sm text-muted-foreground">{j.description}</p>
-                <div className="mt-4 flex items-center justify-between gap-2">
+                <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{j.description}</p>
+                <div className="mt-auto flex items-center justify-between gap-2 pt-4">
                   <p className="text-xs text-muted-foreground">
                     {postedAgo(j.created_at)}
                     {applied.has(j.id) && (
