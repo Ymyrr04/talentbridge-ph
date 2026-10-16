@@ -540,6 +540,7 @@ export type Database = {
         Args: never
         Returns: {
           applicants: number
+          contacted: number
           created_at: string
           id: string
           pending: number
