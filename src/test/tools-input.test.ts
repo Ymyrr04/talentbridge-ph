@@ -7,3 +7,9 @@ describe("must-have tools", () => {
   it("blocks an 11th tool", () => expect(typeof addTool(Array.from({ length: 10 }, (_, i) => `T${i}`), "New")).toBe("string"));
   it("blocks names over 40 characters", () => expect(typeof addTool([], "x".repeat(41))).toBe("string"));
 });
+
+import { catalogSpelling } from "@/components/ToolsInput";
+describe("catalog spelling", () => {
+  it("uses the catalog's spelling", () => expect(catalogSpelling(" CHATGPT ", ["ChatGPT"])).toBe("ChatGPT"));
+  it("keeps custom tools as typed", () => expect(catalogSpelling("Airtable", ["ChatGPT"])).toBe("Airtable"));
+});

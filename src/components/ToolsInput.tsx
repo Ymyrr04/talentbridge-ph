@@ -1,14 +1,11 @@
 import { useState, type KeyboardEvent } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export const TOOL_SUGGESTIONS = [
-  "Excel", "Google Workspace", "QuickBooks", "Xero", "Canva", "HubSpot", "Shopify", "WordPress",
-  "Slack", "Zapier", "Make", "n8n", "Notion", "Asana", "Trello", "ClickUp", "Salesforce",
-  "Zendesk", "Gorgias", "Figma", "Photoshop", "CapCut", "ChatGPT",
-];
 export const MAX_TOOLS = 10;
 export const TOOL_MAX_LEN = 40;
 
@@ -22,16 +19,33 @@ export function addTool(list: string[], raw: string): string[] | string {
   return [...list, t];
 }
 
+/** Uses the catalog's spelling when the typed name matches one case-insensitively. */
+export function catalogSpelling(raw: string, catalog: string[]): string {
+  const t = raw.trim().replace(/\s+/g, " ");
+  return catalog.find((c) => c.toLowerCase() === t.toLowerCase()) ?? t;
+}
+
 export function ToolsInput({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
   const [text, setText] = useState("");
   const full = value.length >= MAX_TOOLS;
-  const q = text.trim().toLowerCase();
+  const q = text.trim();
+  const { data: matches = [] } = useQuery({
+    queryKey: ["suggest-tools", q.toLowerCase()],
+    enabled: q.length > 0,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("suggest_tools", { _q: q });
+      if (error) throw error;
+      return (data ?? []).map((r) => r.name);
+    },
+  });
   const suggestions = q
-    ? TOOL_SUGGESTIONS.filter((s) => s.toLowerCase().includes(q) && !value.some((v) => v.toLowerCase() === s.toLowerCase())).slice(0, 6)
+    ? matches.filter((s) => !value.some((v) => v.toLowerCase() === s.toLowerCase()))
     : [];
 
   const add = (raw: string) => {
-    const r = addTool(value, raw);
+    const r = addTool(value, catalogSpelling(raw, matches));
     if (typeof r === "string") { toast.error(r); return; }
     onChange(r);
     setText("");

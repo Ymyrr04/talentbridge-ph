@@ -232,6 +232,57 @@ export type Database = {
         }
         Relationships: []
       }
+      tool_catalog: {
+        Row: {
+          created_at: string
+          id: string
+          is_seeded: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_seeded?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_seeded?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      tool_catalog_usage: {
+        Row: {
+          client_id: string
+          tool_id: string
+        }
+        Insert: {
+          client_id: string
+          tool_id: string
+        }
+        Update: {
+          client_id?: string
+          tool_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tool_catalog_usage_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tool_catalog_usage_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "tool_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -329,6 +380,12 @@ export type Database = {
       set_application_status: {
         Args: { _id: string; _status: string }
         Returns: undefined
+      }
+      suggest_tools: {
+        Args: { _q: string }
+        Returns: {
+          name: string
+        }[]
       }
       valid_tool_list: { Args: { _t: string[] }; Returns: boolean }
     }
