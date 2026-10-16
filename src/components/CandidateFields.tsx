@@ -10,7 +10,7 @@ import { SKILL_OPTIONS } from "@/lib/skills";
 export const MAX_SKILLS = 15;
 export const SUMMARY_MAX = 500;
 export const HIGHLIGHT_MAX = 160;
-export const HIGHLIGHT_COUNT = 5;
+export const HIGHLIGHT_COUNT = 8;
 export const FIELD_MAX = 60;
 export const EXPERIENCE = [
   { value: "under_1", label: "Under 1 year" },

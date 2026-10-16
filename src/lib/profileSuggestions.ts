@@ -24,7 +24,7 @@ export function cleanSuggestions(raw: unknown): ProfileSuggestion[] {
     const role = clip(s.role_title, 80);
     if (!role || out.some((o) => o.role_title.toLowerCase() === role.toLowerCase())) continue;
     const yearsNum = Math.round(Number(s.years_experience));
-    const highlights = (Array.isArray(s.highlights) ? s.highlights : []).map((h) => clip(h, 160)).filter(Boolean).slice(0, 5);
+    const highlights = (Array.isArray(s.highlights) ? s.highlights : []).map((h) => clip(h, 160)).filter(Boolean).slice(0, 8);
     const skills = (Array.isArray(s.skills) ? s.skills : [])
       .map((k) => SKILL_OPTIONS.find((o) => typeof k === "string" && o.toLowerCase() === k.trim().toLowerCase()))
       .filter((k): k is string => !!k)
