@@ -205,6 +205,39 @@ export type Database = {
           },
         ]
       }
+      job_views: {
+        Row: {
+          first_viewed_at: string
+          job_id: string
+          viewer_id: string
+        }
+        Insert: {
+          first_viewed_at?: string
+          job_id: string
+          viewer_id: string
+        }
+        Update: {
+          first_viewed_at?: string
+          job_id?: string
+          viewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_views_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_views_viewer_id_fkey"
+            columns: ["viewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -329,7 +362,12 @@ export type Database = {
         Returns: {
           created_at: string
           description: string
+          employment_type: string
+          hours_max: number
+          hours_min: number
           id: string
+          rate_max: number
+          rate_min: number
           title: string
         }[]
       }
@@ -341,6 +379,24 @@ export type Database = {
           initials: string
           role_title: string
           updated_at: string
+        }[]
+      }
+      get_open_job: {
+        Args: { _id: string }
+        Returns: {
+          created_at: string
+          description: string
+          employment_type: string
+          experience_level: string
+          hours_max: number
+          hours_min: number
+          id: string
+          must_have_tools: string[]
+          project_duration: string
+          rate_max: number
+          rate_min: number
+          time_zones: string[]
+          title: string
         }[]
       }
       has_role: {
@@ -377,6 +433,7 @@ export type Database = {
           status: string
         }[]
       }
+      record_job_view: { Args: { _job_id: string }; Returns: undefined }
       set_application_status: {
         Args: { _id: string; _status: string }
         Returns: undefined
