@@ -157,7 +157,7 @@ function Recorder({ state, setState, onUse }: {
     const t0 = Date.now();
     rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
     rec.onstop = () => {
-      const blob = new Blob(chunks, { type: (rec.mimeType || "video/webm").split(";")[0] });
+      const blob = new Blob(chunks, { type: (rec.mimeType || "video/webm").split(";")[0] ?? "video/webm" });
       const duration = Math.min(VIDEO_MAX_SECONDS, Math.round((Date.now() - t0) / 1000));
       setState({ stage: "review", blob, duration });
     };

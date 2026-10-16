@@ -71,7 +71,7 @@ function ClientApplicationsPage() {
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  {videos?.[a.id] && <IntroVideoButton path={videos[a.id]} applicantName={a.applicant_name} />}
+                  {videos?.[a.id] && <IntroVideoButton path={videos[a.id]!} applicantName={a.applicant_name} />}
                   <MessageApplicantButton applicationId={a.id} applicantName={a.applicant_name} />
                   <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${ApplicationStatusClass(a.status)}`}>
                     {APPLICATION_STATUS_LABEL[a.status]}
