@@ -64,6 +64,13 @@
       "when": 1792081675692,
       "tag": "0008_admin_list_users",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792161381063,
+      "tag": "0009_job_post_employment_fields",
+      "breakpoints": true
     }
   ]
 }
