@@ -189,7 +189,7 @@ function Page() {
         ) : (
           <div className="divide-y rounded-xl border bg-card">
             {recentApps.map((a) => (
-              <Link key={a.id} to="/applicant/jobs/$id" params={{ id: a.job_id }} className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-muted/50">
+              <Link key={a.id} to="/applicant/applications" className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-muted/50">
                 <div className="min-w-0">
                   <p className="truncate font-semibold leading-snug">{a.job_title}</p>
                   <p className="mt-0.5 truncate text-sm text-muted-foreground">{a.role_title} · {postedAgo(a.created_at)}</p>

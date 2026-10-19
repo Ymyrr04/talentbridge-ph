@@ -6,7 +6,7 @@ import { JobPostForm } from "@/components/JobPostForm";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/client/jobs/$id/edit")({
-  head: () => ({ meta: [{ title: "Edit Job Post — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Edit Job Post — TalentHub" }, { name: "description", content: "Edit Job Post for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Edit Job Post — TalentHub" }, { property: "og:description", content: "Edit Job Post for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 

@@ -239,6 +239,13 @@
       "when": 1792182401396,
       "tag": "0033_portfolio_requirement",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1792429916795,
+      "tag": "0034_audit_function_access_and_profile_publishing",
+      "breakpoints": true
     }
   ]
 }

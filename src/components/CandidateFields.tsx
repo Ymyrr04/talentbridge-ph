@@ -63,6 +63,8 @@ export function publishErrors(v: CandidateValues): string[] {
   if (v.highlights.filter((h) => h.trim()).length < 3) errs.push("at least 3 highlights");
   if (!v.hours) errs.push("hours per week");
   if (!v.startAvailability) errs.push("when you can start");
+  if (v.availability.length === 0) errs.push("at least 1 availability option");
+  if (v.timeZones.length === 0) errs.push("at least 1 working-hours option");
   return errs;
 }
 
@@ -172,24 +174,9 @@ export function CandidateFields({ value, onChange }: { value: CandidateValues; o
     set("highlights", boxes().filter((_, j) => j !== i));
     setVisible((v) => Math.max(1, v - 1));
   };
-  const [catalog, setCatalog] = useState<string[]>([]);
-
-  useEffect(() => {
-    const q = query.trim();
-    if (!q) { setCatalog([]); return; }
-    let cancelled = false;
-    const t = setTimeout(async () => {
-      try {
-        const { data } = await supabase.rpc("suggest_tools", { _q: q });
-        if (!cancelled) setCatalog(((data ?? []) as { name: string }[]).map((r) => r.name));
-      } catch { /* suggestions are optional */ }
-    }, 200);
-    return () => { cancelled = true; clearTimeout(t); };
-  }, [query]);
   const has = (s: string) => value.skills.some((x) => x.toLowerCase() === s.toLowerCase());
   const local = SKILL_OPTIONS.filter((s) => s.toLowerCase().includes(query.trim().toLowerCase()));
-  const matches = [...local, ...catalog.filter((c) => !local.some((l) => l.toLowerCase() === c.toLowerCase()))]
-    .filter((s) => !has(s));
+  const matches = local.filter((s) => !has(s));
   const full = value.skills.length >= MAX_SKILLS;
 
   const [toolQuery, setToolQuery] = useState("");

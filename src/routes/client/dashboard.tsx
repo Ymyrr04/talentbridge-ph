@@ -8,7 +8,7 @@ import { JobStatusBadge } from "@/components/JobStatusBadge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/client/dashboard")({
-  head: () => ({ meta: [{ title: "Client Dashboard — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Client Dashboard — TalentHub" }, { name: "description", content: "Client Dashboard for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Client Dashboard — TalentHub" }, { property: "og:description", content: "Client Dashboard for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 

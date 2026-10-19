@@ -28,7 +28,7 @@ import { JOB_STATUS_LABEL } from "@/lib/client";
 import { AdminAnalytics } from "@/components/AdminAnalytics";
 
 export const Route = createFileRoute("/admin/dashboard")({
-  head: () => ({ meta: [{ title: "Admin Dashboard — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin Dashboard — TalentHub" }, { name: "description", content: "Admin Dashboard for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Admin Dashboard — TalentHub" }, { property: "og:description", content: "Admin Dashboard for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(adminData),
   component: Page,
 });

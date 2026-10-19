@@ -1,5 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { CV_MAX_BYTES } from "@/lib/cvLimits";
+export { CV_MAX_BYTES } from "@/lib/cvLimits";
 
 export const MAX_PROFILES = 3;
 
@@ -17,7 +19,6 @@ export const myApplicantProfiles = (userId: string) =>
     },
   });
 
-export const CV_MAX_BYTES = 5 * 1024 * 1024;
 export const CV_EXTENSIONS = ["pdf", "docx"];
 
 export function validateCv(file: File): string | null {
@@ -28,7 +29,10 @@ export function validateCv(file: File): string | null {
 }
 
 export async function uploadCv(userId: string, file: File): Promise<string> {
-  const ext = file.name.split(".").pop()!.toLowerCase();
+  const invalid = validateCv(file);
+  if (invalid) throw new Error(invalid);
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  if (!ext) throw new Error("CV must be a PDF or DOCX file.");
   const path = `${userId}/${crypto.randomUUID()}.${ext}`;
   const { error } = await supabase.storage.from("cv-uploads").upload(path, file, {
     contentType:

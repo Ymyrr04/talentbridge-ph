@@ -47,7 +47,7 @@ export function ApplyDialog({ job, onClose }: { job: ApplyJob | null; onClose: (
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Apply: {job?.title}</DialogTitle>
-          <DialogDescription>The client will see your name, email, chosen profile and note.</DialogDescription>
+          <DialogDescription>The client will see your chosen profile, note and any work links you include. Your email stays private.</DialogDescription>
         </DialogHeader>
         {profiles.length === 0 ? (
           <p className="text-sm text-muted-foreground">

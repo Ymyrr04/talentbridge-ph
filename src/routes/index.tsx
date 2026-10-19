@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TalentHub — Hire Filipino Remote Talent" },
+      { title: "TalentHub — Hire Filipino Remote Talent" }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
       { name: "description", content: "TalentHub connects employers worldwide with skilled Filipino remote professionals." },
       { property: "og:title", content: "TalentHub — Hire Filipino Remote Talent" },
       { property: "og:description", content: "Connecting employers worldwide with skilled Filipino remote professionals." },

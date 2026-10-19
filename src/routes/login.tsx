@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Log in — TalentHub" },
+      { title: "Log in — TalentHub" }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
       { name: "description", content: "Log in to your TalentHub account." },
       { property: "og:title", content: "Log in — TalentHub" },
       { property: "og:description", content: "Log in to your TalentHub account." },

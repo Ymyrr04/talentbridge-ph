@@ -4,7 +4,7 @@ import { SettingsForm } from "@/components/SettingsForm";
 import { CvSettings } from "@/components/CvSettings";
 
 export const Route = createFileRoute("/applicant/settings")({
-  head: () => ({ meta: [{ title: "Settings — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Applicant Settings — TalentHub" }, { name: "description", content: "Applicant Settings for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Applicant Settings — TalentHub" }, { property: "og:description", content: "Applicant Settings for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 
