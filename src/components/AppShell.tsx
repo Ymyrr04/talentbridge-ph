@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Briefcase, Inbox, LogOut, Settings, UserRound } from "lucide-react";
+import { LogOut, Settings, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -64,15 +64,14 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
           {messagesItem && (
             <Button
               variant="ghost"
-              size="icon"
-              className="relative h-9 w-9 rounded-full"
-              aria-label={unread ? `Inbox, ${unread} unread messages` : "Inbox"}
-              title="Messages"
+              size="sm"
+              className="h-9 gap-2 px-3 text-sm"
+              aria-label={unread ? `${messagesItem.label}, ${unread} unread messages` : messagesItem.label}
               onClick={() => navigate({ to: messagesItem.to })}
             >
-              <Inbox className="h-5 w-5" />
+              {messagesItem.label}
               {unread > 0 && (
-                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                <span className="grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
                   {unread > 99 ? "99+" : unread}
                 </span>
               )}
@@ -81,13 +80,11 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
           {jobsItem && (
             <Button
               variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full"
-              aria-label={jobsItem.label}
-              title={jobsItem.label}
+              size="sm"
+              className="hidden h-9 px-3 text-sm sm:inline-flex"
               onClick={() => navigate({ to: jobsItem.to })}
             >
-              <Briefcase className="h-5 w-5" />
+              {jobsItem.label}
             </Button>
           )}
           <DropdownMenu>
