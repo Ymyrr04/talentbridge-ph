@@ -52,6 +52,9 @@ export function SignupForm({ role }: { role: "applicant" | "client" }) {
         <p className="mt-1 text-sm text-muted-foreground">
           We sent a verification link to <span className="font-medium text-foreground">{email}</span>. Confirm it, then log in.
         </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          No email yet? Check your spam folder, or sign up again with the same email to send the link again.
+        </p>
         <Button asChild variant="outline" className="mt-6 w-full">
           <Link to="/login">Go to login</Link>
         </Button>
