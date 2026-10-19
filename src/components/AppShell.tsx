@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Inbox, LogOut, Settings, UserRound } from "lucide-react";
+import { Briefcase, Inbox, LogOut, Settings, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -22,6 +22,7 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
   const queryClient = useQueryClient();
   const hasMessages = nav.some((n) => n.unreadBadge);
   const messagesItem = nav.find((n) => n.unreadBadge);
+  const jobsItem = nav.find((n) => n.to.endsWith("/jobs"));
   const { data: unread = 0 } = useQuery({ ...unreadCount, enabled: hasMessages });
   useMessagesRealtime(hasMessages);
   const settingsItem = nav.find((n) => n.to.endsWith("/settings"));
@@ -75,6 +76,18 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
                   {unread > 99 ? "99+" : unread}
                 </span>
               )}
+            </Button>
+          )}
+          {jobsItem && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 rounded-full"
+              aria-label={jobsItem.label}
+              title={jobsItem.label}
+              onClick={() => navigate({ to: jobsItem.to })}
+            >
+              <Briefcase className="h-5 w-5" />
             </Button>
           )}
           <DropdownMenu>
