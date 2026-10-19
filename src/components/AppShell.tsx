@@ -76,11 +76,21 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
                 {me?.email && <p className="truncate text-xs text-muted-foreground">{me.email}</p>}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {settingsItem && (
-                <DropdownMenuItem onSelect={() => navigate({ to: settingsItem.to })}>
-                  <Settings className="h-4 w-4" /> Settings
+              {mainNav.map((n) => (
+                <DropdownMenuItem key={n.to} onSelect={() => navigate({ to: n.to })}>
+                  {n.label}
+                  {n.unreadBadge && <UnreadBadge />}
                 </DropdownMenuItem>
+              ))}
+              {settingsItem && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={() => navigate({ to: settingsItem.to })}>
+                    <Settings className="h-4 w-4" /> Settings
+                  </DropdownMenuItem>
+                </>
               )}
+              <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={signOut}>
                 <LogOut className="h-4 w-4" /> Log out
               </DropdownMenuItem>
