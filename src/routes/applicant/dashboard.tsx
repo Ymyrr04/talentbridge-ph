@@ -53,8 +53,9 @@ function rankJobs(jobs: Job[], q: string): Job[] {
 
 function Page() {
   const { user } = Route.useRouteContext();
-  const { q } = Route.useSearch();
-  const navigate = useNavigate();
+  const search = Route.useSearch();
+  const q = search["q"];
+  const navigate = Route.useNavigate();
   const { data: profile } = useQuery({
     queryKey: ["profile", user.id],
     queryFn: async () => (await supabase.from("profiles").select("name").eq("id", user.id).maybeSingle()).data,
