@@ -92,11 +92,6 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-3 pb-2 md:hidden">
-          {mainNav.map((n) => (
-            <NavLink key={n.to} item={n} />
-          ))}
-        </nav>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
     </div>
