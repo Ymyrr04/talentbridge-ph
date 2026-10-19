@@ -23,6 +23,7 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
   const hasMessages = nav.some((n) => n.unreadBadge);
   const messagesItem = nav.find((n) => n.unreadBadge);
   const jobsItem = nav.find((n) => n.to.endsWith("/jobs"));
+  const dashboardItem = nav.find((n) => n.to.endsWith("/dashboard"));
   const { data: unread = 0 } = useQuery({ ...unreadCount, enabled: hasMessages });
   useMessagesRealtime(hasMessages);
   const settingsItem = nav.find((n) => n.to.endsWith("/settings"));
@@ -61,6 +62,16 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
             </span>
           </div>
           <div className="flex items-center gap-3">
+          {dashboardItem && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="hidden h-9 px-3 text-sm sm:inline-flex"
+              onClick={() => navigate({ to: dashboardItem.to })}
+            >
+              {dashboardItem.label}
+            </Button>
+          )}
           {messagesItem && (
             <Button
               variant="ghost"
