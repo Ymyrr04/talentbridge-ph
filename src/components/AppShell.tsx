@@ -56,11 +56,6 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
               {roleLabel}
             </span>
           </div>
-          <nav className="hidden items-center gap-1 md:flex">
-            {mainNav.map((n) => (
-              <NavLink key={n.to} item={n} />
-            ))}
-          </nav>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -76,39 +71,30 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
                 {me?.email && <p className="truncate text-xs text-muted-foreground">{me.email}</p>}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {settingsItem && (
-                <DropdownMenuItem onSelect={() => navigate({ to: settingsItem.to })}>
-                  <Settings className="h-4 w-4" /> Settings
+              {mainNav.map((n) => (
+                <DropdownMenuItem key={n.to} onSelect={() => navigate({ to: n.to })}>
+                  {n.label}
+                  {n.unreadBadge && <UnreadBadge />}
                 </DropdownMenuItem>
+              ))}
+              {settingsItem && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={() => navigate({ to: settingsItem.to })}>
+                    <Settings className="h-4 w-4" /> Settings
+                  </DropdownMenuItem>
+                </>
               )}
+              <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={signOut}>
                 <LogOut className="h-4 w-4" /> Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-3 pb-2 md:hidden">
-          {mainNav.map((n) => (
-            <NavLink key={n.to} item={n} />
-          ))}
-        </nav>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
     </div>
-  );
-}
-
-function NavLink({ item }: { item: NavItem }) {
-  return (
-    <Link
-      to={item.to}
-      activeOptions={{ exact: item.exact ?? false }}
-      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-      activeProps={{ className: "bg-secondary text-foreground" }}
-    >
-      {item.label}
-      {item.unreadBadge && <UnreadBadge />}
-    </Link>
   );
 }
 
@@ -116,11 +102,13 @@ function UnreadBadge() {
   const { data = 0 } = useQuery(unreadCount);
   if (!data) return null;
   return (
-    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground" aria-label={`${data} unread`}>
+    <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground" aria-label={`${data} unread`}>
       {data > 99 ? "99+" : data}
     </span>
   );
 }
+
+
 
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: ReactNode; action?: ReactNode }) {
   return (
