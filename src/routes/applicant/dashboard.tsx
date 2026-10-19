@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Briefcase, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, myApplications } from "@/lib/applications";
