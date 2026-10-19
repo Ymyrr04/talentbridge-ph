@@ -98,6 +98,17 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
   );
 }
 
+function UnreadBadge() {
+  const { data = 0 } = useQuery(unreadCount);
+  if (!data) return null;
+  return (
+    <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground" aria-label={`${data} unread`}>
+      {data > 99 ? "99+" : data}
+    </span>
+  );
+}
+
+
 
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: ReactNode; action?: ReactNode }) {
   return (
