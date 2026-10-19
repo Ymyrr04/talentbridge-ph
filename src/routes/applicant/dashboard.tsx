@@ -159,7 +159,7 @@ function Page() {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold">
-            {searching ? `Results for “${q?.trim()}” · ${results.length}` : "Recently posted jobs"}
+            {searching ? `Results for “${submitted}” · ${results.length}` : "Recently posted jobs"}
           </h2>
           <Link to="/applicant/jobs" className="text-sm font-medium text-primary hover:underline">View all</Link>
         </div>
