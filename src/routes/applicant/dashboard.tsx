@@ -68,11 +68,15 @@ function Page() {
   const q = search["q"];
   const navigate = Route.useNavigate();
   const [draft, setDraft] = useState(q ?? "");
+  const [submitted, setSubmitted] = useState(q ?? "");
   useEffect(() => {
     setDraft(q ?? "");
+    setSubmitted(q ?? "");
   }, [q]);
   const runSearch = (value: string) => {
     const trimmed = value.trim();
+    setDraft(trimmed);
+    setSubmitted(trimmed);
     navigate({ search: (prev) => ({ ...prev, q: trimmed || undefined }), replace: true });
   };
   const { data: profile } = useQuery({
@@ -80,8 +84,8 @@ function Page() {
     queryFn: async () => (await supabase.from("profiles").select("name").eq("id", user.id).maybeSingle()).data,
   });
   const { data: jobs = [] } = useQuery(jobsQuery);
-  const searching = Boolean(q?.trim());
-  const results = searching ? rankJobs(jobs, q ?? "") : [];
+  const searching = Boolean(submitted);
+  const results = searching ? rankJobs(jobs, submitted) : [];
   const shown = searching
     ? results
     : [...jobs]
