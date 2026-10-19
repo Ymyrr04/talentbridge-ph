@@ -10,7 +10,7 @@ const tiers = [
 ];
 
 export const Route = createFileRoute("/client/pricing")({
-  head: () => ({ meta: [{ title: "Pricing — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Pricing — TalentHub" }, { name: "description", content: "Pricing for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Pricing — TalentHub" }, { property: "og:description", content: "Pricing for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: () => (
     <>
       <PageHeader title="Pricing" subtitle="Plans are coming soon." />

@@ -6,7 +6,7 @@ import { ApplicantProfileForm } from "@/components/ApplicantProfileForm";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/applicant/profiles/new")({
-  head: () => ({ meta: [{ title: "Create a Profile — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Create a Profile — TalentHub" }, { name: "description", content: "Create a Profile for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Create a Profile — TalentHub" }, { property: "og:description", content: "Create a Profile for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 

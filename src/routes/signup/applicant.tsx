@@ -5,7 +5,7 @@ import { SignupForm } from "@/components/SignupForm";
 export const Route = createFileRoute("/signup/applicant")({
   head: () => ({
     meta: [
-      { title: "Sign up as an Applicant — TalentHub" },
+      { title: "Sign up as an Applicant — TalentHub" }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
       { name: "description", content: "Create your TalentHub applicant account and get discovered by employers worldwide." },
       { property: "og:title", content: "Sign up as an Applicant — TalentHub" },
       { property: "og:description", content: "Create your TalentHub applicant account." },

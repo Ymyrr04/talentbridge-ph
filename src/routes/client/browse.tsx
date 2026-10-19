@@ -16,7 +16,7 @@ const talentQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/client/browse")({
-  head: () => ({ meta: [{ title: "Browse Talent Pool — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Browse Talent Pool — TalentHub" }, { name: "description", content: "Browse Talent Pool for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Browse Talent Pool — TalentHub" }, { property: "og:description", content: "Browse Talent Pool for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(talentQuery),
   component: BrowsePage,
 });

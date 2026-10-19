@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/AppShell";
 import { SettingsForm } from "@/components/SettingsForm";
 
 export const Route = createFileRoute("/client/settings")({
-  head: () => ({ meta: [{ title: "Settings — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Client Settings — TalentHub" }, { name: "description", content: "Client Settings for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Client Settings — TalentHub" }, { property: "og:description", content: "Client Settings for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 

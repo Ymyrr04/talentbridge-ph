@@ -6,7 +6,7 @@ import { ApplicantProfileForm } from "@/components/ApplicantProfileForm";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/applicant/profiles/$id/edit")({
-  head: () => ({ meta: [{ title: "Edit Profile — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Edit Profile — TalentHub" }, { name: "description", content: "Edit Profile for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Edit Profile — TalentHub" }, { property: "og:description", content: "Edit Profile for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 

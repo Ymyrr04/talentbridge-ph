@@ -8,7 +8,7 @@ import { formatRate, postedAgo } from "@/lib/jobFormat";
 import { applyRate, myJobStats } from "@/lib/jobStats";
 
 export const Route = createFileRoute("/client/jobs/$id/")({
-  head: () => ({ meta: [{ title: "Job Analytics — TalentHub" }, { name: "description", content: "Views and applicants for your job post." }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Job Analytics — TalentHub" }, { property: "og:title", content: "Job Analytics — TalentHub" }, { property: "og:description", content: "Views and applicants for your job post." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "description", content: "Views and applicants for your job post." }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 

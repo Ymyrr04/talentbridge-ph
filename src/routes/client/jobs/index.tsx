@@ -11,7 +11,7 @@ import { JobStatusBadge } from "@/components/JobStatusBadge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/client/jobs/")({
-  head: () => ({ meta: [{ title: "Job Posts — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Job Posts — TalentHub" }, { name: "description", content: "Job Posts for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Job Posts — TalentHub" }, { property: "og:description", content: "Job Posts for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 

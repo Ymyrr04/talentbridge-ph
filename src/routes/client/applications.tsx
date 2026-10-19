@@ -17,7 +17,7 @@ import { VoiceIntroButton } from "@/components/VoiceIntroButton";
 import { myJobPosts } from "@/lib/client";
 
 export const Route = createFileRoute("/client/applications")({
-  head: () => ({ meta: [{ title: "Applications — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Applications — TalentHub" }, { name: "description", content: "Applications for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Applications — TalentHub" }, { property: "og:description", content: "Applications for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   validateSearch: (s: Record<string, unknown>): { job?: string } => (typeof s["job"] === "string" ? { job: s["job"] } : {}),
   loader: ({ context }) => context.queryClient.ensureQueryData(incomingApplications),
   component: ClientApplicationsPage,

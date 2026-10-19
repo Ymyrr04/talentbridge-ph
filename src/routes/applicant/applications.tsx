@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, myApplications } from "@/lib/applications";
 
 export const Route = createFileRoute("/applicant/applications")({
-  head: () => ({ meta: [{ title: "My Applications — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "My Applications — TalentHub" }, { name: "description", content: "My Applications for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "My Applications — TalentHub" }, { property: "og:description", content: "My Applications for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(myApplications),
   component: MyApplicationsPage,
 });

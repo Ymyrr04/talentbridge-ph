@@ -15,7 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { publishErrors } from "@/components/CandidateFields";
 
 export const Route = createFileRoute("/applicant/profiles/")({
-  head: () => ({ meta: [{ title: "Your Profiles — TalentHub" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Your Profiles — TalentHub" }, { name: "description", content: "Your Profiles for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Your Profiles — TalentHub" }, { property: "og:description", content: "Your Profiles for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 
