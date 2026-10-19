@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Add an inbox shortcut beside the profile icon with unread counts.
+- [ ] Enable new-message push notifications (requires Firebase connection with web push).
 - [x] Add and verify applicant dashboard recommendations based on profile titles, skills, and tools.
 - [x] Applicant area: profiles (max 3), CV uploads, settings
 - [x] Client area: job posts, browse shell, pricing, settings, phone on profile

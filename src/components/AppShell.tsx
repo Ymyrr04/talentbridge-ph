@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Settings, UserRound } from "lucide-react";
+import { Inbox, LogOut, Settings, UserRound } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
@@ -20,6 +21,8 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const hasMessages = nav.some((n) => n.unreadBadge);
+  const messagesItem = nav.find((n) => n.unreadBadge);
+  const { data: unread = 0 } = useQuery({ ...unreadCount, enabled: hasMessages });
   useMessagesRealtime(hasMessages);
   const settingsItem = nav.find((n) => n.to.endsWith("/settings"));
   const mainNav = nav.filter((n) => n !== settingsItem);
@@ -36,7 +39,7 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((w) => w[0]!.toUpperCase())
+    .map((w) => w.charAt(0).toUpperCase())
     .join("");
 
   async function signOut() {
@@ -56,14 +59,33 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
               {roleLabel}
             </span>
           </div>
+          <div className="flex items-center gap-3">
+          {messagesItem && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative h-9 w-9 rounded-full"
+              aria-label={unread ? `Inbox, ${unread} unread messages` : "Inbox"}
+              title="Messages"
+              onClick={() => navigate({ to: messagesItem.to })}
+            >
+              <Inbox className="h-5 w-5" />
+              {unread > 0 && (
+                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                  {unread > 99 ? "99+" : unread}
+                </span>
+              )}
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button
+              <Button
+                size="icon"
                 aria-label="Profile menu"
                 className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground ring-offset-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 {initials || <UserRound className="h-4 w-4" />}
-              </button>
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="font-normal">
@@ -91,6 +113,7 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
