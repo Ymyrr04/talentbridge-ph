@@ -1,6 +1,6 @@
 # Roadmap
 - [x] Applicant dashboard search runs only on the Search button or Enter, not per keystroke.
-- [x] Top bar shows text shortcuts (Messages with unread count, Open Jobs / Job Posts) beside the profile menu — no icon-only buttons.
+- [x] Top bar shows text shortcuts (Dashboard, Messages with unread count, Open Jobs / Job Posts) beside the profile menu — no icon-only buttons.
 - [ ] Enable new-message push notifications (requires Firebase connection with web push).
 - [x] Add and verify applicant dashboard recommendations based on profile titles, skills, and tools.
 - [x] Applicant area: profiles (max 3), CV uploads, settings
