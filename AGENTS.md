@@ -23,3 +23,4 @@
 - useEffect callbacks always use a block body ({ ... }) — newer browsers return Promises from DOM calls like scrollIntoView, and React crashes if an effect returns a non-function.
 - AI features run in createServerFn (*.functions.ts) with helpers in *.server.ts under src/lib, never Supabase Edge Functions — TanStack Start keeps server logic in one runtime; inputs like CVs are read server-side from the caller's own storage.
 - Dashboard job recommendations use the pure browser-safe jobRecommendations helper with the owner's profile query and existing jobs RPC; deterministic ranking avoids sending personal profile data to an external service.
+- The applicant dashboard search renders from its own submitted-query state and only writes the URL as a shareable mirror — client-side search-param navigation on this route changes the address bar without re-rendering the component, so rendering from the URL alone silently shows no results.

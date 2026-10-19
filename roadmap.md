@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Applicant dashboard search runs only on the Search button or Enter, not per keystroke.
 - [x] Add an inbox shortcut beside the profile icon with unread counts.
 - [ ] Enable new-message push notifications (requires Firebase connection with web push).
 - [x] Add and verify applicant dashboard recommendations based on profile titles, skills, and tools.
