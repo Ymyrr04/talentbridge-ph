@@ -108,29 +108,6 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
   );
 }
 
-function NavLink({ item }: { item: NavItem }) {
-  return (
-    <Link
-      to={item.to}
-      activeOptions={{ exact: item.exact ?? false }}
-      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-      activeProps={{ className: "bg-secondary text-foreground" }}
-    >
-      {item.label}
-      {item.unreadBadge && <UnreadBadge />}
-    </Link>
-  );
-}
-
-function UnreadBadge() {
-  const { data = 0 } = useQuery(unreadCount);
-  if (!data) return null;
-  return (
-    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground" aria-label={`${data} unread`}>
-      {data > 99 ? "99+" : data}
-    </span>
-  );
-}
 
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: ReactNode; action?: ReactNode }) {
   return (
