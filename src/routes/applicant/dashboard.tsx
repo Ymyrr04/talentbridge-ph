@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Briefcase, Search, Sparkles } from "lucide-react";
+import { Briefcase, Search, Sparkles, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, myApplications } from "@/lib/applications";
 import { EmptyState, PageHeader } from "@/components/AppShell";
@@ -66,6 +67,14 @@ function Page() {
   const search = Route.useSearch();
   const q = search["q"];
   const navigate = Route.useNavigate();
+  const [draft, setDraft] = useState(q ?? "");
+  useEffect(() => {
+    setDraft(q ?? "");
+  }, [q]);
+  const runSearch = (value: string) => {
+    const trimmed = value.trim();
+    navigate({ search: (prev) => ({ ...prev, q: trimmed || undefined }), replace: true });
+  };
   const { data: profile } = useQuery({
     queryKey: ["profile", user.id],
     queryFn: async () => (await supabase.from("profiles").select("name").eq("id", user.id).maybeSingle()).data,
@@ -88,16 +97,40 @@ function Page() {
   return (
     <>
       <PageHeader title={`Welcome${profile?.name ? `, ${profile.name}` : ""}.`} />
-      <div className="relative mb-8">
+      <form
+        className="relative mb-8"
+        onSubmit={(e) => {
+          e.preventDefault();
+          runSearch(draft);
+        }}
+      >
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
         <Input
-          value={q ?? ""}
-          onChange={(e) => navigate({ search: (prev) => ({ ...prev, q: e.target.value }), replace: true })}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
           placeholder="Search jobs, e.g. AI automation"
-          className="pl-9"
+          className="pl-9 pr-32"
           aria-label="Search jobs"
         />
-      </div>
+        <div className="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
+          {searching && (
+            <button
+              type="button"
+              onClick={() => {
+                setDraft("");
+                runSearch("");
+              }}
+              aria-label="Clear search"
+              className="rounded-full p-1 text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          )}
+          <Button type="submit" size="sm" className="h-8">
+            Search
+          </Button>
+        </div>
+      </form>
       {!searching && (
         <section className="mb-10" aria-labelledby="recommended-jobs-heading">
           <h2 id="recommended-jobs-heading" className="mb-4 flex items-center gap-2 font-display text-lg font-semibold">
