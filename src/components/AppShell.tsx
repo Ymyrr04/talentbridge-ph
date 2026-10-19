@@ -1,9 +1,16 @@
 import type { ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings, UserRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { unreadCount, useMessagesRealtime } from "@/lib/messages";
 import { Brand } from "./Brand";
 
@@ -14,6 +21,23 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
   const queryClient = useQueryClient();
   const hasMessages = nav.some((n) => n.unreadBadge);
   useMessagesRealtime(hasMessages);
+  const settingsItem = nav.find((n) => n.to.endsWith("/settings"));
+  const mainNav = nav.filter((n) => n !== settingsItem);
+  const { data: me } = useQuery({
+    queryKey: ["shell-me"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      const { data } = await supabase.from("profiles").select("name, email").eq("id", user.id).maybeSingle();
+      return { name: data?.name ?? "", email: data?.email ?? user.email ?? "" };
+    },
+  });
+  const initials = (me?.name || me?.email || "?")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join("");
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -33,16 +57,38 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
             </span>
           </div>
           <nav className="hidden items-center gap-1 md:flex">
-            {nav.map((n) => (
+            {mainNav.map((n) => (
               <NavLink key={n.to} item={n} />
             ))}
           </nav>
-          <Button variant="outline" size="sm" onClick={signOut}>
-            <LogOut className="h-4 w-4" /> <span className="hidden sm:inline">Log out</span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label="Profile menu"
+                className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground ring-offset-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                {initials || <UserRound className="h-4 w-4" />}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel className="font-normal">
+                <p className="truncate text-sm font-semibold">{me?.name || roleLabel}</p>
+                {me?.email && <p className="truncate text-xs text-muted-foreground">{me.email}</p>}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {settingsItem && (
+                <DropdownMenuItem onSelect={() => navigate({ to: settingsItem.to })}>
+                  <Settings className="h-4 w-4" /> Settings
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onSelect={signOut}>
+                <LogOut className="h-4 w-4" /> Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-3 pb-2 md:hidden">
-          {nav.map((n) => (
+          {mainNav.map((n) => (
             <NavLink key={n.to} item={n} />
           ))}
         </nav>
