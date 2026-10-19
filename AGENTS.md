@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
+- Open Jobs and direct job links share JobDetail and its query so application actions and job-view tracking remain consistent.
 - Both intro recorders use useRecordingMedia for microphone selection, readiness and metering; live monitoring never feeds speakers, preventing feedback while recording.
 - Role gating: role dashboards use `ssr: false` + `beforeLoad: requireRole(role)` from `src/lib/auth.ts` — session lives in browser storage, and one helper keeps redirect rules consistent.
 - Roles live only in `public.user_roles` (one row per user, no client write grants); assigned by the `handle_new_user` signup trigger from metadata limited to applicant/client — admin is set manually in the database.
