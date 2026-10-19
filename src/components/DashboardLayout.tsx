@@ -42,7 +42,7 @@ export function DashboardLayout({ userId, roleLabel, showAllDashboards = false }
           {showAllDashboards && (
             <nav className="flex gap-1 text-sm">
               <Link to="/admin/dashboard" className="rounded-md px-2 py-1 text-muted-foreground hover:bg-muted" activeProps={{ className: "bg-muted text-foreground" }}>Admin</Link>
-              <Link to="/applicant/dashboard" search={{}} className="rounded-md px-2 py-1 text-muted-foreground hover:bg-muted" activeProps={{ className: "bg-muted text-foreground" }}>Applicant</Link>
+              <Link to="/applicant/dashboard" search={{ q: undefined }} className="rounded-md px-2 py-1 text-muted-foreground hover:bg-muted" activeProps={{ className: "bg-muted text-foreground" }}>Applicant</Link>
               <Link to="/client/dashboard" className="rounded-md px-2 py-1 text-muted-foreground hover:bg-muted" activeProps={{ className: "bg-muted text-foreground" }}>Client</Link>
             </nav>
           )}

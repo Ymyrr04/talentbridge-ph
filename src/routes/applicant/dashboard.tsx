@@ -24,7 +24,7 @@ type Job = {
 };
 
 export const Route = createFileRoute("/applicant/dashboard")({
-  validateSearch: (search) => ({ q: typeof search.q === "string" ? search.q : undefined }),
+  validateSearch: (search) => ({ q: typeof search["q"] === "string" ? search["q"] : undefined }),
   head: () => ({ meta: [{ title: "Applicant Dashboard — TalentHub" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
