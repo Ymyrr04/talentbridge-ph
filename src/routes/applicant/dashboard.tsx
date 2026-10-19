@@ -6,6 +6,8 @@ import { MAX_PROFILES, myApplicantProfiles } from "@/lib/applicant";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { jobsQuery } from "@/routes/applicant/jobs";
+import { EMPLOYMENT_LABEL, formatHours, formatRate, postedAgo } from "@/lib/jobFormat";
 
 export const Route = createFileRoute("/applicant/dashboard")({
   head: () => ({ meta: [{ title: "Applicant Dashboard — TalentHub" }, { name: "robots", content: "noindex" }] }),
@@ -19,6 +21,10 @@ function Page() {
     queryFn: async () => (await supabase.from("profiles").select("name").eq("id", user.id).maybeSingle()).data,
   });
   const { data: profiles = [], isLoading } = useQuery(myApplicantProfiles(user.id));
+  const { data: jobs = [] } = useQuery(jobsQuery);
+  const recent = [...jobs]
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 3);
   const full = profiles.length >= MAX_PROFILES;
 
   return (
