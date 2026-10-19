@@ -9,7 +9,7 @@ describe("profile-based job recommendations", () => {
     expect(recommendJobs([job("partial", "Automation engineer"), job("exact", "AI Automation specialist")], [profile]).map(({ job }) => job.id)).toEqual(["exact", "partial"]);
   });
   it("matches past titles and named skills or tools", () => {
-    expect(recommendJobs([job("past", "Bookkeeper"), job("tool", "Integration developer", "Build workflows using n8n"), job("skill", "Consultant", "Workflow Automation")], [{ ...profile, past_titles: ["Bookkeeper"] }]).map(({ job }) => job.id)).toEqual(["past", "tool", "skill"]);
+    expect(recommendJobs([job("past", "Bookkeeper"), job("tool", "Integration developer", "Build workflows using n8n"), job("skill", "Consultant", "Workflow Automation")], [{ ...profile, past_titles: ["Bookkeeper"] }]).map(({ job }) => job.id)).toEqual(["past", "skill", "tool"]);
   });
   it("does not recommend unrelated jobs or substring-only word matches", () => {
     expect(recommendJobs([job("unrelated", "Designer"), job("substring", "Paid ads assistant")], [profile])).toEqual([]);
