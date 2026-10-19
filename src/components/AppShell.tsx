@@ -56,11 +56,6 @@ export function AppShell({ roleLabel, nav, children }: { roleLabel: string; nav:
               {roleLabel}
             </span>
           </div>
-          <nav className="hidden items-center gap-1 md:flex">
-            {mainNav.map((n) => (
-              <NavLink key={n.to} item={n} />
-            ))}
-          </nav>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
