@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Open Jobs uses a selectable list with job details on the right and a mobile back button.
 - [x] Applicant dashboard search runs only on the Search button or Enter, not per keystroke.
 - [x] Top bar shows text shortcuts (Dashboard, Messages with unread count, Open Jobs / Job Posts) beside the profile menu — no icon-only buttons.
 - [ ] Enable new-message push notifications (requires Firebase connection with web push).
