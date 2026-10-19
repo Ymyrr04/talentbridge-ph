@@ -73,6 +73,37 @@ function Page() {
         </div>
       )}
       {full && <p className="mt-4 text-sm text-muted-foreground">You’ve reached the 3 profile limit.</p>}
+      {recent.length > 0 && (
+        <section className="mt-10">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold">Recently posted jobs</h2>
+            <Link to="/applicant/jobs" className="text-sm font-medium text-primary hover:underline">View all</Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {recent.map((j) => {
+              const facts = [
+                j.employment_type ? EMPLOYMENT_LABEL[j.employment_type] : null,
+                formatRate(j.rate_min, j.rate_max),
+                formatHours(j.hours_min, j.hours_max),
+              ].filter(Boolean);
+              return (
+                <article key={j.id} className="flex flex-col rounded-xl border bg-card p-5 shadow-sm">
+                  <h3 className="font-semibold leading-snug">{j.title}</h3>
+                  {j.portfolio_required && <span className="mt-1.5 w-fit rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">Portfolio required</span>}
+                  {facts.length > 0 && <p className="mt-1.5 text-sm font-medium text-foreground/80">{facts.join(" · ")}</p>}
+                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{j.description}</p>
+                  <div className="mt-auto flex items-center justify-between gap-2 pt-4">
+                    <p className="text-xs text-muted-foreground">{postedAgo(j.created_at)}</p>
+                    <Button size="sm" asChild>
+                      <Link to="/applicant/jobs/$id" params={{ id: j.id }}>View job</Link>
+                    </Button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </>
   );
 }
