@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Lightbulb, Plus, UserRoundPlus } from "lucide-react";
+import { Briefcase } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { MAX_PROFILES, myApplicantProfiles } from "@/lib/applicant";
+import { APPLICATION_STATUS_LABEL, ApplicationStatusClass, myApplications } from "@/lib/applications";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,65 +20,26 @@ function Page() {
     queryKey: ["profile", user.id],
     queryFn: async () => (await supabase.from("profiles").select("name").eq("id", user.id).maybeSingle()).data,
   });
-  const { data: profiles = [], isLoading } = useQuery(myApplicantProfiles(user.id));
   const { data: jobs = [] } = useQuery(jobsQuery);
   const recent = [...jobs]
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
-    .slice(0, 3);
-  const full = profiles.length >= MAX_PROFILES;
+    .slice(0, 6);
+  const { data: apps = [] } = useQuery(myApplications);
+  const recentApps = [...apps]
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 4);
 
   return (
     <>
-      <PageHeader
-        title={`Welcome${profile?.name ? `, ${profile.name}` : ""}.`}
-        subtitle={<span>Your Profiles · <span className="font-medium text-foreground">{profiles.length} of {MAX_PROFILES} used</span></span>}
-        action={
-          !full && profiles.length > 0 ? (
-            <Button asChild><Link to="/applicant/profiles/new"><Plus className="h-4 w-4" /> Create a Profile</Link></Button>
-          ) : undefined
-        }
-      />
-      {!full && (
-        <section className="mb-6 flex gap-4 rounded-2xl border border-primary/15 bg-primary/5 p-5">
-          <Lightbulb className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-          <div>
-            <h3 className="font-display font-semibold">Make up to 3 focused profiles</h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Each profile can target a different role. Tailor the title, rate, skills and summary to that role so employers see right away why you're a fit. All your profiles use the same CV, so keep each one true to your real experience. When you apply, pick the profile that best matches the job.
-            </p>
-            <Button asChild size="sm" className="mt-4">
-              <Link to="/applicant/profiles/new"><Plus className="h-4 w-4" /> Create a Profile</Link>
-            </Button>
-          </div>
-        </section>
-      )}
-      <h2 className="mb-4 font-display text-lg font-semibold">Your Profiles</h2>
-      {isLoading ? null : profiles.length === 0 ? (
-        <EmptyState
-          icon={<UserRoundPlus className="h-6 w-6" />}
-          title="No profiles yet"
-          body="Create up to three profiles to showcase different roles you can do."
-          action={<Button asChild><Link to="/applicant/profiles/new"><Plus className="h-4 w-4" /> Create a Profile</Link></Button>}
-        />
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {profiles.map((p) => (
-            <Link key={p.id} to="/applicant/profiles/$id/edit" params={{ id: p.id }} className="group rounded-2xl border bg-card p-5 transition-shadow hover:shadow-elevated">
-              <Badge variant={p.status === "published" ? "default" : "secondary"}>{p.status === "published" ? "Published" : "Draft"}</Badge>
-              <p className="mt-3 font-display font-semibold">{p.role_title}</p>
-              <p className="mt-1 text-sm text-muted-foreground">${Number(p.hourly_rate).toFixed(2)}/hr</p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">Edit <ArrowRight className="h-3.5 w-3.5" /></span>
-            </Link>
-          ))}
+      <PageHeader title={`Welcome${profile?.name ? `, ${profile.name}` : ""}.`} />
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-display text-lg font-semibold">Recently posted jobs</h2>
+          <Link to="/applicant/jobs" className="text-sm font-medium text-primary hover:underline">View all</Link>
         </div>
-      )}
-      {full && <p className="mt-4 text-sm text-muted-foreground">You’ve reached the 3 profile limit.</p>}
-      {recent.length > 0 && (
-        <section className="mt-10">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold">Recently posted jobs</h2>
-            <Link to="/applicant/jobs" className="text-sm font-medium text-primary hover:underline">View all</Link>
-          </div>
+        {recent.length === 0 ? (
+          <EmptyState icon={<Briefcase className="h-6 w-6" />} title="No open jobs yet" body="Job posts that clients publish will appear here." />
+        ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {recent.map((j) => {
               const facts = [
@@ -102,8 +63,31 @@ function Page() {
               );
             })}
           </div>
-        </section>
-      )}
+        )}
+      </section>
+      <section className="mt-10">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-display text-lg font-semibold">Your applications</h2>
+          {apps.length > 0 && (
+            <Link to="/applicant/applications" className="text-sm font-medium text-primary hover:underline">View all</Link>
+          )}
+        </div>
+        {recentApps.length === 0 ? (
+          <EmptyState icon={<Briefcase className="h-6 w-6" />} title="No applications yet" body="Browse the open jobs and apply with one of your profiles." action={<Button asChild><Link to="/applicant/jobs">Browse jobs</Link></Button>} />
+        ) : (
+          <div className="divide-y rounded-xl border bg-card">
+            {recentApps.map((a) => (
+              <Link key={a.id} to="/applicant/jobs/$id" params={{ id: a.job_id }} className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-muted/50">
+                <div className="min-w-0">
+                  <p className="truncate font-semibold leading-snug">{a.job_title}</p>
+                  <p className="mt-0.5 truncate text-sm text-muted-foreground">{a.role_title} · {postedAgo(a.created_at)}</p>
+                </div>
+                <Badge className={ApplicationStatusClass(a.status)}>{APPLICATION_STATUS_LABEL[a.status] ?? a.status}</Badge>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
     </>
   );
 }
