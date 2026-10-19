@@ -9,7 +9,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { jobsQuery } from "@/routes/applicant/jobs";
 import { EMPLOYMENT_LABEL, formatHours, formatRate, postedAgo } from "@/lib/jobFormat";
-import type { Job } from "@/lib/jobTypes";
+
+type Job = {
+  id: string;
+  title: string;
+  description: string;
+  created_at: string;
+  employment_type: string | null;
+  rate_min: number | null;
+  rate_max: number | null;
+  hours_min: number | null;
+  hours_max: number | null;
+  portfolio_required: boolean;
+};
 
 export const Route = createFileRoute("/applicant/dashboard")({
   validateSearch: (search) => ({ q: typeof search.q === "string" ? search.q : undefined }),
