@@ -12,6 +12,7 @@ import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { publishErrors } from "@/components/CandidateFields";
 
 export const Route = createFileRoute("/applicant/profiles/")({
   head: () => ({ meta: [{ title: "Your Profiles — TalentHub" }, { name: "robots", content: "noindex" }] }),
@@ -29,10 +30,27 @@ function Page() {
 
   const toggle = useMutation({
     mutationFn: async ({ id, publish }: { id: string; publish: boolean }) => {
+      if (publish) {
+        const profile = profiles.find((p) => p.id === id);
+        if (!profile) throw new Error("Profile not found.");
+        if (!cv) throw new Error("Upload your CV in Settings before publishing.");
+        const missing = publishErrors({
+          years: profile.years_experience == null ? "" : String(profile.years_experience),
+          pastTitles: profile.past_titles ?? [], industries: profile.industries ?? [],
+          highlights: profile.highlights ?? [], tools: profile.tools ?? [], education: profile.education ?? [],
+          skills: profile.skills ?? [], availability: profile.availability_list ?? [],
+          hours: profile.hours_per_week == null ? "" : String(profile.hours_per_week),
+          timeZones: profile.time_zones ?? [], startAvailability: profile.start_availability ?? "",
+        });
+        if (missing.length) throw new Error("To publish, please add: " + missing.join(", ") + ".");
+      }
       const { error } = await supabase.from("applicant_profiles").update({ status: publish ? "published" : "draft" }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: key }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: key });
+      await qc.invalidateQueries({ queryKey: ["my-published-profiles"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 

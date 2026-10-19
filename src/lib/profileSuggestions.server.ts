@@ -2,6 +2,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { jsonSchema, Output, streamText } from "ai";
 import { createLovableAiGatewayRunIdFetch } from "@/lib/ai/run-id";
 import { SKILL_OPTIONS } from "@/lib/skills";
+import { assertCvSize } from "@/lib/cvLimits";
 
 const MODEL = "openai/gpt-6-astra";
 const GATEWAY = "https://ai.gateway.lovable.dev/v1";
@@ -12,6 +13,7 @@ function decodeXml(s: string) {
 }
 
 export async function extractCvText(file: Blob, path: string): Promise<string> {
+  assertCvSize(file.size);
   const buf = new Uint8Array(await file.arrayBuffer());
   let text = "";
   if (path.toLowerCase().endsWith(".pdf")) {

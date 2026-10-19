@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { MessageApplicantButton } from "@/components/MessageApplicantButton";
 import { IntroVideoButton } from "@/components/IntroVideoButton";
 import { VoiceIntroButton } from "@/components/VoiceIntroButton";
+import { myJobPosts } from "@/lib/client";
 
 export const Route = createFileRoute("/client/applications")({
   head: () => ({ meta: [{ title: "Applications — TalentHub" }, { name: "robots", content: "noindex" }] }),
@@ -58,6 +59,8 @@ function appliedDate(iso: string) {
 }
 
 function ClientApplicationsPage() {
+  const { user } = Route.useRouteContext();
+  const { data: ownJobs = [] } = useQuery(myJobPosts(user.id));
   const { data } = useSuspenseQuery(incomingApplications);
   const { data: formats } = useQuery({
     queryKey: ["incoming-application-profiles"],
@@ -87,8 +90,9 @@ function ClientApplicationsPage() {
   const [jobFilter, setJobFilter] = useState(Route.useSearch().job ?? "all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selected, setSelected] = useState<string | undefined>();
+  const [mobilePreview, setMobilePreview] = useState(false);
 
-  const jobs = useMemo(() => Array.from(new Map(data.map((a) => [a.job_id, a.job_title])).entries()), [data]);
+  const jobs = useMemo(() => Array.from(new Map([...ownJobs.map((j) => [j.id, j.title] as const), ...data.map((a) => [a.job_id, a.job_title] as const)]).entries()), [data, ownJobs]);
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: 0, pending: 0, contacted: 0, shortlisted: 0, rejected: 0 };
     for (const a of jobFilter === "all" ? data : data.filter((x) => x.job_id === jobFilter)) {
@@ -111,7 +115,7 @@ function ClientApplicationsPage() {
       if (selected !== undefined) setSelected(undefined);
       return;
     }
-    if (!selected || !shown.some((a) => a.id === selected)) setSelected(shown[0]!.id);
+    if (!selected || !shown.some((a) => a.id === selected)) setSelected(shown[0]?.id);
   }, [shown, selected]);
 
   const current = shown.find((a) => a.id === selected);
@@ -131,7 +135,7 @@ function ClientApplicationsPage() {
       ) : (
         <>
           <div className="mb-4 flex flex-wrap items-center gap-3">
-            <Select value={jobFilter} onValueChange={setJobFilter}>
+            <Select value={jobFilter} onValueChange={(value) => { setJobFilter(value); setSelected(undefined); setMobilePreview(false); }}>
               <SelectTrigger className="w-60" aria-label="Filter by job"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All jobs</SelectItem>
@@ -142,7 +146,7 @@ function ClientApplicationsPage() {
               {(["all", ...STATUS_ORDER] as const).map((s) => (
                 <button
                   key={s}
-                  onClick={() => setStatusFilter(s)}
+                  onClick={() => { setStatusFilter(s); setSelected(undefined); setMobilePreview(false); }}
                   className={cn(
                     "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
                     statusFilter === s ? "border-accent bg-accent text-accent-foreground" : "bg-card text-muted-foreground hover:bg-muted",
@@ -155,14 +159,14 @@ function ClientApplicationsPage() {
           </div>
 
           <div className="flex min-h-[420px] overflow-hidden rounded-2xl border bg-card">
-            <aside className={cn("w-full shrink-0 overflow-y-auto border-r md:block md:w-[260px]", current && "hidden")}>
+            <aside className={cn("w-full shrink-0 overflow-y-auto border-r md:block md:w-[260px]", mobilePreview && current && "hidden")}>
               {shown.length === 0 ? (
                 <p className="p-4 text-sm text-muted-foreground">No applications match these filters.</p>
               ) : (
                 shown.map((a) => (
                   <button
                     key={a.id}
-                    onClick={() => setSelected(a.id)}
+                    onClick={() => { setSelected(a.id); setMobilePreview(true); }}
                     className={cn("flex w-full flex-col gap-0.5 border-b px-4 py-3 text-left transition-colors hover:bg-muted", a.id === selected && "bg-secondary")}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -187,7 +191,8 @@ function ClientApplicationsPage() {
                 format={formats?.[current.id]}
                 videoPath={videos?.[current.id]}
                 voice={voices?.[current.id]}
-                onBack={() => setSelected(undefined)}
+                mobilePreview={mobilePreview}
+                onBack={() => setMobilePreview(false)}
                 onSetStatus={setStatus}
               />
             ) : (
@@ -207,6 +212,7 @@ function Preview({
   format,
   videoPath,
   voice,
+  mobilePreview,
   onBack,
   onSetStatus,
 }: {
@@ -214,11 +220,12 @@ function Preview({
   format: ProfileFormat | undefined;
   videoPath: string | undefined;
   voice: { voice_path: string | null; voice_link: string | null } | undefined;
+  mobilePreview: boolean;
   onBack: () => void;
   onSetStatus: (id: string, status: string) => void;
 }) {
   return (
-    <section className="flex min-w-0 flex-1 flex-col overflow-y-auto p-5">
+    <section className={cn("min-w-0 flex-1 flex-col overflow-y-auto p-5 md:flex", mobilePreview ? "flex" : "hidden")}>
       <div className="mb-3 flex items-center gap-2">
         <Button variant="ghost" size="icon" className="md:hidden" onClick={onBack} aria-label="Back to applications">
           <ArrowLeft className="h-4 w-4" />
@@ -228,7 +235,7 @@ function Preview({
         </p>
       </div>
 
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
         <StandardProfile
           className="min-w-0"
           data={{
