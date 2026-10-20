@@ -11,3 +11,5 @@
 - [x] Admin dashboard: all applicants/clients, exports with CVs, analytics, role sorting + counts
 - [ ] Real pricing numbers for /client/pricing (placeholders now)
 - [x] Profiles list "Publish" switch applies the same required-field rules as the form, with database enforcement on publication transitions.
+
+- [ ] Email client on new applicant; email recipient on new message (applicant and client) — waiting on sender domain setup
