@@ -291,6 +291,7 @@ export type Database = {
           hours_min: number | null
           hours_per_week: number | null
           id: string
+          moderation_status: string
           must_have_tools: string[] | null
           owner_id: string
           portfolio_required: boolean
@@ -312,6 +313,7 @@ export type Database = {
           hours_min?: number | null
           hours_per_week?: number | null
           id?: string
+          moderation_status?: string
           must_have_tools?: string[] | null
           owner_id?: string
           portfolio_required?: boolean
@@ -333,6 +335,7 @@ export type Database = {
           hours_min?: number | null
           hours_per_week?: number | null
           id?: string
+          moderation_status?: string
           must_have_tools?: string[] | null
           owner_id?: string
           portfolio_required?: boolean
@@ -555,6 +558,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_job: { Args: { _id: string }; Returns: undefined }
       admin_list_users: {
         Args: never
         Returns: {
@@ -565,6 +569,10 @@ export type Database = {
           phone: string
           role: Database["public"]["Enums"]["app_role"]
         }[]
+      }
+      admin_moderate_job: {
+        Args: { _id: string; _status: string }
+        Returns: undefined
       }
       apply_to_job: {
         Args: {
