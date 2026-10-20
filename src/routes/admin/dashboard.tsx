@@ -26,6 +26,7 @@ import {
 } from "@/lib/admin";
 import { JOB_STATUS_LABEL } from "@/lib/client";
 import { AdminAnalytics } from "@/components/AdminAnalytics";
+import { AdminJobPosts } from "@/components/AdminJobPosts";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [{ title: "Admin Dashboard — TalentHub" }, { name: "description", content: "Admin Dashboard for your TalentHub remote talent marketplace account." }, { property: "og:title", content: "Admin Dashboard — TalentHub" }, { property: "og:description", content: "Admin Dashboard for your TalentHub remote talent marketplace account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
@@ -186,6 +187,8 @@ function Page() {
           </Table>
         </div>
       </section>
+
+      <AdminJobPosts data={data} />
 
       <section>
         <h2 className="mb-3 font-display text-lg font-semibold">Applicants and clients in detail</h2>
