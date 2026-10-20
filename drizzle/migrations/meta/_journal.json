@@ -246,6 +246,13 @@
       "when": 1792429916795,
       "tag": "0034_audit_function_access_and_profile_publishing",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1792522184904,
+      "tag": "0035_admin_job_moderation",
+      "breakpoints": true
     }
   ]
 }
