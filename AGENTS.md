@@ -30,3 +30,4 @@
 - CV byte limits are shared by browser uploads and server parsing, preventing oversized files from reaching document extraction.
 - Privileged public-schema functions deny anonymous execution; trigger-only functions also deny authenticated execution, reducing unnecessary callable endpoints.
 - Transitive security patches use package overrides, keeping fixes in every dependency path rather than adding unused direct packages.
+- Job moderation (pending/approved/flagged) is changed only via admin RPCs; a trigger stops clients editing it, and flagged jobs are excluded inside the applicant job RPCs so hiding can't be bypassed.
