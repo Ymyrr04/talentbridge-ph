@@ -13,3 +13,4 @@
 - [x] Profiles list "Publish" switch applies the same required-field rules as the form, with database enforcement on publication transitions.
 
 - [ ] Email client on new applicant; email recipient on new message (applicant and client) — waiting on sender domain setup
+- [ ] Summarize all admins' Markbot questions and usage — locate accessible Markbot records.
